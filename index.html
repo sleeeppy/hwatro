@@ -95,8 +95,8 @@
   #playresult .r-formula { font-size: 13px; color: #e2e8f0; }
   #playresult .r-formula .c { color: var(--chip-blue); font-weight: 800; }
   #playresult .r-formula .m { color: var(--mult-red); font-weight: 800; }
-  #playresult .r-score { font-size: 26px; font-weight: 900; color: #fff; animation: pop .45s ease; }
-  @keyframes pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
+  #playresult .r-score { font-size: 26px; font-weight: 900; color: #fff; }
+  /* pop 애니 제거: 카드 선택 시 render가 DOM을 다시 그리며 반복 재생되던 버그 방지 */
 
   #handarea { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 116px; }
   #actions { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
@@ -256,6 +256,143 @@
   }
   .shake { animation: shake .3s ease; }
   @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+  /* ── 주스 연출 ────────────────────────── */
+  #juice-root {
+    position: fixed; inset: 0; z-index: 55; pointer-events: none;
+  }
+  #juice-root.skipable { pointer-events: auto; cursor: pointer; }
+  body.juicing #actions button { pointer-events: none; opacity: .45; }
+  body.screen-shake { animation: screenShake .42s ease; }
+  @keyframes screenShake {
+    0%,100% { transform: translate(0,0); }
+    15% { transform: translate(-7px, 3px); }
+    30% { transform: translate(8px, -4px); }
+    45% { transform: translate(-5px, -2px); }
+    60% { transform: translate(6px, 3px); }
+    75% { transform: translate(-3px, 1px); }
+  }
+  body.punch #main { animation: punchScale .38s ease; }
+  @keyframes punchScale {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.035); }
+    100% { transform: scale(1); }
+  }
+  #playedarea.juice-stage {
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; min-height: 220px; border-style: solid;
+    border-color: rgba(232,205,122,.35); background: rgba(0,0,0,.18);
+  }
+  #juice-cards { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 98px; align-items: flex-end; }
+  #juice-cards .juice-card-wrap {
+    position: relative; opacity: 0; transform: translateY(28px) scale(.55);
+    transition: none;
+  }
+  #juice-cards .juice-card-wrap.show {
+    opacity: 1; transform: translateY(0) scale(1);
+    animation: cardPop .38s cubic-bezier(.2,1.4,.4,1) both;
+  }
+  @keyframes cardPop {
+    0% { transform: translateY(36px) scale(.4); opacity: 0; }
+    70% { transform: translateY(-6px) scale(1.08); opacity: 1; }
+    100% { transform: translateY(0) scale(1); }
+  }
+  #juice-cards .chip-float {
+    position: absolute; left: 50%; top: -8px; transform: translate(-50%,-100%);
+    font-size: 18px; font-weight: 900; color: var(--chip-blue);
+    text-shadow: 0 2px 8px rgba(0,0,0,.65), 0 0 12px rgba(96,165,250,.55);
+    opacity: 0; pointer-events: none; white-space: nowrap;
+  }
+  #juice-cards .chip-float.go {
+    animation: chipFloat .7s ease forwards;
+  }
+  #juice-cards .chip-float.flat { color: #94a3b8; text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+  @keyframes chipFloat {
+    0% { opacity: 0; transform: translate(-50%,-70%) scale(.6); }
+    25% { opacity: 1; transform: translate(-50%,-110%) scale(1.25); }
+    100% { opacity: 0; transform: translate(-50%,-160%) scale(1); }
+  }
+  #juice-tally {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    flex-wrap: wrap; min-height: 42px; font-weight: 900;
+  }
+  #juice-tally .jt-chips { font-size: 28px; color: var(--chip-blue); min-width: 3ch; text-align: right; }
+  #juice-tally .jt-times { font-size: 22px; color: #94a3b8; opacity: 0; transform: scale(.5); }
+  #juice-tally .jt-times.on { opacity: 1; transform: scale(1); transition: transform .25s cubic-bezier(.2,1.6,.4,1), opacity .15s; }
+  #juice-tally .jt-mult {
+    font-size: 28px; color: var(--mult-red); min-width: 2.5ch; opacity: 0;
+    transform: scale(2.4) rotate(-8deg); filter: blur(2px);
+  }
+  #juice-tally .jt-mult.slam {
+    opacity: 1; transform: scale(1) rotate(0); filter: blur(0);
+    transition: transform .32s cubic-bezier(.15,1.5,.4,1), opacity .12s, filter .2s;
+  }
+  #juice-tally .jt-eq { font-size: 22px; color: #94a3b8; opacity: 0; }
+  #juice-tally .jt-eq.on { opacity: 1; }
+  #juice-tally .jt-score {
+    font-size: 34px; color: #fff; min-width: 4ch; text-align: left;
+    opacity: 0; text-shadow: 0 0 18px rgba(255,255,255,.25);
+  }
+  #juice-tally .jt-score.on { opacity: 1; }
+  #juice-tally .jt-score.punch { animation: scorePunch .45s ease; }
+  @keyframes scorePunch {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.28); }
+    100% { transform: scale(1); }
+  }
+  #juice-tally .jt-flat {
+    width: 100%; text-align: center; font-size: 13px; color: #94a3b8;
+    opacity: 0; margin-top: -4px;
+  }
+  #juice-tally .jt-flat.on { opacity: 1; }
+  #hand-banner {
+    position: fixed; left: 50%; top: 120px; transform: translate(-50%, -50%) scale(.3);
+    z-index: 60; font-size: clamp(26px, 5.5vw, 48px); font-weight: 900;
+    letter-spacing: 2px; opacity: 0; pointer-events: none; white-space: nowrap;
+    text-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 40px rgba(0,0,0,.5);
+  }
+  #hand-banner.show {
+    animation: bannerSlam .55s cubic-bezier(.15,1.5,.35,1) forwards;
+  }
+  #hand-banner.hide {
+    animation: bannerOut .35s ease forwards;
+  }
+  @keyframes bannerSlam {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(2.2) rotate(-4deg); filter: blur(4px); }
+    55% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(1deg); filter: blur(0); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+  }
+  @keyframes bannerOut {
+    to { opacity: 0; transform: translate(-50%, -70%) scale(1.1); }
+  }
+  #hand-banner.tier-S { color: #fde68a; text-shadow: 0 0 28px rgba(251,191,36,.7), 0 4px 0 #78350f; }
+  #hand-banner.tier-A { color: #fca5a5; text-shadow: 0 0 24px rgba(248,113,113,.55), 0 4px 0 #7f1d1d; }
+  #hand-banner.tier-B { color: #fdba74; text-shadow: 0 0 20px rgba(251,146,60,.45), 0 3px 0 #9a3412; }
+  #hand-banner.tier-C { color: #93c5fd; text-shadow: 0 0 16px rgba(96,165,250,.4), 0 3px 0 #1e3a8a; }
+  #hand-banner.tier-D { color: #cbd5e1; text-shadow: 0 2px 0 #334155; }
+  #gauge.overflow { box-shadow: 0 0 0 2px #fde68a, 0 0 18px rgba(250,204,21,.75); }
+  #gauge-fill.overflow {
+    background: linear-gradient(90deg, #fbbf24, #f472b6, #a3e635) !important;
+    animation: gaugeFlash .55s ease;
+  }
+  @keyframes gaugeFlash {
+    0%,100% { filter: brightness(1); }
+    40% { filter: brightness(1.7); }
+  }
+  .coin-particle {
+    position: fixed; z-index: 70; font-size: 16px; pointer-events: none;
+    animation: coinFly .85s ease forwards;
+  }
+  @keyframes coinFly {
+    0% { opacity: 1; transform: translate(0,0) scale(1) rotate(0); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.4) rotate(120deg); }
+  }
+  #juice-skip-hint {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 61; font-size: 11px; color: rgba(255,255,255,.45); opacity: 0;
+    transition: opacity .3s; pointer-events: none;
+  }
+  #juice-root.skipable #juice-skip-hint { opacity: 1; }
 </style>
 </head>
 <body>
@@ -331,6 +468,11 @@
 
 <div id="modal-overlay"><div id="modal"></div></div>
 
+<div id="juice-root">
+  <div id="hand-banner"></div>
+  <div id="juice-skip-hint">클릭하면 연출 스킵</div>
+</div>
+
 <script>
 /* ================================================================
    ==== ENGINE START ==== (순수 로직 — DOM 접근 없음, Node 테스트 가능)
@@ -391,7 +533,7 @@ function buildDeck() {
   return d;
 }
 
-const CHIP = { kwang: 15, yeol: 10, tti: 8, ssangpi: 6, pi: 3 };
+const CHIP = { kwang: 12, yeol: 8, tti: 6, ssangpi: 5, pi: 2 };
 const effType = (c) => (c.tags.includes('dual') && c.asPi) ? 'ssangpi' : c.type;
 const baseChip = (c) => CHIP[effType(c)];
 
@@ -415,34 +557,56 @@ const HAND_BY_ID = Object.fromEntries(HANDS.map((h) => [h.id, h]));
 
 // 12판 = 1월(송학) → 12월(비). 3·6·9·12월(환절기)은 박 라운드.
 const ROUNDS = 12;
-const TARGETS = [320, 480, 660, 880, 1150, 1500, 2000, 2600, 3400, 4400, 5700, 7400];
+const TARGETS = [290, 430, 590, 790, 1030, 1350, 1800, 2350, 3050, 3950, 5100, 6600];
 const BOSS_ROUNDS = [3, 6, 9, 12];
 const MILD_BOSSES = ['pibak', 'gwangbak', 'meongbak'];
 // 고 무제한: n고 = 목표 ×(1+0.5n), 성공 보너스 n(n+3)냥 (4, 10, 18, 28, 40…)
 const goMult = (n) => 1 + 0.5 * n;
 const goBonus = (n) => n * (n + 3);
+// n고 목표: 기본 공식과 "현재 점수 + 기본 목표의 25%" 중 큰 쪽.
+// 항상 현재 점수보다 크므로 고 선언 즉시 다음 단계가 충족되는 연쇄 고는 발생 불가.
+const goTarget = (base, n, score) => Math.max(Math.ceil(base * goMult(n)), score + Math.ceil(base * 0.25));
 
 // ── 족보 판정 (고정 우선순위, 첫 매치) ─────────────────────
-function detectHand(cards) {
+// core = 족보를 구성한 카드들 — 이 카드들의 칩만 배수를 타고, 나머지는 배수 없이 가산.
+function detectHandInfo(cards) {
   const kw = cards.filter((c) => c.type === 'kwang');
-  const monthCount = {};
-  for (const c of cards) monthCount[c.month] = (monthCount[c.month] || 0) + 1;
-  const maxMonth = Math.max(0, ...Object.values(monthCount));
+  const byMonth = {};
+  for (const c of cards) (byMonth[c.month] = byMonth[c.month] || []).push(c);
+  const monthGroups = Object.values(byMonth).sort((a, b) => b.length - a.length);
+  const maxMonth = monthGroups.length ? monthGroups[0].length : 0;
 
-  if (kw.length === 5) return 'ogwang';
-  if (kw.length === 4) return 'sagwang';
-  if (maxMonth >= 4) return 'chongtong';
-  if (cards.filter((c) => c.tags.includes('godori')).length === 3) return 'godori';
-  if (kw.length === 3) return kw.some((c) => c.tags.includes('bikwang')) ? 'bisamgwang' : 'samgwang';
-  for (const t of ['hongdan', 'cheongdan', 'chodan'])
-    if (cards.filter((c) => c.tags.includes(t)).length === 3) return 'dan';
-  if (maxMonth >= 3) return 'month3';
-  if (cards.filter((c) => effType(c) === 'yeol').length >= 3) return 'yeol3';
-  if (cards.filter((c) => c.type === 'tti').length >= 3) return 'tti3';
-  if (cards.length === 5 && cards.every((c) => ['pi', 'ssangpi'].includes(effType(c)))) return 'pi5';
-  if (maxMonth >= 2) return 'month2';
-  return 'none';
+  if (kw.length === 5) return { handId: 'ogwang', core: kw };
+  if (kw.length === 4) return { handId: 'sagwang', core: kw };
+  if (maxMonth >= 4) return { handId: 'chongtong', core: monthGroups[0] };
+  const birds = cards.filter((c) => c.tags.includes('godori'));
+  if (birds.length === 3) return { handId: 'godori', core: birds };
+  if (kw.length === 3)
+    return { handId: kw.some((c) => c.tags.includes('bikwang')) ? 'bisamgwang' : 'samgwang', core: kw };
+  for (const t of ['hongdan', 'cheongdan', 'chodan']) {
+    const set = cards.filter((c) => c.tags.includes(t));
+    if (set.length === 3) return { handId: 'dan', core: set };
+  }
+  if (maxMonth >= 3) return { handId: 'month3', core: monthGroups[0] };
+  const yeol = cards.filter((c) => effType(c) === 'yeol');
+  if (yeol.length >= 3) return { handId: 'yeol3', core: yeol };
+  const tti = cards.filter((c) => c.type === 'tti');
+  if (tti.length >= 3) return { handId: 'tti3', core: tti };
+  if (cards.length === 5 && cards.every((c) => ['pi', 'ssangpi'].includes(effType(c))))
+    return { handId: 'pi5', core: [...cards] };
+  if (maxMonth >= 2) {
+    // 짝이 여럿이면 기본칩 합이 높은 쪽을 족보 코어로 (플레이어에게 유리하게, 결정적)
+    let best = null, bestSum = -1;
+    for (const g of monthGroups) {
+      if (g.length < 2) continue;
+      const s = g.reduce((a, c) => a + baseChip(c), 0);
+      if (s > bestSum) { bestSum = s; best = g; }
+    }
+    return { handId: 'month2', core: best };
+  }
+  return { handId: 'none', core: [...cards] };
 }
+function detectHand(cards) { return detectHandInfo(cards).handId; }
 
 // ── 특수패 12종 ────────────────────────────────────────────
 // 훅 ctx: { cards, handId, boss, mitjangChips }
@@ -506,8 +670,8 @@ function cardChip(c, env) {
   let chip = baseChip(c);
   const t = effType(c);
   if (env.seasonMonth && c.month === env.seasonMonth) chip *= 2;          // 이달의 패
-  if (env.night === false && (t === 'kwang' || t === 'yeol')) chip += 3;  // 낮: 광·열끗
-  if (env.night === true && (t === 'tti' || t === 'ssangpi' || t === 'pi')) chip += 3; // 밤: 띠·피
+  if (env.night === false && (t === 'kwang' || t === 'yeol')) chip += 2;  // 낮: 광·열끗
+  if (env.night === true && (t === 'tti' || t === 'ssangpi' || t === 'pi')) chip += 2; // 밤: 띠·피
   if (!env.jokerIds.includes('pibak_boheom')) {
     if (env.boss === 'pibak' && (t === 'pi' || t === 'ssangpi')) chip = 0;
     if (env.boss === 'gwangbak' && t === 'kwang') chip = 0;
@@ -517,15 +681,24 @@ function cardChip(c, env) {
 }
 
 // ── 점수 계산 (순수 함수 — 프리뷰와 실정산이 공유) ─────────
-// 반환: { handId, chips, mult, score, kwangPlayed }
+// 족보 구성(core) 카드 칩만 배수를 타고, 나머지 카드 칩(flat)은 배수 없이 가산.
+// 반환: { handId, chips, mult, flat, score, kwangPlayed }
 function computeScore(cards, env) {
-  let handId = detectHand(cards);
-  if (env.boss === 'no_shake' && ['month2', 'month3', 'chongtong'].includes(handId)) handId = 'none';
+  let { handId, core } = detectHandInfo(cards);
+  if (env.boss === 'no_shake' && ['month2', 'month3', 'chongtong'].includes(handId)) {
+    handId = 'none';
+    core = [...cards]; // 무조합 강등 시엔 전부 코어 (배수 1이라 결과 동일)
+  }
   const hd = HAND_BY_ID[handId];
   let chips = hd.chips;
   let mult = hd.mult;
+  let flat = 0;
 
-  for (const c of cards) chips += cardChip(c, env);
+  const coreSet = new Set(core);
+  for (const c of cards) {
+    const v = cardChip(c, env);
+    if (coreSet.has(c)) chips += v; else flat += v;
+  }
 
   const ctx = { cards, handId, boss: env.boss, mitjangChips: env.mitjangChips };
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addChips) chips += j.addChips(ctx); }
@@ -533,8 +706,8 @@ function computeScore(cards, env) {
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.xMult)    mult  *= j.xMult(ctx); }
 
   return {
-    handId, chips, mult,
-    score: Math.floor(chips * mult),
+    handId, chips, mult, flat,
+    score: Math.floor(chips * mult + flat),
     kwangPlayed: cards.filter((c) => c.type === 'kwang').length,
   };
 }
@@ -601,7 +774,8 @@ const state = {
   mitjangChips: 0,
   makgeolli: 0,         // 막걸리 보유 병 수 (최대 3)
   drunk: false,         // 이번 판 춘향이 훈수 활성화 여부
-  lastPlay: null,       // { cards 스냅샷, result }
+  lastPlay: null,       // { cards 스냅샷, result, scoreBefore }
+  juicing: false,       // 연출 중 입력 잠금 (중간값은 state에 안 넣음)
   playLog: [],
   settleData: null,
   gameOverReason: '',
@@ -621,7 +795,10 @@ const scoreEnv = () => ({
 
 function addMoney(n) {
   state.money += n;
-  if (n > 0) state.stats.totalEarned += n;
+  if (n > 0) {
+    state.stats.totalEarned += n;
+    spawnCoinParticles(n);
+  }
 }
 
 // ── 판 진행 ────────────────────────────────────────────────
@@ -689,7 +866,7 @@ function selectedCards() {
 }
 
 function toggleSelect(uid) {
-  if (state.screen !== 'play') return;
+  if (state.screen !== 'play' || state.juicing) return;
   const i = state.selected.indexOf(uid);
   if (i >= 0) state.selected.splice(i, 1);
   else {
@@ -700,7 +877,7 @@ function toggleSelect(uid) {
 }
 
 function toggleGukjin() {
-  if (state.screen !== 'play') return;
+  if (state.screen !== 'play' || state.juicing) return;
   const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
   if (!g) return;
   g.asPi = !g.asPi;
@@ -709,7 +886,7 @@ function toggleGukjin() {
 
 // ── 내기 ───────────────────────────────────────────────────
 function playSelected() {
-  if (state.screen !== 'play') return;
+  if (state.screen !== 'play' || state.juicing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.playsLeft <= 0) return;
 
@@ -727,7 +904,9 @@ function playSelected() {
     }
   }
 
-  const result = computeScore(cards, scoreEnv());
+  const env = scoreEnv();
+  const result = computeScore(cards, env);
+  const scoreBefore = state.roundScore;
 
   // 경제 트리거 (실정산에서만)
   if (hasJoker('gwangpari') && result.kwangPlayed > 0) {
@@ -743,17 +922,28 @@ function playSelected() {
   state.playsLeft--;
   state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
 
-  // 낸 패 스냅샷 (국진 모드 포함)
+  // 낸 패 스냅샷 (국진 모드 포함) — 연출은 이 스냅샷만 재생
   state.lastPlay = {
     cards: cards.map((c) => ({ ...c, tags: [...c.tags] })),
     result,
+    scoreBefore,
+    env: { ...env, jokerIds: [...env.jokerIds] },
   };
 
   state.hand = state.hand.filter((c) => !state.selected.includes(c.uid));
   state.selected = [];
   refillHand();
-  checkAfterPlay();
+
+  // 고/스톱·게임오버는 연출 끝난 뒤에 (모달 중첩·조기 전환 방지)
+  state.juicing = true;
+  document.body.classList.add('juicing');
   render();
+  playJuiceSequence(state.lastPlay).then(() => {
+    state.juicing = false;
+    document.body.classList.remove('juicing');
+    checkAfterPlay();
+    render();
+  });
 }
 
 function checkAfterPlay() {
@@ -769,9 +959,9 @@ function checkAfterPlay() {
 function chooseGo() {
   if (state.screen !== 'gostop') return;
   state.goLevel++;
-  state.target = Math.ceil(state.baseTarget * goMult(state.goLevel));
+  state.target = goTarget(state.baseTarget, state.goLevel, state.roundScore);
   state.screen = 'play';
-  checkAfterPlay(); // 연쇄 고: 이미 새 목표를 넘었으면 즉시 재판정
+  checkAfterPlay(); // goTarget이 항상 현재 점수보다 크므로 즉시 재진입은 없음 (방어적 재판정)
   render();
 }
 
@@ -783,7 +973,7 @@ function chooseStop() {
 
 // ── 버리기 ─────────────────────────────────────────────────
 function discardSelected() {
-  if (state.screen !== 'play') return;
+  if (state.screen !== 'play' || state.juicing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.discardsLeft <= 0) return;
   state.discardsLeft--;
@@ -903,7 +1093,7 @@ function restart() {
     selected: [], jokers: [], money: 4, boss: null, usedBosses: [],
     nextBoss: null, bossCandidates: null, shopOffers: [], rerollCost: 2,
     kwangSoldThisRound: 0, mitjangChips: 0, makgeolli: 0, drunk: false,
-    lastPlay: null, playLog: [],
+    lastPlay: null, juicing: false, playLog: [],
     settleData: null, gameOverReason: '',
     stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
   });
@@ -1036,7 +1226,10 @@ function renderChunhyang() {
   const hint = chunhyangHint();
   const face = $('ch-face');
   const bubble = $('ch-bubble');
-  if (hint) {
+  if (state.tempReact && Date.now() < state.tempReact.expires) {
+    face.textContent = state.tempReact.mood;
+    bubble.textContent = state.tempReact.text;
+  } else if (hint) {
     face.textContent = hint.mood;
     bubble.textContent = hint.text;
   } else if (state.drunk) {
@@ -1077,7 +1270,7 @@ function renderSide() {
   $('roundlabel').innerHTML = `${M.flower} ${state.round}월 · ${M.name} ${isNight() ? '🌙' : '☀️'}` +
     ` <span style="color:#94a3b8;font-size:11px">(판 ${state.round}/${ROUNDS})</span>${bossTag}`;
   $('seasonline').innerHTML = `이달의 패: <b style="color:#fde68a">${state.round}월 카드 칩 ×2</b><br>` +
-    (isNight() ? '밤 🌙 — 띠·피·쌍피 칩 +3' : '낮 ☀️ — 광·열끗 칩 +3');
+    (isNight() ? '밤 🌙 — 띠·피·쌍피 칩 +2' : '낮 ☀️ — 광·열끗 칩 +2');
 
   const bb = $('bossbanner');
   if (state.boss) {
@@ -1088,8 +1281,14 @@ function renderSide() {
   } else bb.style.display = 'none';
 
   $('target-val').textContent = fmt(state.target);
-  $('score-val').textContent = fmt(state.roundScore);
-  $('gauge-fill').style.width = Math.min(100, (state.roundScore / state.target) * 100) + '%';
+  // 연출 중엔 사이드 점수를 연출 시작값으로 두고, juice가 DOM을 직접 롤업
+  const displayScore = (state.juicing && state.lastPlay)
+    ? state.lastPlay.scoreBefore
+    : state.roundScore;
+  $('score-val').textContent = fmt(displayScore);
+  $('gauge-fill').style.width = Math.min(100, (displayScore / state.target) * 100) + '%';
+  $('gauge-fill').classList.remove('overflow');
+  $('gauge').classList.remove('overflow');
 
   const gl = $('golevel');
   if (state.goLevel > 0) {
@@ -1108,7 +1307,7 @@ function renderSide() {
     const r = computeScore(sel, scoreEnv());
     pv.innerHTML = `
       <div class="pv-hand">${HAND_BY_ID[r.handId].name}</div>
-      <div class="pv-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span></div>
+      <div class="pv-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span>${r.flat ? ` + ${fmt(r.flat)}` : ''}</div>
       <div class="pv-score">= ${fmt(r.score)}점</div>`;
   }
 
@@ -1129,30 +1328,41 @@ function renderSide() {
 
 function renderTable() {
   const pa = $('playedarea');
-  if (state.lastPlay) {
+  if (state.juicing) {
+    // playedarea는 juice 시퀀스가 소유 — 손패·버튼만 갱신
+  } else if (state.lastPlay) {
+    // 카드 선택마다 innerHTML을 다시 그리면 점수 애니/깜빡임이 반복되므로 시그니처로 스킵
     const r = state.lastPlay.result;
-    pa.innerHTML =
-      state.lastPlay.cards.map((c) => cardHTML(c, { reveal: true })).join('') +
-      `<div id="playresult">
-        <div class="r-hand">${HAND_BY_ID[r.handId].name}</div>
-        <div class="r-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span></div>
-        <div class="r-score">+${fmt(r.score)}점</div>
-      </div>`;
+    const sig = `${r.handId}:${r.score}:${state.lastPlay.cards.map((c) => c.uid).join(',')}`;
+    if (pa.dataset.playSig !== sig) {
+      pa.dataset.playSig = sig;
+      pa.classList.remove('juice-stage');
+      pa.innerHTML =
+        state.lastPlay.cards.map((c) => cardHTML(c, { reveal: true })).join('') +
+        `<div id="playresult">
+          <div class="r-hand">${HAND_BY_ID[r.handId].name}</div>
+          <div class="r-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span>${r.flat ? ` + ${fmt(r.flat)}` : ''}</div>
+          <div class="r-score">+${fmt(r.score)}점</div>
+        </div>`;
+    }
   } else {
+    pa.dataset.playSig = '';
+    pa.classList.remove('juice-stage');
     pa.innerHTML = `<div class="hint">여기에 낸 패와 점수가 표시됩니다 — 카드를 선택하고 [내기]를 누르세요</div>`;
   }
 
   $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true })).join('');
 
   const n = state.selected.length;
+  const canAct = state.screen === 'play' && !state.juicing;
   $('btn-play').textContent = `내기 (${state.playsLeft}회 남음)`;
-  $('btn-play').disabled = state.screen !== 'play' || n < 1 || n > 5 || state.playsLeft <= 0;
+  $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0;
   $('btn-discard').textContent = `버리기 (${state.discardsLeft}회 남음)`;
-  $('btn-discard').disabled = state.screen !== 'play' || n < 1 || n > 5 || state.discardsLeft <= 0;
+  $('btn-discard').disabled = !canAct || n < 1 || n > 5 || state.discardsLeft <= 0;
 
   const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
   const bg = $('btn-gukjin');
-  if (g && state.screen === 'play') {
+  if (g && canAct) {
     bg.style.display = 'inline-block';
     bg.textContent = `국진 모드: ${g.asPi ? '쌍피' : '열끗'} (전환)`;
   } else bg.style.display = 'none';
@@ -1170,7 +1380,8 @@ function renderModal() {
 
 function gostopHTML() {
   const n = state.goLevel + 1; // 다음 고 단계 (무제한)
-  const newTarget = Math.ceil(state.baseTarget * goMult(n));
+  const newTarget = goTarget(state.baseTarget, n, state.roundScore);
+  const floored = newTarget > Math.ceil(state.baseTarget * goMult(n));
   return `
     <h2>🎉 목표 달성!</h2>
     <div class="sub">현재 <b style="color:#93c5fd">${fmt(state.roundScore)}점</b> / 목표 ${fmt(state.target)}점 · 남은 내기 <b>${state.playsLeft}회</b></div>
@@ -1181,7 +1392,7 @@ function gostopHTML() {
       </button>
       <button class="choicebtn btn-go" onclick="chooseGo()">
         <div class="t">🔥 ${n}고!</div>
-        <div class="d">새 목표 <b>${fmt(newTarget)}점</b> (원래 목표 ×${goMult(n)})<br>
+        <div class="d">새 목표 <b>${fmt(newTarget)}점</b> ${floored ? '(점수를 크게 넘겨 목표 상향!)' : `(원래 목표 ×${goMult(n)})`}<br>
         성공 시 정산에 <b>+${goBonus(n)}냥</b> · 남은 내기 안에 못 넘으면 <b>고박 = 런 종료</b></div>
       </button>
     </div>`;
@@ -1297,14 +1508,14 @@ function helpHTML() {
   }).join('');
   return `
     <h2>📖 족보표</h2>
-    <div class="sub" style="margin-bottom:8px">위에서부터 먼저 성립하는 족보 하나로 판정 · 점수 = (족보 칩 + 낸 카드 칩 합) × 배수</div>
+    <div class="sub" style="margin-bottom:8px">위에서부터 먼저 성립하는 족보 하나로 판정 · 점수 = (족보 칩 + <b>족보를 구성한 카드</b>의 칩) × 배수 + 나머지 낸 카드 칩</div>
     <table class="handtable">
       <tr><th>족보</th><th>조건</th><th>기본칩</th><th>배수</th></tr>${rows}
     </table>
     <div class="sub" style="margin-top:10px">
-      카드 칩: 광 15 · 열끗 10 · 띠 8 · 쌍피 6 · 피 3<br>
-      <b>시간 시스템</b>: 판 = 1월(송학)→12월(비). 이달의 패는 칩 ×2, 홀수 달 낮☀️엔 광·열끗 +3칩, 짝수 달 밤🌙엔 띠·피 +3칩.<br>
-      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
+      카드 칩: 광 12 · 열끗 8 · 띠 6 · 쌍피 5 · 피 2<br>
+      <b>시간 시스템</b>: 판 = 1월(송학)→12월(비). 이달의 패는 칩 ×2, 홀수 달 낮☀️엔 광·열끗 +2칩, 짝수 달 밤🌙엔 띠·피 +2칩.<br>
+      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}과 현재 점수+25% 중 큰 쪽, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
       9월 국진 열끗은 열끗↔쌍피 전환 가능. 3·6·9·12월은 박 라운드(디버프).<br>
       🍶 상점에서 막걸리를 사서 춘향이에게 주면 그 판 동안 패를 봐주고 훈수를 둡니다.
     </div>
@@ -1316,6 +1527,361 @@ function flashActions() {
   el.classList.remove('shake');
   void el.offsetWidth;
   el.classList.add('shake');
+}
+
+/* ================================================================
+   주스 연출 (오버레이 — state 중간값 오염 금지, lastPlay 스냅샷만 재생)
+   ================================================================ */
+const JUICE = {
+  skip: false,
+  running: false,
+  onSkip: null,
+};
+
+function juiceWait(ms) {
+  return new Promise((resolve) => {
+    if (JUICE.skip) { resolve(); return; }
+    const t = setTimeout(resolve, ms);
+    const prev = JUICE.onSkip;
+    JUICE.onSkip = () => { clearTimeout(t); prev && prev(); resolve(); };
+  });
+}
+
+function juiceTier(handId) {
+  const i = HANDS.findIndex((h) => h.id === handId);
+  if (i <= 1) return 'S';
+  if (i <= 5) return 'A';
+  if (i <= 8) return 'B';
+  if (i <= 11) return 'C';
+  return 'D';
+}
+
+function juiceBreakdown(snap) {
+  const { cards, result, env } = snap;
+  let { handId, core } = detectHandInfo(cards);
+  if (env.boss === 'no_shake' && ['month2', 'month3', 'chongtong'].includes(handId)) {
+    handId = 'none';
+    core = [...cards];
+  }
+  const coreSet = new Set(core);
+  const handBase = HAND_BY_ID[result.handId].chips;
+  const steps = cards.map((c) => ({
+    card: c,
+    chip: cardChip(c, env),
+    isCore: coreSet.has(c),
+  }));
+  const coreSum = steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0);
+  const flatSum = steps.filter((s) => !s.isCore).reduce((a, s) => a + s.chip, 0);
+  const jokerChips = Math.max(0, result.chips - handBase - coreSum);
+  return { handBase, steps, jokerChips, flatSum, mult: result.mult, score: result.score, handId: result.handId };
+}
+
+// ── Web Audio 신스 (파일 없음) ─────────────────────────────
+let _audioCtx = null;
+function audioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function beep(freq, dur, type = 'square', gain = 0.04, slideTo = null) {
+  try {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, ctx.currentTime);
+    if (slideTo != null) o.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), ctx.currentTime + dur);
+    g.gain.setValueAtTime(gain, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  } catch (_) { /* autoplay 정책 등 */ }
+}
+function sfxChip() { beep(660 + Math.random() * 80, 0.07, 'square', 0.035); }
+function sfxMult() { beep(180, 0.22, 'sawtooth', 0.05, 420); setTimeout(() => beep(520, 0.12, 'square', 0.04), 80); }
+function sfxScore() { beep(392, 0.1, 'triangle', 0.04); setTimeout(() => beep(523, 0.12, 'triangle', 0.045), 70); setTimeout(() => beep(659, 0.18, 'triangle', 0.05), 140); }
+function sfxBanner(tier) {
+  const base = { S: 520, A: 440, B: 370, C: 330, D: 260 }[tier] || 300;
+  beep(base, 0.15, 'sawtooth', 0.045); setTimeout(() => beep(base * 1.5, 0.2, 'triangle', 0.04), 90);
+}
+function sfxOverflow() { beep(200, 0.15, 'square', 0.04, 800); setTimeout(() => beep(900, 0.2, 'triangle', 0.05), 100); }
+function sfxCoin() { beep(980, 0.06, 'square', 0.03); setTimeout(() => beep(1310, 0.08, 'square', 0.025), 40); }
+
+function spawnCoinParticles(n) {
+  const box = $('moneybox');
+  if (!box) return;
+  const r = box.getBoundingClientRect();
+  const count = Math.min(8, Math.max(1, n));
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'coin-particle';
+    el.textContent = '💰';
+    const dx = (Math.random() - 0.5) * 80;
+    const dy = -40 - Math.random() * 70;
+    el.style.left = (r.left + r.width / 2 + (Math.random() - 0.5) * 20) + 'px';
+    el.style.top = (r.top + r.height / 2) + 'px';
+    el.style.setProperty('--dx', dx + 'px');
+    el.style.setProperty('--dy', dy + 'px');
+    document.body.appendChild(el);
+    sfxCoin();
+    setTimeout(() => el.remove(), 900);
+  }
+}
+
+function screenShake(heavy = false) {
+  document.body.classList.remove('screen-shake');
+  void document.body.offsetWidth;
+  document.body.classList.add('screen-shake');
+  if (heavy) {
+    document.body.classList.remove('punch');
+    void document.body.offsetWidth;
+    document.body.classList.add('punch');
+  }
+  setTimeout(() => {
+    document.body.classList.remove('screen-shake', 'punch');
+  }, 450);
+}
+
+function chunhyangReact(score, handId) {
+  const tier = juiceTier(handId);
+  let mood = '😊', text = '좋은 한 수예요!';
+  if (score >= 500 || tier === 'S') {
+    mood = '🤩'; text = '어머나!! 이 점수 실화예요!!';
+  } else if (score >= 200 || tier === 'A') {
+    mood = '😲'; text = '와… 진짜 세게 나갔네요!';
+  } else if (score >= 80 || tier === 'B') {
+    mood = '😄'; text = '좋아요, 이 기세로!';
+  }
+  state.tempReact = { mood, text, expires: Date.now() + 2800 };
+  const face = $('ch-face');
+  const bubble = $('ch-bubble');
+  if (face) face.textContent = mood;
+  if (bubble) bubble.textContent = text;
+}
+
+function animateNumber(el, from, to, ms, formatter = fmt) {
+  return new Promise((resolve) => {
+    if (JUICE.skip || ms <= 0 || from === to) {
+      el.textContent = formatter(to);
+      resolve();
+      return;
+    }
+    const t0 = performance.now();
+    const tick = (now) => {
+      if (JUICE.skip) { el.textContent = formatter(to); resolve(); return; }
+      const p = Math.min(1, (now - t0) / ms);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatter(Math.round(from + (to - from) * eased));
+      if (p < 1) requestAnimationFrame(tick);
+      else resolve();
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function armJuiceSkip() {
+  const root = $('juice-root');
+  root.classList.add('skipable');
+  const handler = () => { JUICE.skip = true; JUICE.onSkip && JUICE.onSkip(); };
+  root.addEventListener('click', handler, { once: true });
+  const keyHandler = (e) => {
+    if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') {
+      e.preventDefault();
+      JUICE.skip = true;
+      JUICE.onSkip && JUICE.onSkip();
+      window.removeEventListener('keydown', keyHandler);
+    }
+  };
+  window.addEventListener('keydown', keyHandler);
+  return () => {
+    root.classList.remove('skipable');
+    root.removeEventListener('click', handler);
+    window.removeEventListener('keydown', keyHandler);
+  };
+}
+
+async function playJuiceSequence(snap) {
+  if (JUICE.running) return;
+  JUICE.running = true;
+  JUICE.skip = false;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const disarm = armJuiceSkip();
+  const bd = juiceBreakdown(snap);
+  const pa = $('playedarea');
+  const banner = $('hand-banner');
+  const hitTarget = snap.scoreBefore < state.target && state.roundScore >= state.target;
+  const bigHand = HANDS.findIndex((h) => h.id === bd.handId) <= 4; // 삼광 이상
+
+  try {
+    if (reduce) {
+      // 접근성: 최종 결과만 즉시
+      pa.classList.remove('juice-stage');
+      return;
+    }
+
+    // 스테이지 세팅
+    pa.classList.add('juice-stage');
+    pa.dataset.playSig = '';
+    pa.innerHTML = `
+      <div id="juice-cards"></div>
+      <div id="juice-tally">
+        <span class="jt-chips" id="jt-chips">0</span>
+        <span class="jt-times" id="jt-times">×</span>
+        <span class="jt-mult" id="jt-mult">${fmtMult(bd.mult)}</span>
+        <span class="jt-eq" id="jt-eq">=</span>
+        <span class="jt-score" id="jt-score">0</span>
+        <div class="jt-flat" id="jt-flat"></div>
+      </div>`;
+    const cardsEl = $('juice-cards');
+    const wraps = bd.steps.map((s) => {
+      const w = document.createElement('div');
+      w.className = 'juice-card-wrap';
+      w.innerHTML = cardHTML(s.card, { reveal: true }) +
+        `<div class="chip-float${s.isCore ? '' : ' flat'}">${s.chip > 0 ? '+' + s.chip + '!' : '+0'}</div>`;
+      cardsEl.appendChild(w);
+      return w;
+    });
+
+    // 1) 족보 배너 슬램 — 낸 패 영역 상단에 띄워 카드/집계와 겹치지 않게
+    const tier = juiceTier(bd.handId);
+    const handName = HAND_BY_ID[bd.handId].name;
+    const paRect = pa.getBoundingClientRect();
+    banner.style.left = (paRect.left + paRect.width / 2) + 'px';
+    banner.style.top = (paRect.top + 36) + 'px';
+    banner.className = '';
+    void banner.offsetWidth;
+    banner.textContent = bd.handId === 'none' ? handName : handName + '!';
+    banner.className = `tier-${tier} show`;
+    sfxBanner(tier);
+    if (bigHand) screenShake(true);
+    await juiceWait(bigHand ? 520 : 380);
+    banner.classList.add('hide');
+    await juiceWait(180);
+    banner.className = '';
+    banner.textContent = '';
+    banner.style.left = '';
+    banner.style.top = '';
+
+    // 2) 족보 기본칩 → 카드 한 장씩
+    const chipsEl = $('jt-chips');
+    let chips = 0;
+    let flat = 0;
+
+    if (bd.handBase > 0) {
+      chips = bd.handBase;
+      chipsEl.textContent = fmt(chips);
+      chipsEl.style.transform = 'scale(1.2)';
+      sfxChip();
+      await juiceWait(160);
+      chipsEl.style.transform = '';
+    }
+
+    for (const [i, step] of bd.steps.entries()) {
+      if (JUICE.skip) break;
+      const w = wraps[i];
+      w.classList.add('show');
+      const floater = w.querySelector('.chip-float');
+      void floater.offsetWidth;
+      floater.classList.add('go');
+      sfxChip();
+      if (step.isCore) {
+        chips += step.chip;
+        await animateNumber(chipsEl, chips - step.chip, chips, 120);
+      } else {
+        flat += step.chip;
+      }
+      await juiceWait(200);
+    }
+
+    if (bd.jokerChips > 0 && !JUICE.skip) {
+      chips += bd.jokerChips;
+      chipsEl.textContent = fmt(chips);
+      sfxChip();
+      await juiceWait(160);
+    }
+
+    // 스킵 시 카드·수치 최종 상태로
+    if (JUICE.skip) {
+      wraps.forEach((w) => w.classList.add('show'));
+      chips = bd.handBase + bd.steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0) + bd.jokerChips;
+      flat = bd.flatSum;
+      chipsEl.textContent = fmt(chips);
+    }
+
+    // 3) 배수 슬램
+    $('jt-times').classList.add('on');
+    await juiceWait(80);
+    const multEl = $('jt-mult');
+    multEl.classList.add('slam');
+    sfxMult();
+    if (bd.mult >= 4) screenShake(bd.mult >= 6);
+    await juiceWait(320);
+
+    // 4) 최종 점수 롤업
+    $('jt-eq').classList.add('on');
+    const scoreEl = $('jt-score');
+    scoreEl.classList.add('on');
+    if (flat > 0 || bd.flatSum > 0) {
+      const fl = $('jt-flat');
+      fl.textContent = `+ ${fmt(bd.flatSum)} (배수 밖)`;
+      fl.classList.add('on');
+    }
+    sfxScore();
+    const rollMs = Math.min(900, 280 + Math.abs(bd.score) * 1.2);
+    await animateNumber(scoreEl, 0, bd.score, rollMs);
+    scoreEl.classList.add('punch');
+    chunhyangReact(bd.score, bd.handId);
+
+    // 사이드 점수·게이지 롤업
+    const sideScore = $('score-val');
+    const gauge = $('gauge-fill');
+    const sideFrom = snap.scoreBefore;
+    const sideTo = state.roundScore;
+    await Promise.all([
+      animateNumber(sideScore, sideFrom, sideTo, rollMs),
+      (async () => {
+        const t0 = performance.now();
+        await new Promise((resolve) => {
+          const tick = (now) => {
+            if (JUICE.skip) {
+              gauge.style.width = Math.min(100, (sideTo / state.target) * 100) + '%';
+              resolve(); return;
+            }
+            const p = Math.min(1, (now - t0) / rollMs);
+            const v = sideFrom + (sideTo - sideFrom) * (1 - Math.pow(1 - p, 3));
+            gauge.style.width = Math.min(100, (v / state.target) * 100) + '%';
+            if (p < 1) requestAnimationFrame(tick); else resolve();
+          };
+          requestAnimationFrame(tick);
+        });
+      })(),
+    ]);
+
+    // 5) 목표 돌파 시 게이지 오버플로우 → 모달 전 반 박자
+    if (hitTarget || bigHand) {
+      if (hitTarget) {
+        $('gauge').classList.add('overflow');
+        gauge.classList.add('overflow');
+        gauge.style.width = '100%';
+        sfxOverflow();
+        screenShake(true);
+      } else if (bigHand) {
+        screenShake(false);
+      }
+      await juiceWait(hitTarget ? 480 : 200);
+    } else {
+      await juiceWait(220);
+    }
+  } finally {
+    disarm();
+    banner.className = '';
+    banner.textContent = '';
+    banner.style.left = '';
+    banner.style.top = '';
+    JUICE.running = false;
+    JUICE.skip = false;
+    JUICE.onSkip = null;
+  }
 }
 
 // ── 시작 ───────────────────────────────────────────────────
