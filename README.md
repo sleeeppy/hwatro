@@ -8,7 +8,10 @@
 
 `index.html`을 브라우저에서 열면 끝. 외부 리소스·빌드·서버 불필요.
 
-- 시드 고정: `index.html?seed=42`
+- 플레이: https://sleeeppy.github.io/hwatro/
+- 시드 고정: `index.html?seed=42` (또는 배포 URL에 `?seed=42`)
+
+`main` 푸시 시 GitHub Actions가 테스트 후 GitHub Pages로 배포합니다.
 
 ## 게임 규칙
 
