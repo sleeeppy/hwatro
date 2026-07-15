@@ -285,18 +285,24 @@
   }
   #juice-cards { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 98px; align-items: flex-end; }
   #juice-cards .juice-card-wrap {
-    position: relative; opacity: 0; transform: translateY(28px) scale(.55);
-    transition: none;
+    position: relative; opacity: 0;
   }
-  #juice-cards .juice-card-wrap.show {
-    opacity: 1; transform: translateY(0) scale(1);
-    animation: cardPop .38s cubic-bezier(.2,1.4,.4,1) both;
+  #juice-cards .juice-card-wrap.landed { opacity: 1; }
+  #juice-cards .juice-card-wrap.pulse {
+    animation: cardLandPulse .32s cubic-bezier(.2,1.3,.4,1);
   }
-  @keyframes cardPop {
-    0% { transform: translateY(36px) scale(.4); opacity: 0; }
-    70% { transform: translateY(-6px) scale(1.08); opacity: 1; }
-    100% { transform: translateY(0) scale(1); }
+  @keyframes cardLandPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.08); }
+    100% { transform: scale(1); }
   }
+  .play-fly-card {
+    position: fixed; z-index: 75; pointer-events: none; margin: 0;
+    filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
+    will-change: transform;
+  }
+  .play-fly-card .card { width: 100% !important; height: 100% !important; cursor: default; }
+  .play-fly-card .card:hover { transform: none; }
   #juice-cards .chip-float {
     position: absolute; left: 50%; top: -8px; transform: translate(-50%,-100%);
     font-size: 18px; font-weight: 900; color: var(--chip-blue);
@@ -343,9 +349,33 @@
   .score-fly {
     position: fixed; z-index: 80; pointer-events: none; margin: 0;
     font-weight: 900; color: #fff; white-space: nowrap; text-align: center;
-    text-shadow: 0 0 18px rgba(147,197,253,.7), 0 2px 0 rgba(0,0,0,.35);
-    transition: transform .5s cubic-bezier(.2,.85,.25,1), opacity .5s ease;
-    will-change: transform, opacity;
+    letter-spacing: -0.5px;
+    text-shadow:
+      0 0 24px rgba(147,197,253,.85),
+      0 0 48px rgba(96,165,250,.45),
+      0 3px 0 rgba(15,23,42,.45);
+    will-change: transform, opacity, filter;
+  }
+  .score-fly::after {
+    content: ''; position: absolute; inset: -12px -18px; border-radius: 999px;
+    background: radial-gradient(circle, rgba(147,197,253,.35), transparent 70%);
+    z-index: -1; filter: blur(2px);
+  }
+  #score-val.score-land {
+    display: inline-block;
+    animation: scoreLand .65s cubic-bezier(.2, 1.35, .35, 1);
+  }
+  @keyframes scoreLand {
+    0% { transform: scale(1); filter: brightness(1); }
+    30% { transform: scale(1.42); filter: brightness(1.35);
+      text-shadow: 0 0 22px rgba(147,197,253,.95), 0 0 40px rgba(56,189,248,.5); color: #fff; }
+    55% { transform: scale(0.94); }
+    100% { transform: scale(1); filter: brightness(1); text-shadow: none; }
+  }
+  #gauge.score-pulse { box-shadow: 0 0 0 1px rgba(147,197,253,.5), 0 0 14px rgba(56,189,248,.35); }
+  #juice-tally.tally-fade {
+    transition: opacity .4s ease, filter .4s ease, transform .4s ease !important;
+    opacity: .2 !important; filter: blur(1.5px); transform: scale(.96);
   }
   #juice-tally .jt-flat {
     width: 100%; text-align: center; font-size: 13px; color: #94a3b8;
@@ -962,6 +992,11 @@ function playSelected() {
   state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
 
   // 낸 패 스냅샷 (국진 모드 포함) — 연출은 이 스냅샷만 재생
+  const fromRects = {};
+  for (const c of cards) {
+    const el = document.querySelector(`#handarea [data-uid="${c.uid}"]`);
+    if (el) fromRects[c.uid] = el.getBoundingClientRect();
+  }
   state.lastPlay = {
     cards: cards.map((c) => ({ ...c, tags: [...c.tags] })),
     result,
@@ -977,7 +1012,7 @@ function playSelected() {
   state.juicing = true;
   document.body.classList.add('juicing');
   render();
-  playJuiceSequence(state.lastPlay).then(() => {
+  playJuiceSequence(state.lastPlay, fromRects).then(() => {
     state.juicing = false;
     document.body.classList.remove('juicing');
     checkAfterPlay();
@@ -1296,7 +1331,7 @@ function cardHTML(card, opts = {}) {
     const discCls = discarding ? ' discarding' : '';
     const styleAttr = discarding ? ` style="--dd:${dd}"` : '';
     const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
-    return `<div class="card facedown${selCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}"${styleAttr}${click}><div class="back-q">?</div></div>`;
+    return `<div class="card facedown${selCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
   }
   const t = effType(card);
   let cls = `card ${t === 'ssangpi' && card.type === 'yeol' ? 'ssangpi' : card.type}`;
@@ -1333,7 +1368,7 @@ function cardHTML(card, opts = {}) {
   if (discarding) styleBits.push(`--dd:${dd}`);
   const styleAttr = styleBits.length ? ` style="${styleBits.join(';')}"` : '';
   const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
-  return `<div class="${cls}${selCls}${dealCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}"${styleAttr}${click}>
+  return `<div class="${cls}${selCls}${dealCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}>
     <div class="chipbadge">+${chip}</div>
     <div class="month">${card.month}月</div>
     <div class="mname">${M.name}</div>
@@ -1779,6 +1814,10 @@ function beep(freq, dur, type = 'square', gain = 0.04, slideTo = null) {
 function sfxChip() { beep(660 + Math.random() * 80, 0.07, 'square', 0.035); }
 function sfxMult() { beep(180, 0.22, 'sawtooth', 0.05, 420); setTimeout(() => beep(520, 0.12, 'square', 0.04), 80); }
 function sfxScore() { beep(392, 0.1, 'triangle', 0.04); setTimeout(() => beep(523, 0.12, 'triangle', 0.045), 70); setTimeout(() => beep(659, 0.18, 'triangle', 0.05), 140); }
+function sfxScoreLand() {
+  beep(620, 0.06, 'triangle', 0.035);
+  setTimeout(() => beep(880, 0.1, 'sine', 0.04), 40);
+}
 function sfxBanner(tier) {
   const base = { S: 520, A: 440, B: 370, C: 330, D: 260 }[tier] || 300;
   beep(base, 0.15, 'sawtooth', 0.045); setTimeout(() => beep(base * 1.5, 0.2, 'triangle', 0.04), 90);
@@ -1788,6 +1827,10 @@ function sfxCoin() { beep(980, 0.06, 'square', 0.03); setTimeout(() => beep(1310
 function sfxDiscard() {
   beep(420, 0.08, 'triangle', 0.03, 180);
   setTimeout(() => beep(280, 0.1, 'sawtooth', 0.025, 120), 50);
+}
+function sfxPlayLift() {
+  beep(380, 0.07, 'triangle', 0.03);
+  setTimeout(() => beep(520, 0.09, 'sine', 0.035), 60);
 }
 
 const SHAKE_SCORE = 100;       // 이 점수 이상일 때만 카메라 쉐이크
@@ -1856,24 +1899,70 @@ function flyScoreToSide(fromEl, toEl, label) {
     const a = fromEl.getBoundingClientRect();
     const b = toEl.getBoundingClientRect();
     if (a.width < 1 || b.width < 1) { resolve(); return; }
+
     const ghost = document.createElement('div');
     ghost.className = 'score-fly';
     ghost.textContent = label;
     const fs = parseFloat(getComputedStyle(fromEl).fontSize) || 34;
-    ghost.style.left = a.left + 'px';
-    ghost.style.top = a.top + 'px';
+    const sx = a.left + a.width / 2;
+    const sy = a.top + a.height / 2;
+    const ex = b.left + b.width / 2;
+    const ey = b.top + b.height / 2;
+    ghost.style.left = sx + 'px';
+    ghost.style.top = sy + 'px';
     ghost.style.fontSize = fs + 'px';
+    ghost.style.transform = 'translate(-50%, -50%) scale(1)';
     document.body.appendChild(ghost);
+    fromEl.style.transition = 'opacity .2s ease';
     fromEl.style.opacity = '0';
-    void ghost.offsetWidth;
-    const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
-    const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-    ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
-    ghost.style.opacity = '0.35';
-    const done = () => { ghost.remove(); resolve(); };
-    ghost.addEventListener('transitionend', done, { once: true });
-    setTimeout(done, 560);
+
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const mx = dx * 0.42;
+    const my = dy * 0.28 - Math.min(72, 36 + Math.abs(dx) * 0.08);
+
+    const finish = () => {
+      if (ghost.parentNode) ghost.remove();
+      resolve();
+    };
+
+    try {
+      const anim = ghost.animate([
+        { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1, filter: 'blur(0px)', offset: 0 },
+        { transform: `translate(calc(-50% + ${mx * 0.55}px), calc(-50% + ${my}px)) scale(1.08) rotate(-3deg)`,
+          opacity: 1, filter: 'blur(0px)', offset: 0.38 },
+        { transform: `translate(calc(-50% + ${dx * 0.92}px), calc(-50% + ${dy * 0.92}px)) scale(0.55) rotate(2deg)`,
+          opacity: 0.95, filter: 'blur(0.5px)', offset: 0.82 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.28)`,
+          opacity: 0, filter: 'blur(2px)', offset: 1 },
+      ], {
+        duration: 680,
+        easing: 'cubic-bezier(0.22, 0.9, 0.28, 1)',
+        fill: 'forwards',
+      });
+      anim.onfinish = finish;
+      anim.oncancel = finish;
+      setTimeout(finish, 750);
+    } catch (_) {
+      ghost.style.transition = 'transform .62s cubic-bezier(.22,.9,.28,1), opacity .62s ease';
+      void ghost.offsetWidth;
+      ghost.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.3)`;
+      ghost.style.opacity = '0';
+      setTimeout(finish, 640);
+    }
   });
+}
+
+function pulseScoreLand(el, gaugeEl) {
+  if (!el) return;
+  el.classList.remove('score-land');
+  void el.offsetWidth;
+  el.classList.add('score-land');
+  if (gaugeEl && gaugeEl.parentElement) {
+    gaugeEl.parentElement.classList.add('score-pulse');
+    setTimeout(() => gaugeEl.parentElement.classList.remove('score-pulse'), 500);
+  }
+  setTimeout(() => el.classList.remove('score-land'), 700);
 }
 
 function animateNumber(el, from, to, ms, formatter = fmt) {
@@ -1887,7 +1976,7 @@ function animateNumber(el, from, to, ms, formatter = fmt) {
     const tick = (now) => {
       if (JUICE.skip) { el.textContent = formatter(to); resolve(); return; }
       const p = Math.min(1, (now - t0) / ms);
-      const eased = 1 - Math.pow(1 - p, 3);
+      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
       el.textContent = formatter(Math.round(from + (to - from) * eased));
       if (p < 1) requestAnimationFrame(tick);
       else resolve();
@@ -1917,7 +2006,63 @@ function armJuiceSkip() {
   };
 }
 
-async function playJuiceSequence(snap) {
+async function flyCardsFromHand(wraps, steps, fromRects) {
+  if (!fromRects || JUICE.skip) {
+    wraps.forEach((w) => w.classList.add('landed'));
+    return;
+  }
+  sfxPlayLift();
+  const pending = [];
+  for (let i = 0; i < wraps.length; i++) {
+    const w = wraps[i];
+    const card = steps[i].card;
+    const from = fromRects[card.uid];
+    const to = w.getBoundingClientRect();
+    if (!from || to.width < 1) {
+      w.classList.add('landed');
+      continue;
+    }
+    const ghost = document.createElement('div');
+    ghost.className = 'play-fly-card';
+    ghost.innerHTML = cardHTML(card, { reveal: true });
+    ghost.style.left = from.left + 'px';
+    ghost.style.top = from.top + 'px';
+    ghost.style.width = from.width + 'px';
+    ghost.style.height = from.height + 'px';
+    document.body.appendChild(ghost);
+
+    const dx = to.left - from.left;
+    const dy = to.top - from.top;
+    const delay = i * 50;
+    pending.push(new Promise((resolve) => {
+      const finish = () => {
+        w.classList.add('landed');
+        if (ghost.parentNode) ghost.remove();
+        resolve();
+      };
+      try {
+        const anim = ghost.animate([
+          { transform: 'translate(0, 0) scale(1) rotate(0deg)', offset: 0 },
+          { transform: `translate(${dx * 0.45}px, ${dy * 0.3 - 36}px) scale(1.1) rotate(-5deg)`, offset: 0.4 },
+          { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(0deg)`, offset: 1 },
+        ], {
+          duration: 520,
+          delay,
+          easing: 'cubic-bezier(0.22, 0.9, 0.28, 1)',
+          fill: 'forwards',
+        });
+        anim.onfinish = finish;
+        anim.oncancel = finish;
+        setTimeout(finish, 520 + delay + 80);
+      } catch (_) {
+        finish();
+      }
+    }));
+  }
+  await Promise.all(pending);
+}
+
+async function playJuiceSequence(snap, fromRects = null) {
   if (JUICE.running) return;
   JUICE.running = true;
   JUICE.skip = false;
@@ -1931,17 +2076,16 @@ async function playJuiceSequence(snap) {
 
   try {
     if (reduce) {
-      // 접근성: 최종 결과만 즉시
       pa.classList.remove('juice-stage');
       return;
     }
 
-    // 스테이지 세팅
+    // 스테이지 세팅 — 카드는 손패에서 날아온 뒤 보임
     pa.classList.add('juice-stage');
     pa.dataset.playSig = '';
     pa.innerHTML = `
       <div id="juice-cards"></div>
-      <div id="juice-tally">
+      <div id="juice-tally" style="opacity:0">
         <span class="jt-chips" id="jt-chips">0</span>
         <span class="jt-times" id="jt-times">×</span>
         <span class="jt-mult" id="jt-mult">${fmtMult(bd.mult)}</span>
@@ -1959,7 +2103,11 @@ async function playJuiceSequence(snap) {
       return w;
     });
 
-    // 1) 족보 배너 슬램 — 낸 패 영역 상단에 띄워 카드/집계와 겹치지 않게
+    // 0) 손패 → 낸 패 영역으로 카드 상승
+    await flyCardsFromHand(wraps, bd.steps, fromRects);
+    if (JUICE.skip) wraps.forEach((w) => w.classList.add('landed'));
+
+    // 1) 족보 배너 슬램
     const tier = juiceTier(bd.handId);
     const handName = HAND_BY_ID[bd.handId].name;
     const paRect = pa.getBoundingClientRect();
@@ -1970,15 +2118,22 @@ async function playJuiceSequence(snap) {
     banner.textContent = bd.handId === 'none' ? handName : handName + '!';
     banner.className = `tier-${tier} show`;
     sfxBanner(tier);
-    await juiceWait(bigHand ? 520 : 380);
+    await juiceWait(bigHand ? 480 : 340);
     banner.classList.add('hide');
-    await juiceWait(180);
+    await juiceWait(160);
     banner.className = '';
     banner.textContent = '';
     banner.style.left = '';
     banner.style.top = '';
 
-    // 2) 족보 기본칩 → 카드 한 장씩
+    // 집계 UI 페이드 인
+    const tally = $('juice-tally');
+    if (tally) {
+      tally.style.transition = 'opacity .28s ease';
+      tally.style.opacity = '1';
+    }
+
+    // 2) 카드 칩 순차 가산 (이미 올라온 카드 위에서 쥬시하게)
     const chipsEl = $('jt-chips');
     let chips = 0;
     let flat = 0;
@@ -1995,7 +2150,7 @@ async function playJuiceSequence(snap) {
     for (const [i, step] of bd.steps.entries()) {
       if (JUICE.skip) break;
       const w = wraps[i];
-      w.classList.add('show');
+      w.classList.add('landed', 'pulse');
       const floater = w.querySelector('.chip-float');
       void floater.offsetWidth;
       floater.classList.add('go');
@@ -2007,6 +2162,7 @@ async function playJuiceSequence(snap) {
         flat += step.chip;
       }
       await juiceWait(200);
+      w.classList.remove('pulse');
     }
 
     if (bd.jokerChips > 0 && !JUICE.skip) {
@@ -2016,12 +2172,12 @@ async function playJuiceSequence(snap) {
       await juiceWait(160);
     }
 
-    // 스킵 시 카드·수치 최종 상태로
     if (JUICE.skip) {
-      wraps.forEach((w) => w.classList.add('show'));
+      wraps.forEach((w) => w.classList.add('landed'));
       chips = bd.handBase + bd.steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0) + bd.jokerChips;
       flat = bd.flatSum;
       chipsEl.textContent = fmt(chips);
+      if (tally) tally.style.opacity = '1';
     }
 
     // 3) 배수 슬램
@@ -2032,7 +2188,7 @@ async function playJuiceSequence(snap) {
     sfxMult();
     await juiceWait(320);
 
-    // 4) 최종 점수 롤업
+    // 4) 최종 점수 롤업 → 사이드 착지
     $('jt-eq').classList.add('on');
     const scoreEl = $('jt-score');
     scoreEl.classList.add('on');
@@ -2044,21 +2200,23 @@ async function playJuiceSequence(snap) {
     sfxScore();
     const rollMs = Math.min(900, 280 + Math.abs(bd.score) * 1.2);
     await animateNumber(scoreEl, 0, bd.score, rollMs);
-    // 가운데 점수에 + 붙여 보여주고 → 사이드 점수로 날아감
     scoreEl.textContent = '+' + fmt(bd.score);
     scoreEl.classList.add('punch');
     chunhyangReact(bd.score, bd.handId);
     maybeShake(bd.score);
-    await juiceWait(280);
+    await juiceWait(320);
 
     const sideScore = $('score-val');
     const gauge = $('gauge-fill');
     const sideFrom = snap.scoreBefore;
     const sideTo = state.roundScore;
-    await flyScoreToSide(scoreEl, sideScore, '+' + fmt(bd.score));
+    if (tally) tally.classList.add('tally-fade');
 
-    // 도착 후 사이드 점수·게이지 롤업
-    const landMs = Math.min(420, 180 + Math.abs(bd.score) * 0.6);
+    await flyScoreToSide(scoreEl, sideScore, '+' + fmt(bd.score));
+    sfxScoreLand();
+    pulseScoreLand(sideScore, gauge);
+
+    const landMs = Math.min(520, 260 + Math.abs(bd.score) * 0.85);
     await Promise.all([
       animateNumber(sideScore, sideFrom, sideTo, landMs),
       (async () => {
@@ -2070,7 +2228,8 @@ async function playJuiceSequence(snap) {
               resolve(); return;
             }
             const p = Math.min(1, (now - t0) / landMs);
-            const v = sideFrom + (sideTo - sideFrom) * (1 - Math.pow(1 - p, 3));
+            const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+            const v = sideFrom + (sideTo - sideFrom) * eased;
             gauge.style.width = Math.min(100, (v / state.target) * 100) + '%';
             if (p < 1) requestAnimationFrame(tick); else resolve();
           };
@@ -2078,8 +2237,9 @@ async function playJuiceSequence(snap) {
         });
       })(),
     ]);
+    await juiceWait(120);
 
-    // 5) 목표 돌파 시 게이지 오버플로우 → 모달 전 반 박자
+    // 5) 목표 돌파
     if (hitTarget) {
       $('gauge').classList.add('overflow');
       gauge.classList.add('overflow');
