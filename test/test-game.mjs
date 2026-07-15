@@ -52,6 +52,19 @@ console.log('[2] 족보 판정');
   const pi3 = pick((c) => c.type === 'pi').slice(0, 3);
   const sp = pick((c) => c.type === 'ssangpi')[0];
   assert(det([...pi3, sp]) === 'pi5', '쌍피=2 환산으로 피3+쌍피1 → 피5');
+  // 비단은 띠 셋에서 제외: 홍단+청단+비단 → 띠셋 아님
+  const hong1 = pick((c) => c.tags.includes('hongdan'))[0];
+  const cheong1 = pick((c) => c.tags.includes('cheongdan'))[0];
+  const biti = pick((c) => c.tags.includes('bi_tti'))[0];
+  assert(det([hong1, cheong1, biti]) !== 'tti3', '비단 포함 3띠 → 띠셋 아님');
+  // 홍단+청단+초단 → 띠셋
+  const cho1 = pick((c) => c.tags.includes('chodan'))[0];
+  assert(det([hong1, cheong1, cho1]) === 'tti3', '홍·청·초단 → 띠셋');
+  // 홍단2+청단+비단: 띠셋 코어에 비단 없음
+  const hong2 = pick((c) => c.tags.includes('hongdan'));
+  const infoTti = E.detectHandInfo([...hong2.slice(0, 2), cheong1, biti]);
+  assert(infoTti.handId === 'tti3' && !infoTti.core.some((c) => c.tags.includes('bi_tti')),
+    '띠셋 코어에 비단 미포함');
 }
 
 // ─── 3. 계절(이달의 패) + 밤일낮장 ────────────────────────
@@ -135,6 +148,22 @@ console.log('[5] 특수패·박 회귀');
   guk.asPi = true;
   assert(E.computeScore([guk], env({ boss: 'meongbak' })).chips === 5, '국진 쌍피 모드 멍박 면제');
   guk.asPi = false;
+  // 비광우산: 코어에 12월이 있을 때만 ×2, 무조합/flat만으로는 미발동
+  const bikwang = pick((c) => c.tags.includes('bikwang'))[0];
+  const sam = pick((c) => c.type === 'kwang' && !c.tags.includes('bikwang')).slice(0, 2);
+  const rUsan = E.computeScore([...sam, bikwang], env({ jokerIds: ['bigwang_usan'] }));
+  assert(rUsan.handId === 'bisamgwang' && rUsan.mult === 8, `비삼광+우산 ×8 (실제 ${rUsan.mult})`);
+  const tti3 = [
+    pick((c) => c.tags.includes('hongdan'))[0],
+    pick((c) => c.tags.includes('cheongdan'))[0],
+    pick((c) => c.tags.includes('chodan'))[0],
+  ];
+  const biti = pick((c) => c.tags.includes('bi_tti'))[0];
+  const rFlat = E.computeScore([...tti3, biti], env({ jokerIds: ['bigwang_usan'] }));
+  assert(rFlat.handId === 'tti3' && rFlat.mult === 2, `비단 flat만으론 우산 미발동 (실제 ${rFlat.mult})`);
+  const none12 = [bikwang, pick((c) => c.month === 1 && c.type === 'pi')[0]];
+  const rNone = E.computeScore(none12, env({ jokerIds: ['bigwang_usan'] }));
+  assert(rNone.handId === 'none' && rNone.mult === 1, `무조합+12월 우산 미발동 (실제 ${rNone.mult})`);
 }
 
 // ─── 6. evaluateHand (춘향 훈수 엔진) ─────────────────────

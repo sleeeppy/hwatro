@@ -25,7 +25,7 @@
   #topbar {
     display: flex; align-items: center; gap: 14px; padding: 10px 16px;
     background: rgba(0,0,0,.35); border-bottom: 1px solid var(--panel-line);
-    flex-wrap: wrap;
+    flex-wrap: wrap; position: relative; z-index: 40;
   }
   #logo { font-weight: 900; font-size: 17px; color: var(--gold-soft); letter-spacing: 1px; white-space: nowrap; }
   #logo small { display: block; font-size: 10px; font-weight: 400; color: #cbd5e1; letter-spacing: 2px; }
@@ -37,11 +37,25 @@
     text-align: center;
   }
   .jokerslot.filled {
+    position: relative;
     border: 1px solid var(--gold); background: linear-gradient(160deg, #3b2f14, #241c0b);
     color: #fde68a; display: block; cursor: help;
   }
   .jokerslot .jname { font-weight: 800; font-size: 12px; }
   .jokerslot .jdesc { font-size: 9.5px; color: #d6c58a; margin-top: 2px; line-height: 1.35; }
+  .jokerslot.filled .jtip {
+    display: none; position: absolute; left: 50%; top: calc(100% + 8px);
+    transform: translateX(-50%); z-index: 130; pointer-events: none;
+    width: max-content; max-width: 230px; padding: 8px 10px; border-radius: 8px;
+    background: #0f172a; border: 1px solid rgba(212,175,55,.55);
+    box-shadow: 0 10px 24px rgba(0,0,0,.5);
+    font-size: 11px; font-weight: 500; color: #e2e8f0; line-height: 1.4; text-align: left;
+  }
+  .jokerslot.filled .jtip::after {
+    content: ''; position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%);
+    border: 6px solid transparent; border-bottom-color: rgba(212,175,55,.55);
+  }
+  .jokerslot.filled:hover .jtip { display: block; }
   #moneybox { font-size: 16px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
   #moneybox .delta { font-size: 12px; color: #a3e635; }
 
@@ -88,6 +102,10 @@
     min-height: 152px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.16);
     display: flex; align-items: center; justify-content: center; gap: 10px;
     padding: 12px; flex-wrap: wrap; position: relative;
+    transition: opacity .42s ease, transform .42s ease;
+  }
+  #playedarea.play-fade-out {
+    opacity: 0; transform: translateY(-10px) scale(.97); pointer-events: none;
   }
   #playedarea .hint { color: rgba(255,255,255,.35); font-size: 12.5px; }
   #playresult { text-align: center; width: 100%; }
@@ -319,27 +337,42 @@
     100% { opacity: 0; transform: translate(-50%,-160%) scale(1); }
   }
   #juice-tally {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    flex-wrap: wrap; min-height: 42px; font-weight: 900;
+    display: flex; justify-content: center; width: 100%;
+    font-weight: 900;
   }
-  #juice-tally .jt-chips { font-size: 28px; color: var(--chip-blue); min-width: 3ch; text-align: right; }
-  #juice-tally .jt-times { font-size: 22px; color: #94a3b8; opacity: 0; transform: scale(.5); }
-  #juice-tally .jt-times.on { opacity: 1; transform: scale(1); transition: transform .25s cubic-bezier(.2,1.6,.4,1), opacity .15s; }
+  #juice-tally .jt-row {
+    display: inline-flex; align-items: baseline; gap: 7px;
+    white-space: nowrap; max-width: 100%;
+  }
+  #juice-tally .jt-chips { font-size: 28px; color: var(--chip-blue); }
+  #juice-tally .jt-times {
+    font-size: 22px; color: #94a3b8; display: none;
+    transform: scale(.5);
+  }
+  #juice-tally .jt-times.on {
+    display: inline; opacity: 1; transform: scale(1);
+    transition: transform .25s cubic-bezier(.2,1.6,.4,1), opacity .15s;
+  }
   #juice-tally .jt-mult {
-    font-size: 28px; color: var(--mult-red); min-width: 2.5ch; opacity: 0;
+    font-size: 28px; color: var(--mult-red); display: none;
     transform: scale(2.4) rotate(-8deg); filter: blur(2px);
   }
   #juice-tally .jt-mult.slam {
-    opacity: 1; transform: scale(1) rotate(0); filter: blur(0);
+    display: inline; opacity: 1; transform: scale(1) rotate(0); filter: blur(0);
     transition: transform .32s cubic-bezier(.15,1.5,.4,1), opacity .12s, filter .2s;
   }
-  #juice-tally .jt-eq { font-size: 22px; color: #94a3b8; opacity: 0; }
-  #juice-tally .jt-eq.on { opacity: 1; }
-  #juice-tally .jt-score {
-    font-size: 34px; color: #fff; min-width: 4ch; text-align: left;
-    opacity: 0; text-shadow: 0 0 18px rgba(255,255,255,.25);
+  #juice-tally .jt-plus { font-size: 22px; color: #94a3b8; }
+  #juice-tally .jt-flat {
+    font-size: 26px; color: #94a3b8;
+    transition: transform .12s ease;
   }
-  #juice-tally .jt-score.on { opacity: 1; }
+  #juice-tally .jt-eq { font-size: 22px; color: #94a3b8; display: none; }
+  #juice-tally .jt-eq.on { display: inline; opacity: 1; }
+  #juice-tally .jt-score {
+    font-size: 34px; color: #fff; display: none;
+    text-shadow: 0 0 18px rgba(255,255,255,.25);
+  }
+  #juice-tally .jt-score.on { display: inline; opacity: 1; }
   #juice-tally .jt-score.punch { animation: scorePunch .45s ease; }
   @keyframes scorePunch {
     0% { transform: scale(1); }
@@ -377,11 +410,6 @@
     transition: opacity .4s ease, filter .4s ease, transform .4s ease !important;
     opacity: .2 !important; filter: blur(1.5px); transform: scale(.96);
   }
-  #juice-tally .jt-flat {
-    width: 100%; text-align: center; font-size: 13px; color: #94a3b8;
-    opacity: 0; margin-top: -4px;
-  }
-  #juice-tally .jt-flat.on { opacity: 1; }
   #hand-banner {
     position: fixed; left: 50%; top: 120px; transform: translate(-50%, -50%) scale(.3);
     z-index: 60; font-size: clamp(26px, 5.5vw, 48px); font-weight: 900;
@@ -442,12 +470,14 @@
     100% { transform: translateY(-90px) rotate(22deg) scale(.5); opacity: 0; filter: grayscale(.85); }
   }
   #handarea .card.deal-in {
-    animation: dealIn .38s cubic-bezier(.2,1.3,.4,1) both;
+    animation: dealIn .4s cubic-bezier(.2,1.25,.35,1) both;
+    pointer-events: none;
   }
-  #handarea .card.deal-in:nth-child(n) { animation-delay: calc(var(--di, 0) * 40ms); }
+  #handarea.sorting .card { pointer-events: none; }
   @keyframes dealIn {
-    0% { transform: translateY(24px) scale(.7); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% { transform: translate(-18px, -36px) scale(.55) rotate(-10deg); opacity: 0; filter: brightness(.7); }
+    70% { opacity: 1; }
+    100% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; filter: brightness(1); }
   }
 </style>
 </head>
@@ -652,7 +682,8 @@ function detectHandInfo(cards) {
   if (maxMonth >= 3) return { handId: 'month3', core: topByBaseChip(monthGroups[0], 3) };
   const yeol = cards.filter((c) => effType(c) === 'yeol');
   if (yeol.length >= 3) return { handId: 'yeol3', core: topByBaseChip(yeol, 3) };
-  const tti = cards.filter((c) => c.type === 'tti');
+  // 비단(12월 띠)은 전통 룰대로 띠 셋에서 제외
+  const tti = cards.filter((c) => c.type === 'tti' && !c.tags.includes('bi_tti'));
   if (tti.length >= 3) return { handId: 'tti3', core: topByBaseChip(tti, 3) };
   // 피5: 낸 카드가 전부 피/쌍피이고, 쌍피=2로 환산해 합 ≥5
   if (cards.length >= 1 && cards.every((c) => piCount(c) > 0)
@@ -673,7 +704,7 @@ function detectHandInfo(cards) {
 function detectHand(cards) { return detectHandInfo(cards).handId; }
 
 // ── 특수패 12종 ────────────────────────────────────────────
-// 훅 ctx: { cards, handId, boss, mitjangChips }
+// 훅 ctx: { cards, handId, core, boss, mitjangChips }
 const JOKERS = [
   { id: 'pi_merchant', name: '피장사꾼', icon: '🧺', rarity: 'common', price: 4, kind: '+칩',
     desc: '낸 피 1장당 +4칩, 쌍피 1장당 +8칩',
@@ -694,8 +725,11 @@ const JOKERS = [
     desc: '족보가 홍단/청단/초단 또는 띠 셋이면 +6배수',
     addMult: (x) => (x.handId === 'dan' || x.handId === 'tti3' ? 6 : 0) },
   { id: 'bigwang_usan', name: '비광우산', icon: '☔', rarity: 'uncommon', price: 6, kind: '×배수',
-    desc: '낸 패에 12월(비) 카드가 1장 이상이면 배수 ×2',
-    xMult: (x) => (x.cards.some((c) => c.month === 12) ? 2 : 1) },
+    desc: '족보 구성(코어)에 12월(비) 카드가 있으면 배수 ×2 (무조합 제외)',
+    xMult: (x) => {
+      if (x.handId === 'none') return 1;
+      return x.core.some((c) => c.month === 12) ? 2 : 1;
+    } },
   { id: 'heundeulgi', name: '흔들기', icon: '🌀', rarity: 'uncommon', price: 7, kind: '×배수',
     desc: '낸 패에 같은 달 2장 이상이 있으면 배수 ×1.5 (흔들기 금지 판에선 무효)',
     xMult: (x) => {
@@ -764,7 +798,7 @@ function computeScore(cards, env) {
     if (coreSet.has(c)) chips += v; else flat += v;
   }
 
-  const ctx = { cards, handId, boss: env.boss, mitjangChips: env.mitjangChips };
+  const ctx = { cards, handId, core, boss: env.boss, mitjangChips: env.mitjangChips };
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addChips) chips += j.addChips(ctx); }
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addMult)  mult  += j.addMult(ctx); }
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.xMult)    mult  *= j.xMult(ctx); }
@@ -842,6 +876,8 @@ const state = {
   hoverReact: null,     // 내기/버리기 호버 예측 표정 { mood, text } | null
   lastPlay: null,       // { cards 스냅샷, result, scoreBefore }
   juicing: false,       // 연출 중 입력 잠금 (중간값은 state에 안 넣음)
+  dealing: false,       // 손패 드로우 연출 중
+  pendingGoStop: false, // 목표 달성 → 고/스톱 대기 (이때 드로우 금지)
   playLog: [],
   settleData: null,
   gameOverReason: '',
@@ -884,6 +920,8 @@ function startRound() {
   state.hoverReact = null;
   state.lastPlay = null;
   state.playLog = [];
+  state.pendingGoStop = false;
+  state.dealing = false;
 
   state.boss = isBossRound(state.round) ? state.nextBoss : null;
   state.nextBoss = null;
@@ -893,9 +931,22 @@ function startRound() {
     if (state.boss === 'bibaram') state.discardsLeft = 0;
   }
 
-  refillHand(true);
   state.screen = 'play';
-  render();
+  render(); // 빈 손패부터
+  dealToHand({ isRoundStart: true });
+}
+
+function applyAngaeFaceDown(drawn, isRoundStart) {
+  if (state.boss !== 'angae') return;
+  const pool = isRoundStart ? [...state.hand, ...drawn] : [...drawn];
+  let downCount = state.hand.filter((c) => c.faceDown).length;
+  const candidates = pool.filter((c) => !c.faceDown);
+  shuffle(candidates, rng);
+  for (const c of candidates) {
+    if (downCount >= 3) break;
+    c.faceDown = true;
+    downCount++;
+  }
 }
 
 function refillHand(isRoundStart = false) {
@@ -905,19 +956,72 @@ function refillHand(isRoundStart = false) {
     state.hand.push(c);
     drawn.push(c);
   }
-  if (state.boss === 'angae') {
-    // 뒷면은 항상 최대 3장 유지 — 새로 뽑힌 카드 중에서만 지정 (공개된 카드는 다시 안 뒤집힘)
-    const pool = isRoundStart ? [...state.hand] : [...drawn];
-    let downCount = state.hand.filter((c) => c.faceDown).length;
-    const candidates = pool.filter((c) => !c.faceDown);
-    shuffle(candidates, rng);
-    for (const c of candidates) {
-      if (downCount >= 3) break;
-      c.faceDown = true;
-      downCount++;
-    }
-  }
+  applyAngaeFaceDown(drawn, isRoundStart);
   sortHand();
+  return drawn;
+}
+
+// 빈 자리 상태에서 한 장씩 드로우 → 연출 후 정렬
+async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
+  // 고/스톱 대기 중에는 절대 보충하지 않음
+  if (state.pendingGoStop && !isRoundStart) return;
+  if (state.screen === 'gostop') return;
+
+  const drawn = [];
+  while (state.hand.length + drawn.length < 8 && state.deck.length > 0) {
+    drawn.push(state.deck.pop());
+  }
+  if (!drawn.length) {
+    if (!state.pendingGoStop) {
+      sortHand();
+      render();
+    }
+    return;
+  }
+  applyAngaeFaceDown(drawn, isRoundStart);
+
+  state.dealing = true;
+  render(); // 패 없는/모자란 상태 노출
+  await new Promise((r) => setTimeout(r, isRoundStart ? 160 : 240));
+  if (state.pendingGoStop || state.screen === 'gostop') {
+    // 뽑으려다 고/스톱으로 막히면 덱에 되돌림
+    for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
+    state.dealInUids = null;
+    state.dealing = false;
+    render();
+    return;
+  }
+  if (playGen != null && playGen !== state.playFadeGen) {
+    for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
+    state.dealInUids = null;
+    state.dealing = false;
+    render();
+    return;
+  }
+
+  for (let i = 0; i < drawn.length; i++) {
+    if (state.pendingGoStop || state.screen === 'gostop' ||
+        (playGen != null && playGen !== state.playFadeGen)) {
+      for (let j = drawn.length - 1; j >= i; j--) state.deck.push(drawn[j]);
+      state.dealInUids = null;
+      state.dealing = false;
+      render();
+      return;
+    }
+    state.hand.push(drawn[i]);
+    state.dealInUids = [drawn[i].uid];
+    render();
+    try { sfxChip(); } catch (_) {}
+    await new Promise((r) => setTimeout(r, 105));
+  }
+
+  await new Promise((r) => setTimeout(r, 360));
+  state.dealInUids = null;
+  render();
+  await new Promise((r) => setTimeout(r, 40));
+  await sortHandAnimated();
+  state.dealing = false;
+  render();
 }
 
 const TYPE_ORDER = { kwang: 0, yeol: 1, tti: 2, ssangpi: 3, pi: 4 };
@@ -929,12 +1033,86 @@ function sortHand() {
   });
 }
 
+function captureHandRects() {
+  const map = {};
+  document.querySelectorAll('#handarea [data-uid]').forEach((el) => {
+    map[+el.dataset.uid] = el.getBoundingClientRect();
+  });
+  return map;
+}
+
+// FLIP: 드로우 직후 월별 정렬이 미끄러지듯 이동
+async function sortHandAnimated() {
+  const handEl = $('handarea');
+  if (!handEl || state.hand.length < 2) {
+    sortHand();
+    render();
+    return;
+  }
+  const from = captureHandRects();
+  const before = state.hand.map((c) => c.uid).join(',');
+  sortHand();
+  if (before === state.hand.map((c) => c.uid).join(',')) {
+    render();
+    return;
+  }
+  render();
+  handEl.classList.add('sorting');
+  const els = [...handEl.querySelectorAll('[data-uid]')];
+  const movers = [];
+  for (const el of els) {
+    const prev = from[+el.dataset.uid];
+    if (!prev) continue;
+    const next = el.getBoundingClientRect();
+    const dx = prev.left - next.left;
+    const dy = prev.top - next.top;
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+    el.style.transition = 'none';
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+    movers.push(el);
+  }
+  if (!movers.length) {
+    handEl.classList.remove('sorting');
+    return;
+  }
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  for (const el of movers) {
+    el.style.transition = 'transform .48s cubic-bezier(.22,.9,.28,1)';
+    el.style.transform = 'translate(0, 0)';
+  }
+  await new Promise((r) => setTimeout(r, 500));
+  for (const el of movers) {
+    el.style.transition = '';
+    el.style.transform = '';
+  }
+  handEl.classList.remove('sorting');
+}
+
+// 낸 패 표시용 정렬: 코어(왼쪽) → flat, 각 그룹은 월↑ · 칩↑ · uid
+function sortPlayedCards(cards, env) {
+  let { handId, core } = detectHandInfo(cards);
+  if (env.boss === 'no_shake' && ['month2', 'month3', 'chongtong'].includes(handId)) {
+    core = [...cards];
+  }
+  const coreSet = new Set(core);
+  const byMonthChip = (a, b) => {
+    if (a.month !== b.month) return a.month - b.month;
+    const ca = cardChip(a, env), cb = cardChip(b, env);
+    if (ca !== cb) return ca - cb;
+    return a.uid - b.uid;
+  };
+  return [
+    ...cards.filter((c) => coreSet.has(c)).sort(byMonthChip),
+    ...cards.filter((c) => !coreSet.has(c)).sort(byMonthChip),
+  ];
+}
+
 function selectedCards() {
   return state.selected.map((uid) => state.hand.find((c) => c.uid === uid)).filter(Boolean);
 }
 
 function toggleSelect(uid) {
-  if (state.screen !== 'play' || state.juicing) return;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const i = state.selected.indexOf(uid);
   if (i >= 0) state.selected.splice(i, 1);
   else {
@@ -946,7 +1124,7 @@ function toggleSelect(uid) {
 }
 
 function toggleGukjin() {
-  if (state.screen !== 'play' || state.juicing) return;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
   if (!g) return;
   g.asPi = !g.asPi;
@@ -955,7 +1133,7 @@ function toggleGukjin() {
 
 // ── 내기 ───────────────────────────────────────────────────
 function playSelected() {
-  if (state.screen !== 'play' || state.juicing) return;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.playsLeft <= 0) return;
 
@@ -990,15 +1168,18 @@ function playSelected() {
   }
   state.playsLeft--;
   state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
+  // 이번 내기로 목표 달성 → 고/스톱 전까지 드로우 금지
+  state.pendingGoStop = state.roundScore >= state.target && state.round !== ROUNDS;
 
-  // 낸 패 스냅샷 (국진 모드 포함) — 연출은 이 스냅샷만 재생
+  // 낸 패 스냅샷 (국진 모드 포함) — 코어→flat, 월·칩 순으로 정렬해 연출/표시
   const fromRects = {};
   for (const c of cards) {
     const el = document.querySelector(`#handarea [data-uid="${c.uid}"]`);
     if (el) fromRects[c.uid] = el.getBoundingClientRect();
   }
+  const sorted = sortPlayedCards(cards, env);
   state.lastPlay = {
-    cards: cards.map((c) => ({ ...c, tags: [...c.tags] })),
+    cards: sorted.map((c) => ({ ...c, tags: [...c.tags] })),
     result,
     scoreBefore,
     env: { ...env, jokerIds: [...env.jokerIds] },
@@ -1006,15 +1187,58 @@ function playSelected() {
 
   state.hand = state.hand.filter((c) => !state.selected.includes(c.uid));
   state.selected = [];
-  refillHand();
+  // 보충은 연출 후 — 목표 달성 시엔 고 선택 후에만
 
   // 고/스톱·게임오버는 연출 끝난 뒤에 (모달 중첩·조기 전환 방지)
   state.juicing = true;
   document.body.classList.add('juicing');
   render();
-  playJuiceSequence(state.lastPlay, fromRects).then(() => {
+  const playGen = (state.playFadeGen = (state.playFadeGen || 0) + 1);
+  playJuiceSequence(state.lastPlay, fromRects).then(async () => {
     state.juicing = false;
     document.body.classList.remove('juicing');
+
+    // 목표 달성: 드로우 없이 바로 고/스톱
+    if (state.pendingGoStop || (state.roundScore >= state.target && state.round !== ROUNDS)) {
+      state.pendingGoStop = true;
+      checkAfterPlay();
+      render(); // 팝업 먼저
+      await new Promise((r) => setTimeout(r, 500));
+      if (playGen !== state.playFadeGen) return;
+      const pa = $('playedarea');
+      if (pa && state.lastPlay) {
+        pa.classList.add('play-fade-out');
+        await new Promise((r) => setTimeout(r, 420));
+      }
+      if (playGen !== state.playFadeGen) return;
+      state.lastPlay = null;
+      if (pa) pa.classList.remove('play-fade-out');
+      render();
+      return;
+    }
+
+    render(); // 정렬된 낸 패 + 결과 잠깐 고정
+    await new Promise((r) => setTimeout(r, 750));
+    if (playGen !== state.playFadeGen) return;
+    const pa = $('playedarea');
+    if (pa && state.lastPlay) {
+      pa.classList.add('play-fade-out');
+      await new Promise((r) => setTimeout(r, 420));
+    }
+    if (playGen !== state.playFadeGen) return;
+    state.lastPlay = null;
+    if (pa) pa.classList.remove('play-fade-out');
+
+    if (state.roundScore >= state.target) {
+      // 12월 클리어 등
+      checkAfterPlay();
+      render();
+      return;
+    }
+
+    render();
+    await dealToHand({ playGen });
+    if (playGen !== state.playFadeGen) return;
     checkAfterPlay();
     render();
   });
@@ -1023,31 +1247,36 @@ function playSelected() {
 function checkAfterPlay() {
   if (state.roundScore >= state.target) {
     if (state.round === ROUNDS) { victory(); return; }
-    if (state.playsLeft === 0) { settle(); return; }
-    state.screen = 'gostop'; // 고는 무제한 — 남은 내기가 있는 한 계속 선택 가능
+    // 내기 0이어도 고/스톱 선택 — 고 시 내기 +1로 이어갈 수 있음
+    state.screen = 'gostop';
   } else if (state.playsLeft === 0) {
     gameOver(state.goLevel > 0 ? '고박' : '목표 미달');
   }
 }
 
-function chooseGo() {
-  if (state.screen !== 'gostop') return;
+async function chooseGo() {
+  if (state.screen !== 'gostop' || state.dealing) return;
   state.goLevel++;
   state.target = goTarget(state.baseTarget, state.goLevel, state.roundScore);
+  state.playsLeft++; // 고 보상: 내기 +1 (버리기는 추가하지 않음)
+  state.pendingGoStop = false;
   state.screen = 'play';
-  checkAfterPlay(); // goTarget이 항상 현재 점수보다 크므로 즉시 재진입은 없음 (방어적 재판정)
+  render(); // 모달 닫고 모자란 손패 노출
+  await dealToHand();
+  checkAfterPlay();
   render();
 }
 
 function chooseStop() {
   if (state.screen !== 'gostop') return;
+  state.pendingGoStop = false;
   settle();
   render();
 }
 
 // ── 버리기 ─────────────────────────────────────────────────
 function discardSelected() {
-  if (state.screen !== 'play' || state.juicing) return;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.discardsLeft <= 0) return;
   const uids = cards.map((c) => c.uid);
@@ -1061,15 +1290,13 @@ function discardSelected() {
   render(); // 손패에 남긴 채로 날아가는 애니
   sfxDiscard();
 
-  const finish = () => {
+  const finish = async () => {
     state.hand = state.hand.filter((c) => !uids.includes(c.uid));
     state.discardAnimUids = null;
-    refillHand();
     state.juicing = false;
     document.body.classList.remove('juicing');
-    state.dealInUids = state.hand.slice(-uids.length).map((c) => c.uid);
-    render();
-    setTimeout(() => { state.dealInUids = null; }, 500);
+    render(); // 버린 뒤 빈 자리
+    await dealToHand();
   };
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
@@ -1186,7 +1413,7 @@ function restart() {
     nextBoss: null, bossCandidates: null, shopOffers: [], rerollCost: 2,
     kwangSoldThisRound: 0, mitjangChips: 0, makgeolli: 0,
     chunhyangNext: false, drunk: false, hoverReact: null, tempReact: null,
-    lastPlay: null, juicing: false, playLog: [],
+    lastPlay: null, juicing: false, dealing: false, pendingGoStop: false, playLog: [],
     settleData: null, gameOverReason: '',
     stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
   });
@@ -1328,10 +1555,14 @@ function cardHTML(card, opts = {}) {
   const dd = discarding ? state.discardAnimUids.indexOf(card.uid) : -1;
   if (card.faceDown && !opts.reveal) {
     const selCls = opts.selectable && state.selected.includes(card.uid) && !discarding ? ' sel' : '';
+    const dealCls = state.dealInUids && state.dealInUids.includes(card.uid) ? ' deal-in' : '';
     const discCls = discarding ? ' discarding' : '';
-    const styleAttr = discarding ? ` style="--dd:${dd}"` : '';
+    const styleBits = [];
+    if (dealCls) styleBits.push(`--di:${state.dealInUids.indexOf(card.uid)}`);
+    if (discarding) styleBits.push(`--dd:${dd}`);
+    const styleAttr = styleBits.length ? ` style="${styleBits.join(';')}"` : '';
     const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
-    return `<div class="card facedown${selCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
+    return `<div class="card facedown${selCls}${dealCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
   }
   const t = effType(card);
   let cls = `card ${t === 'ssangpi' && card.type === 'yeol' ? 'ssangpi' : card.type}`;
@@ -1437,9 +1668,11 @@ function renderTopbar() {
     const j = state.jokers[i];
     if (j) {
       const def = JOKER_BY_ID[j.id];
-      slots += `<div class="jokerslot filled" title="${esc(def.desc)}">
+      const mit = def.id === 'mitjang' ? ` · 현재 +${state.mitjangChips}칩` : '';
+      slots += `<div class="jokerslot filled">
         <div class="jname">${def.icon} ${def.name}</div>
-        <div class="jdesc">${esc(def.kind)}${def.id === 'mitjang' ? ` · 현재 +${state.mitjangChips}칩` : ''}</div>
+        <div class="jdesc">${esc(def.kind)}${mit}</div>
+        <div class="jtip">${esc(def.desc)}${def.id === 'mitjang' ? `<br>누적 +${state.mitjangChips}칩` : ''}</div>
       </div>`;
     } else {
       slots += `<div class="jokerslot">특수패<br>빈 슬롯</div>`;
@@ -1521,7 +1754,7 @@ function renderTable() {
     const sig = `${r.handId}:${r.score}:${state.lastPlay.cards.map((c) => c.uid).join(',')}`;
     if (pa.dataset.playSig !== sig) {
       pa.dataset.playSig = sig;
-      pa.classList.remove('juice-stage');
+      pa.classList.remove('juice-stage', 'play-fade-out');
       pa.innerHTML =
         state.lastPlay.cards.map((c) => cardHTML(c, { reveal: true })).join('') +
         `<div id="playresult">
@@ -1532,14 +1765,14 @@ function renderTable() {
     }
   } else {
     pa.dataset.playSig = '';
-    pa.classList.remove('juice-stage');
+    pa.classList.remove('juice-stage', 'play-fade-out');
     pa.innerHTML = `<div class="hint">여기에 낸 패와 점수가 표시됩니다 — 카드를 선택하고 [내기]를 누르세요</div>`;
   }
 
   $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true })).join('');
 
   const n = state.selected.length;
-  const canAct = state.screen === 'play' && !state.juicing;
+  const canAct = state.screen === 'play' && !state.juicing && !state.dealing;
   $('btn-play').textContent = `내기 (${state.playsLeft}회 남음)`;
   $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0;
   $('btn-discard').textContent = `버리기 (${state.discardsLeft}회 남음)`;
@@ -1605,7 +1838,7 @@ function gostopHTML() {
       <button class="choicebtn btn-go" onclick="chooseGo()">
         <div class="t">🔥 ${n}고!</div>
         <div class="d">새 목표 <b>${fmt(newTarget)}점</b> ${floored ? '(점수를 크게 넘겨 목표 상향!)' : `(원래 목표 ×${goMult(n)})`}<br>
-        성공 시 정산에 <b>+${goBonus(n)}냥</b> · 남은 내기 안에 못 넘으면 <b>고박 = 런 종료</b></div>
+        내기 <b>+1회</b> · 손패 보충 · 성공 시 <b>+${goBonus(n)}냥</b> · 못 넘으면 <b>고박 = 런 종료</b></div>
       </button>
     </div>`;
 }
@@ -1716,7 +1949,7 @@ function helpHTML() {
       godori: '2·4·8월 열끗(새) 3장', samgwang: '광 3장 (비광 제외)', bisamgwang: '광 3장 (비광 포함)',
       dan: '홍단·청단·초단 중 한 세트 3장', month3: '같은 달 3장',
       yeol3: '열끗 3장 이상 (배수 타는 건 칩 높은 3장)',
-      tti3: '띠 3장 이상 (비단 포함, 배수 타는 건 칩 높은 3장)',
+      tti3: '띠 3장 이상 (비단 제외, 배수 타는 건 칩 높은 3장)',
       pi5: '피·쌍피만, 쌍피=2로 환산해 합 5 이상', month2: '같은 달 2장', none: '해당 없음',
     }[h.id];
     return `<tr><td>${h.name}</td><td>${cond}</td><td>×${h.mult}</td></tr>`;
@@ -1730,7 +1963,7 @@ function helpHTML() {
     <div class="sub" style="margin-top:10px">
       카드 칩: 광 12 · 열끗 8 · 띠 6 · 쌍피 5 · 피 2<br>
       <b>시간 시스템</b>: 판 = 1월(송학)→12월(비). 이달의 패는 칩 ×2, 홀수 달 낮☀️엔 광·열끗 +2칩, 짝수 달 밤🌙엔 띠·피 +2칩.<br>
-      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}과 현재 점수+25% 중 큰 쪽, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
+      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}과 현재 점수+25% 중 큰 쪽, 내기 +1회·버리기 추가 없음, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
       9월 국진 열끗은 열끗↔쌍피 전환 가능. 3·6·9·12월은 박 라운드(디버프).<br>
       🍶 준비/상점에서 춘향 훈수를 예약(3냥)하면 그 달 내내 패를 봐줍니다. 패를 고른 뒤 내기·버리기에 마우스를 올리면 다음 패를 예측해 표정이 바뀝니다.
     </div>
@@ -2075,17 +2308,19 @@ async function playJuiceSequence(snap, fromRects = null) {
     }
 
     // 스테이지 세팅 — 카드는 손패에서 날아온 뒤 보임
+    pa.classList.remove('play-fade-out');
     pa.classList.add('juice-stage');
     pa.dataset.playSig = '';
     pa.innerHTML = `
       <div id="juice-cards"></div>
       <div id="juice-tally" style="opacity:0">
-        <span class="jt-chips" id="jt-chips">0</span>
-        <span class="jt-times" id="jt-times">×</span>
-        <span class="jt-mult" id="jt-mult">${fmtMult(bd.mult)}</span>
-        <span class="jt-eq" id="jt-eq">=</span>
-        <span class="jt-score" id="jt-score">0</span>
-        <div class="jt-flat" id="jt-flat"></div>
+        <div class="jt-row">
+          <span class="jt-chips" id="jt-chips">0</span>
+          <span class="jt-times" id="jt-times">×</span>
+          <span class="jt-mult" id="jt-mult">${fmtMult(bd.mult)}</span>
+          <span class="jt-eq" id="jt-eq">=</span>
+          <span class="jt-score" id="jt-score">0</span>
+        </div>
       </div>`;
     const cardsEl = $('juice-cards');
     const wraps = bd.steps.map((s) => {
@@ -2127,10 +2362,25 @@ async function playJuiceSequence(snap, fromRects = null) {
       tally.style.opacity = '1';
     }
 
-    // 2) 카드 칩 순차 가산 (이미 올라온 카드 위에서 쥬시하게)
+    // 2) 카드 칩 순차 가산 (코어 → jt-chips, flat → +jt-flat)
     const chipsEl = $('jt-chips');
+    const eqEl = $('jt-eq');
     let chips = 0;
     let flat = 0;
+    let flatEl = null;
+
+    const ensureFlatUI = () => {
+      if (flatEl || !eqEl) return;
+      const plusEl = document.createElement('span');
+      plusEl.className = 'jt-plus';
+      plusEl.id = 'jt-plus';
+      plusEl.textContent = '+';
+      flatEl = document.createElement('span');
+      flatEl.className = 'jt-flat';
+      flatEl.id = 'jt-flat';
+      flatEl.textContent = '0';
+      eqEl.before(plusEl, flatEl);
+    };
 
     if (bd.handBase > 0) {
       chips = bd.handBase;
@@ -2153,7 +2403,13 @@ async function playJuiceSequence(snap, fromRects = null) {
         chips += step.chip;
         await animateNumber(chipsEl, chips - step.chip, chips, 120);
       } else {
+        ensureFlatUI();
+        const from = flat;
         flat += step.chip;
+        await animateNumber(flatEl, from, flat, 140);
+        flatEl.style.transform = 'scale(1.18)';
+        await juiceWait(80);
+        flatEl.style.transform = '';
       }
       await juiceWait(200);
       w.classList.remove('pulse');
@@ -2171,6 +2427,10 @@ async function playJuiceSequence(snap, fromRects = null) {
       chips = bd.handBase + bd.steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0) + bd.jokerChips;
       flat = bd.flatSum;
       chipsEl.textContent = fmt(chips);
+      if (flat > 0) {
+        ensureFlatUI();
+        flatEl.textContent = fmt(flat);
+      }
       if (tally) tally.style.opacity = '1';
     }
 
@@ -2183,14 +2443,9 @@ async function playJuiceSequence(snap, fromRects = null) {
     await juiceWait(320);
 
     // 4) 최종 점수 롤업 → 사이드 착지
-    $('jt-eq').classList.add('on');
+    eqEl.classList.add('on');
     const scoreEl = $('jt-score');
     scoreEl.classList.add('on');
-    if (flat > 0 || bd.flatSum > 0) {
-      const fl = $('jt-flat');
-      fl.textContent = `+ ${fmt(bd.flatSum)} (배수 밖)`;
-      fl.classList.add('on');
-    }
     sfxScore();
     const rollMs = Math.min(900, 280 + Math.abs(bd.score) * 1.2);
     await animateNumber(scoreEl, 0, bd.score, rollMs);
