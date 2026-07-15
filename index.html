@@ -1918,8 +1918,6 @@ function flyScoreToSide(fromEl, toEl, label) {
 
     const dx = ex - sx;
     const dy = ey - sy;
-    const mx = dx * 0.42;
-    const my = dy * 0.28 - Math.min(72, 36 + Math.abs(dx) * 0.08);
 
     const finish = () => {
       if (ghost.parentNode) ghost.remove();
@@ -1928,27 +1926,23 @@ function flyScoreToSide(fromEl, toEl, label) {
 
     try {
       const anim = ghost.animate([
-        { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1, filter: 'blur(0px)', offset: 0 },
-        { transform: `translate(calc(-50% + ${mx * 0.55}px), calc(-50% + ${my}px)) scale(1.08) rotate(-3deg)`,
-          opacity: 1, filter: 'blur(0px)', offset: 0.38 },
-        { transform: `translate(calc(-50% + ${dx * 0.92}px), calc(-50% + ${dy * 0.92}px)) scale(0.55) rotate(2deg)`,
-          opacity: 0.95, filter: 'blur(0.5px)', offset: 0.82 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, filter: 'blur(0px)' },
         { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.28)`,
-          opacity: 0, filter: 'blur(2px)', offset: 1 },
+          opacity: 0, filter: 'blur(1.5px)' },
       ], {
-        duration: 680,
-        easing: 'cubic-bezier(0.22, 0.9, 0.28, 1)',
+        duration: 420,
+        easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
         fill: 'forwards',
       });
       anim.onfinish = finish;
       anim.oncancel = finish;
-      setTimeout(finish, 750);
+      setTimeout(finish, 480);
     } catch (_) {
-      ghost.style.transition = 'transform .62s cubic-bezier(.22,.9,.28,1), opacity .62s ease';
+      ghost.style.transition = 'transform .4s ease, opacity .4s ease';
       void ghost.offsetWidth;
       ghost.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.3)`;
       ghost.style.opacity = '0';
-      setTimeout(finish, 640);
+      setTimeout(finish, 420);
     }
   });
 }
