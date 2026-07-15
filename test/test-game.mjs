@@ -48,6 +48,10 @@ console.log('[2] 족보 판정');
   assert(det(pick((c) => c.tags.includes('hongdan'))) === 'dan', '홍단');
   const pisSameMonth = [...pick((c) => c.type === 'pi' && c.month === 1), ...pick((c) => c.type === 'pi' && [2, 3].includes(c.month)).slice(0, 3)];
   assert(det(pisSameMonth) === 'pi5', '피5 > 같은달2 우선순위');
+  // 쌍피=2 환산: 피3 + 쌍피1 = 피 환산 5 → 피5 (카드 4장)
+  const pi3 = pick((c) => c.type === 'pi').slice(0, 3);
+  const sp = pick((c) => c.type === 'ssangpi')[0];
+  assert(det([...pi3, sp]) === 'pi5', '쌍피=2 환산으로 피3+쌍피1 → 피5');
 }
 
 // ─── 3. 계절(이달의 패) + 밤일낮장 ────────────────────────
@@ -68,10 +72,10 @@ console.log('[3] 계절 · 밤낮 보정');
   assert(E.cardChip(m1pi, env({ seasonMonth: 1, night: true, boss: 'pibak' })) === 0, '피박은 계절 보정도 0으로');
   assert(E.cardChip(m1pi, env({ seasonMonth: 1, night: true, boss: 'pibak', jokerIds: ['pibak_boheom'] })) === 6, '피박보험 시 보정 복구');
 
-  // computeScore 통합: 1월 피 2장(이달), 낮 → month2 = (10 + 4 + 4) × 2 = 36
+  // computeScore 통합: 1월 피 2장(이달), 낮 → month2 = (4 + 4) × 2 = 16 (족보 기본칩 없음)
   const m1pis = pick((c) => c.month === 1 && c.type === 'pi');
   const r = E.computeScore(m1pis, env({ seasonMonth: 1, night: false }));
-  assert(r.handId === 'month2' && r.score === 36, `계절 통합 36점 (실제 ${r.score})`);
+  assert(r.handId === 'month2' && r.score === 16, `계절 통합 16점 (실제 ${r.score})`);
 }
 
 // ─── 3.5 코어/플랫 분리 (족보 구성 카드만 배수) ────────────
@@ -79,24 +83,29 @@ console.log('[3.5] 코어/플랫 분리');
 {
   const d = E.buildDeck();
   const pick = (p) => d.filter(p);
-  // 삼광(비광 제외) + 피 2장: (40 + 광12×3)×5 + 피2×2 = 380 + 4 = 384
+  // 삼광(비광 제외) + 피 2장: (광12×3)×5 + 피2×2 = 180 + 4 = 184
   const kw3 = pick((c) => c.type === 'kwang' && !c.tags.includes('bikwang')).slice(0, 3);
   const pi2 = pick((c) => c.type === 'pi' && c.month === 5);
   const r = E.computeScore([...kw3, ...pi2], env());
-  assert(r.handId === 'samgwang' && r.flat === 4 && r.score === 384,
-    `삼광+피2 = 384점, flat 4 (실제 ${r.score}, flat ${r.flat})`);
+  assert(r.handId === 'samgwang' && r.flat === 4 && r.score === 184,
+    `삼광+피2 = 184점, flat 4 (실제 ${r.score}, flat ${r.flat})`);
   // 코어만 낼 때는 flat 0
   const r2 = E.computeScore(kw3, env());
-  assert(r2.flat === 0 && r2.score === (40 + 36) * 5, '삼광만 = flat 0');
+  assert(r2.flat === 0 && r2.score === 36 * 5, `삼광만 = 180 (실제 ${r2.score})`);
   // month2 짝 2개면 기본칩 합 높은 쪽이 코어
   const m1 = pick((c) => c.month === 1 && c.type !== 'kwang').slice(0, 2); // 띠6+피2 = 8
   const m11 = pick((c) => c.month === 11 && c.type !== 'kwang').slice(0, 2); // 쌍피5+피2 = 7
   const info = E.detectHandInfo([...m1, ...m11]);
   assert(info.handId === 'month2' && info.core.every((c) => c.month === 1), 'month2 짝 2개 → 칩 높은 1월 코어');
-  // 무조합은 전부 코어 (flat 0, 배수 1이라 결과 동일)
+  // 무조합은 전부 코어 (flat 0, 배수 1)
   const noneCards = [pick((c) => c.month === 1 && c.type === 'kwang')[0], pick((c) => c.month === 2 && c.type === 'pi')[0]];
   const r3 = E.computeScore(noneCards, env());
-  assert(r3.handId === 'none' && r3.flat === 0 && r3.score === 5 + 12 + 2, `무조합 전부 코어 (실제 ${r3.score}, flat ${r3.flat})`);
+  assert(r3.handId === 'none' && r3.flat === 0 && r3.score === 12 + 2, `무조합 카드합 (실제 ${r3.score}, flat ${r3.flat})`);
+  // 열끗 5장: 코어 3장만 배수, 나머지 2장은 flat
+  const yeol5 = pick((c) => c.type === 'yeol' && !c.tags.includes('dual')).slice(0, 5);
+  const ry = E.computeScore(yeol5, env());
+  assert(ry.handId === 'yeol3' && ry.flat === 16 && ry.score === 8 * 3 * 3 + 16,
+    `열끗5 = (24)×3 + 16 = 88 (실제 score ${ry.score}, flat ${ry.flat})`);
 }
 
 // ─── 4. 고 무제한 공식 ────────────────────────────────────
@@ -124,7 +133,7 @@ console.log('[5] 특수패·박 회귀');
   assert(E.computeScore(m1pi2, env({ jokerIds: ['heundeulgi'], boss: 'no_shake' })).handId === 'none', 'no_shake 강등');
   const guk = pick((c) => c.tags.includes('dual'))[0];
   guk.asPi = true;
-  assert(E.computeScore([guk], env({ boss: 'meongbak' })).chips === 5 + 5, '국진 쌍피 모드 멍박 면제');
+  assert(E.computeScore([guk], env({ boss: 'meongbak' })).chips === 5, '국진 쌍피 모드 멍박 면제');
   guk.asPi = false;
 }
 
