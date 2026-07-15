@@ -27,13 +27,13 @@
     background: rgba(0,0,0,.35); border-bottom: 1px solid var(--panel-line);
     flex-wrap: wrap; position: relative; z-index: 40;
   }
-  #logo { font-weight: 900; font-size: 17px; color: var(--gold-soft); letter-spacing: 1px; white-space: nowrap; }
-  #logo small { display: block; font-size: 10px; font-weight: 400; color: #cbd5e1; letter-spacing: 2px; }
+  #logo { font-weight: 900; font-size: 20px; color: var(--gold-soft); letter-spacing: 1px; white-space: nowrap; }
+  #logo small { display: block; font-size: 11px; font-weight: 400; color: #cbd5e1; letter-spacing: 2px; }
   #jokerbar { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
   .jokerslot {
-    width: 118px; min-height: 42px; border-radius: 9px; padding: 8px;
+    width: 140px; min-height: 50px; border-radius: 9px; padding: 9px;
     background: rgba(255,255,255,.07); border: 1px dashed rgba(255,255,255,.22);
-    font-size: 10.5px; color: #94a3b8; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #94a3b8; display: flex; align-items: center; justify-content: center;
     text-align: center;
   }
   .jokerslot.filled {
@@ -41,8 +41,8 @@
     border: 1px solid var(--gold); background: linear-gradient(160deg, #3b2f14, #241c0b);
     color: #fde68a; display: block; cursor: help;
   }
-  .jokerslot .jname { font-weight: 800; font-size: 12px; }
-  .jokerslot .jdesc { font-size: 9.5px; color: #d6c58a; margin-top: 2px; line-height: 1.35; }
+  .jokerslot .jname { font-weight: 800; font-size: 14px; }
+  .jokerslot .jdesc { font-size: 11px; color: #d6c58a; margin-top: 2px; line-height: 1.35; }
   .jokerslot.filled .jtip {
     display: none; position: absolute; left: 50%; top: calc(100% + 8px);
     transform: translateX(-50%); z-index: 130; pointer-events: none;
@@ -55,21 +55,45 @@
     content: ''; position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%);
     border: 6px solid transparent; border-bottom-color: rgba(212,175,55,.55);
   }
-  .jokerslot.filled:hover .jtip { display: block; }
-  #moneybox { font-size: 16px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
-  #moneybox .delta { font-size: 12px; color: #a3e635; }
+  @media (hover: hover) {
+    .jokerslot.filled:hover .jtip { display: block; }
+  }
+  #moneybox { font-size: 19px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
+  #moneybox .delta { font-size: 13px; color: #a3e635; }
+  #top-help {
+    display: none; flex-shrink: 0;
+    background: rgba(255,255,255,.14); color: #e2e8f0;
+    padding: 7px 10px; font-size: 13px; font-weight: 800; border-radius: 8px;
+  }
 
   /* ── 본문 레이아웃 ───────────────────── */
-  #main { display: flex; gap: 14px; padding: 14px 16px 30px; align-items: flex-start; flex-wrap: wrap; }
+  #main { display: flex; gap: 16px; padding: 16px 18px 34px; align-items: flex-start; flex-wrap: wrap; }
   #side {
-    width: 235px; min-width: 215px; flex-shrink: 0;
-    display: flex; flex-direction: column; gap: 10px;
+    width: 280px; min-width: 260px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 12px;
   }
-  .panel { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 12px; }
-  #table { flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+  .panel { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px; }
+  #table { flex: 1; min-width: 360px; display: flex; flex-direction: column; gap: 14px; }
 
-  #roundlabel { font-size: 14px; font-weight: 800; color: #e2e8f0; }
+  #roundpanel {
+    border-radius: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    transition: background .35s ease, border-color .35s ease;
+  }
+  #roundpanel.day {
+    background: linear-gradient(145deg, rgba(250,204,21,.14), rgba(255,255,255,.06) 45%, rgba(0,0,0,.12));
+    border-color: rgba(253,224,71,.28);
+  }
+  #roundpanel.night {
+    background: linear-gradient(145deg, rgba(59,130,246,.16), rgba(30,58,138,.18) 50%, rgba(0,0,0,.16));
+    border-color: rgba(147,197,253,.28);
+  }
+  #roundlabel { font-size: 17px; font-weight: 900; color: #f8fafc; letter-spacing: -0.2px; }
   #roundlabel .bak { color: #fca5a5; }
+  #roundlabel .round-meta { color: #94a3b8; font-size: 12px; font-weight: 700; margin-left: 4px; }
+  #seasonline { font-size: 12.5px; color: #cbd5e1; margin-top: 6px; line-height: 1.55; }
+  #seasonline b { color: #fde68a; }
   #bossbanner {
     border: 1px solid rgba(252,165,165,.5); background: rgba(127,29,29,.45);
     border-radius: 10px; padding: 8px 10px; font-size: 11.5px; line-height: 1.45; color: #fecaca;
@@ -77,20 +101,53 @@
   #bossbanner b { color: #fee2e2; }
   #bossbanner .nullified { color: #86efac; font-weight: 700; }
 
-  .statline { display: flex; justify-content: space-between; font-size: 12.5px; margin: 3px 0; color: #cbd5e1; }
-  .statline b { color: #fff; font-size: 14px; }
-  #target-val { color: var(--gold-soft); font-size: 16px; }
-  #score-val { color: #93c5fd; font-size: 16px; }
-  #gauge { height: 10px; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; margin: 6px 0 2px; }
+  .statline { display: flex; justify-content: space-between; font-size: 14px; margin: 3px 0; color: #cbd5e1; }
+  .statline b { color: #fff; font-size: 16px; }
+  #target-val { color: var(--gold-soft); font-size: 19px; }
+  #score-val { color: #93c5fd; font-size: 19px; }
+  #gauge { height: 12px; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; margin: 6px 0 2px; }
   #gauge > div { height: 100%; background: linear-gradient(90deg, #38bdf8, #a3e635); transition: width .35s ease; }
   .golevel { font-size: 11.5px; color: #fbbf24; margin-top: 4px; font-weight: 700; }
 
-  #previewbox { min-height: 74px; }
-  #previewbox .pv-hand { font-weight: 900; font-size: 15px; color: var(--gold-soft); }
-  #previewbox .pv-formula { font-size: 13px; margin-top: 3px; color: #e2e8f0; }
-  #previewbox .pv-formula .c { color: var(--chip-blue); font-weight: 800; }
-  #previewbox .pv-formula .m { color: var(--mult-red); font-weight: 800; }
-  #previewbox .pv-score { font-size: 19px; font-weight: 900; color: #fff; margin-top: 3px; }
+  #previewbox { min-height: 110px; }
+  #previewbox .pv-hand {
+    font-weight: 900; font-size: 16px; color: var(--gold-soft);
+    margin-bottom: 8px;
+  }
+  #previewbox .pv-boxes {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 4px; align-items: stretch; margin-bottom: 8px;
+  }
+  #previewbox .pv-box {
+    border-radius: 9px; padding: 7px 6px; text-align: center;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(0,0,0,.22);
+    min-width: 0;
+  }
+  #previewbox .pv-box .lbl {
+    display: block; font-size: 9px; font-weight: 700; color: #94a3b8;
+    letter-spacing: 0.02em; margin-bottom: 2px;
+  }
+  #previewbox .pv-box .val {
+    display: block; font-size: 18px; font-weight: 900; font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  #previewbox .pv-box.chips .val { color: var(--chip-blue); }
+  #previewbox .pv-box.mult .val { color: var(--mult-red); }
+  #previewbox .pv-box.flat .val { color: #cbd5e1; }
+  #previewbox .pv-box.flat.off { opacity: .45; }
+  #previewbox .pv-op {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; color: #64748b; padding: 0 1px;
+  }
+  #previewbox .pv-total {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 8px; padding: 8px 10px; border-radius: 9px;
+    background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(147,197,253,.1));
+    border: 1px solid rgba(147,197,253,.25);
+  }
+  #previewbox .pv-total .tl { font-size: 11px; font-weight: 700; color: #94a3b8; }
+  #previewbox .pv-total .tv { font-size: 24px; font-weight: 900; color: #fff; }
   #previewbox .pv-empty { font-size: 11.5px; color: #94a3b8; line-height: 1.5; }
 
   #playlog { font-size: 11px; color: #cbd5e1; }
@@ -99,65 +156,78 @@
 
   /* ── 낸 패 / 손패 ────────────────────── */
   #playedarea {
-    min-height: 152px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.16);
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 12px; flex-wrap: wrap; position: relative;
+    min-height: 180px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.16);
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 14px; flex-wrap: wrap; position: relative;
     transition: opacity .42s ease, transform .42s ease;
   }
   #playedarea.play-fade-out {
     opacity: 0; transform: translateY(-10px) scale(.97); pointer-events: none;
   }
-  #playedarea .hint { color: rgba(255,255,255,.35); font-size: 12.5px; }
+  #playedarea .hint { color: rgba(255,255,255,.35); font-size: 14px; }
   #playresult { text-align: center; width: 100%; }
-  #playresult .r-hand { font-size: 15px; font-weight: 900; color: var(--gold-soft); }
-  #playresult .r-formula { font-size: 13px; color: #e2e8f0; }
+  #playresult .r-hand { font-size: 17px; font-weight: 900; color: var(--gold-soft); }
+  #playresult .r-formula { font-size: 15px; color: #e2e8f0; }
   #playresult .r-formula .c { color: var(--chip-blue); font-weight: 800; }
   #playresult .r-formula .m { color: var(--mult-red); font-weight: 800; }
-  #playresult .r-score { font-size: 26px; font-weight: 900; color: #fff; }
+  #playresult .r-score { font-size: 30px; font-weight: 900; color: #fff; }
   /* pop 애니 제거: 카드 선택 시 render가 DOM을 다시 그리며 반복 재생되던 버그 방지 */
 
-  #handarea { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 116px; }
-  #actions { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
-  .bigbtn { padding: 12px 26px; font-size: 15px; font-weight: 900; border-radius: 10px; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
+  #handarea { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 140px; }
+  #actions { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  #deckbox {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 14px; border-radius: 999px;
+    background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.14);
+    font-size: 14px; font-weight: 800; color: #e2e8f0;
+    white-space: nowrap; user-select: none;
+  }
+  #deckbox .deck-ico { font-size: 15px; opacity: .9; }
+  #deckbox b { color: #fde68a; font-variant-numeric: tabular-nums; }
+  .bigbtn { padding: 14px 28px; font-size: 17px; font-weight: 900; border-radius: 10px; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
   #btn-play { background: linear-gradient(180deg, #dc2626, #991b1b); color: #fff; }
   #btn-discard { background: linear-gradient(180deg, #2563eb, #1e40af); color: #fff; }
-  #btn-gukjin { background: linear-gradient(180deg, #7c3aed, #5b21b6); color: #fff; padding: 9px 14px; font-size: 12px; font-weight: 800; }
+  @media (min-width: 721px) {
+    #btn-play, #btn-discard { width: 210px; box-sizing: border-box; }
+  }
+  #btn-gukjin { background: linear-gradient(180deg, #7c3aed, #5b21b6); color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 800; display: none; }
+  #btn-gukjin.on { display: inline-block; }
   .smallbtn { background: rgba(255,255,255,.14); color: #e2e8f0; padding: 7px 12px; font-size: 12px; font-weight: 700; }
 
   /* ── 카드 ────────────────────────────── */
   .card {
-    width: 64px; height: 98px;
+    width: 80px; height: 122px;
     background: linear-gradient(160deg, #fffbef, #f5ecd4);
-    border-radius: 7px; border: 1.5px solid rgba(0,0,0,.55);
+    border-radius: 8px; border: 1.5px solid rgba(0,0,0,.55);
     box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px rgba(192,57,43,.85), inset 0 0 0 4px rgba(255,255,255,.6);
     position: relative; display: flex; flex-direction: column; align-items: center;
-    padding: 6px 4px 5px; color: var(--ink); user-select: none; cursor: pointer;
+    padding: 7px 5px 6px; color: var(--ink); user-select: none; cursor: pointer;
     transition: transform .13s ease, box-shadow .13s ease; flex-shrink: 0;
   }
   .card:hover { transform: translateY(-5px); }
-  .card.sel { transform: translateY(-14px); box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px var(--gold), inset 0 0 0 2.5px rgba(192,57,43,.85); }
+  .card.sel { transform: translateY(-16px); box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px var(--gold), inset 0 0 0 2.5px rgba(192,57,43,.85); }
   .card.static { cursor: default; }
   .card.static:hover { transform: none; }
-  .card .month { font-size: 11px; font-weight: 800; line-height: 1; color: var(--red); align-self: flex-start; margin-left: 2px; }
-  .card .mname { font-size: 8.5px; color: #8a6d3b; align-self: flex-start; margin: 1px 0 0 2px; letter-spacing: -0.5px; }
-  .card .art { font-size: 25px; line-height: 1; margin-top: 7px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
-  .card .tag { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: 9px; font-weight: 700; text-align: center; border-radius: 4px; padding: 2px 0; letter-spacing: .5px; }
+  .card .month { font-size: 13px; font-weight: 800; line-height: 1; color: var(--red); align-self: flex-start; margin-left: 2px; }
+  .card .mname { font-size: 10px; color: #8a6d3b; align-self: flex-start; margin: 1px 0 0 2px; letter-spacing: -0.5px; }
+  .card .art { font-size: 30px; line-height: 1; margin-top: 8px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+  .card .tag { position: absolute; bottom: 5px; left: 5px; right: 5px; font-size: 10px; font-weight: 700; text-align: center; border-radius: 4px; padding: 2px 0; letter-spacing: .5px; }
   .card.kwang { background: linear-gradient(160deg, #fff8dc, #f3e5ab); box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px var(--gold), inset 0 0 0 4px rgba(255,255,255,.6); }
   .card.kwang.sel { box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px #fff, inset 0 0 0 2.5px var(--gold); }
   .card.kwang .gwangmark {
-    margin-top: 3px; width: 27px; height: 27px; border-radius: 50%;
+    margin-top: 3px; width: 32px; height: 32px; border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffe98a, var(--gold));
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 900; color: #7c2d12; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+    font-size: 17px; font-weight: 900; color: #7c2d12; box-shadow: 0 1px 3px rgba(0,0,0,.4);
   }
-  .card.kwang .art { font-size: 21px; }
+  .card.kwang .art { font-size: 25px; }
   .card.kwang .tag { background: var(--gold); color: #5c3a00; }
   .card.kwang.rain .tag { background: #475569; color: #dbeafe; }
   .card.yeol .tag { background: #b45309; color: #fef3c7; }
   .card.tti .ribbon {
-    margin-top: 5px; width: 15px; height: 42px; border-radius: 2px;
+    margin-top: 5px; width: 17px; height: 50px; border-radius: 2px;
     display: flex; align-items: center; justify-content: center;
-    writing-mode: vertical-rl; font-size: 9px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.35);
+    writing-mode: vertical-rl; font-size: 10px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.35);
   }
   .card.tti.hongdan .ribbon { background: #c0392b; color: #fff; }
   .card.tti.cheongdan .ribbon { background: #1e40af; color: #fff; }
@@ -168,7 +238,7 @@
   .card.pi .tag { background: #e5e7eb; color: #4b5563; }
   .card.ssangpi .tag { background: #7c3aed; color: #ede9fe; }
   .card .chipbadge {
-    position: absolute; top: 3px; right: 3px; font-size: 8.5px; font-weight: 800;
+    position: absolute; top: 3px; right: 3px; font-size: 10px; font-weight: 800;
     background: rgba(37,99,235,.14); color: #1d4ed8; border-radius: 4px; padding: 1px 3px;
   }
   .card.facedown {
@@ -187,18 +257,50 @@
     align-items: center; justify-content: center; z-index: 50; padding: 18px; overflow-y: auto;
   }
   #modal-overlay.show { display: flex; }
+  #modal-overlay.gostop-open { overflow: visible; }
   #modal {
     background: linear-gradient(170deg, #1f3d2b, #142a1d);
     border: 1.5px solid var(--gold); border-radius: 16px; padding: 22px 26px;
     max-width: 720px; width: 100%; box-shadow: 0 18px 60px rgba(0,0,0,.6);
     max-height: 92vh; overflow-y: auto;
   }
+  #modal.gostop-modal {
+    overflow: visible;
+    max-width: 480px;
+    padding: 28px 30px 26px;
+  }
+  #modal.gostop-modal .modal-actions {
+    gap: 14px; margin-top: 22px; overflow: visible;
+  }
   #modal h2 { margin: 0 0 12px; color: var(--gold-soft); font-size: 19px; }
   #modal .sub { color: #cbd5e1; font-size: 13px; line-height: 1.55; }
   .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
-  .choicebtn { flex: 1; min-width: 190px; padding: 14px; border-radius: 12px; text-align: left; }
+  .choicebtn { flex: 1; min-width: 190px; padding: 14px; border-radius: 12px; text-align: left; position: relative; }
   .choicebtn .t { font-size: 16px; font-weight: 900; }
   .choicebtn .d { font-size: 11.5px; margin-top: 4px; line-height: 1.45; }
+  .choicebtn.gs-simple {
+    text-align: center; padding: 22px 24px; min-width: 210px; min-height: 76px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .choicebtn.gs-simple .t { font-size: 22px; letter-spacing: -0.3px; }
+  .choicebtn.gs-simple .gs-tip {
+    display: none; position: absolute; left: 50%; bottom: calc(100% + 12px);
+    transform: translateX(-50%); z-index: 30; pointer-events: none;
+    width: max-content; max-width: 260px; margin: 0; text-align: left;
+    padding: 10px 12px; border-radius: 10px;
+    background: #0f172a; border: 1px solid rgba(255,255,255,.2);
+    box-shadow: 0 12px 28px rgba(0,0,0,.5);
+    font-size: 12px; font-weight: 600; color: #e2e8f0; line-height: 1.45;
+  }
+  .choicebtn.gs-simple .gs-tip::after {
+    display: block; content: ''; position: absolute; left: 50%; top: 100%;
+    transform: translateX(-50%);
+    border: 7px solid transparent; border-top-color: rgba(255,255,255,.2);
+  }
+  @media (hover: hover) {
+    .choicebtn.gs-simple:hover .gs-tip { display: block; }
+  }
+  .choicebtn .gs-tip b { color: #fde68a; }
   .btn-stop { background: linear-gradient(180deg, #16a34a, #15803d); color: #fff; }
   .btn-go { background: linear-gradient(180deg, #dc2626, #991b1b); color: #fff; }
 
@@ -354,7 +456,6 @@
   }
 
   #seedinfo { font-size: 10px; color: #475569; text-align: center; }
-  #seasonline { font-size: 10.5px; color: #a7c4b0; margin-top: 4px; line-height: 1.55; }
   .card.season { outline: 2px solid rgba(255, 205, 70, .95); outline-offset: 1.5px; }
 
   /* ── 춘향 조력자 ─────────────────────── */
@@ -377,11 +478,22 @@
     background: linear-gradient(180deg, #d97706, #b45309); color: #fff;
     font-size: 11px; font-weight: 800; padding: 6px 10px; width: 100%;
   }
-  @media (max-width: 860px) {
-    #chunhyang { transform: scale(.72); transform-origin: bottom right; right: 6px; bottom: 6px; }
+  #ch-hint-tabs {
+    display: none; gap: 4px; width: 100%;
+  }
+  #ch-hint-tabs:not([hidden]) { display: flex; }
+  #ch-hint-tabs button {
+    flex: 1; padding: 5px 6px; font-size: 10px; font-weight: 800;
+    border-radius: 7px; background: rgba(255,255,255,.12); color: #e2e8f0;
+  }
+  #ch-hint-tabs button.on {
+    background: linear-gradient(180deg, #d97706, #b45309); color: #fff;
   }
   @media (min-width: 861px) {
-    #main { padding-right: 180px; }
+    #main { padding-right: 200px; }
+  }
+  @media (max-width: 860px) {
+    #chunhyang { transform: scale(.72); transform-origin: bottom right; right: 6px; bottom: 6px; }
   }
   .shake { animation: shake .3s ease; }
   @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -412,7 +524,7 @@
     gap: 14px; min-height: 220px; border-style: solid;
     border-color: rgba(232,205,122,.35); background: rgba(0,0,0,.18);
   }
-  #juice-cards { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 98px; align-items: flex-end; }
+  #juice-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; min-height: 122px; align-items: flex-end; }
   #juice-cards .juice-card-wrap {
     position: relative; opacity: 0;
   }
@@ -434,7 +546,7 @@
   .play-fly-card .card:hover { transform: none; }
   #juice-cards .chip-float {
     position: absolute; left: 50%; top: -8px; transform: translate(-50%,-100%);
-    font-size: 18px; font-weight: 900; color: var(--chip-blue);
+    font-size: 22px; font-weight: 900; color: var(--chip-blue);
     text-shadow: 0 2px 8px rgba(0,0,0,.65), 0 0 12px rgba(96,165,250,.55);
     opacity: 0; pointer-events: none; white-space: nowrap;
   }
@@ -455,9 +567,9 @@
     display: inline-flex; align-items: baseline; gap: 7px;
     white-space: nowrap; max-width: 100%;
   }
-  #juice-tally .jt-chips { font-size: 28px; color: var(--chip-blue); }
+  #juice-tally .jt-chips { font-size: 34px; color: var(--chip-blue); }
   #juice-tally .jt-times {
-    font-size: 22px; color: #94a3b8; display: none;
+    font-size: 26px; color: #94a3b8; display: none;
     transform: scale(.5);
   }
   #juice-tally .jt-times.on {
@@ -465,22 +577,22 @@
     transition: transform .25s cubic-bezier(.2,1.6,.4,1), opacity .15s;
   }
   #juice-tally .jt-mult {
-    font-size: 28px; color: var(--mult-red); display: none;
+    font-size: 34px; color: var(--mult-red); display: none;
     transform: scale(2.4) rotate(-8deg); filter: blur(2px);
   }
   #juice-tally .jt-mult.slam {
     display: inline; opacity: 1; transform: scale(1) rotate(0); filter: blur(0);
     transition: transform .32s cubic-bezier(.15,1.5,.4,1), opacity .12s, filter .2s;
   }
-  #juice-tally .jt-plus { font-size: 22px; color: #94a3b8; }
+  #juice-tally .jt-plus { font-size: 26px; color: #94a3b8; }
   #juice-tally .jt-flat {
-    font-size: 26px; color: #94a3b8;
+    font-size: 30px; color: #94a3b8;
     transition: transform .12s ease;
   }
-  #juice-tally .jt-eq { font-size: 22px; color: #94a3b8; display: none; }
+  #juice-tally .jt-eq { font-size: 26px; color: #94a3b8; display: none; }
   #juice-tally .jt-eq.on { display: inline; opacity: 1; }
   #juice-tally .jt-score {
-    font-size: 34px; color: #fff; display: none;
+    font-size: 42px; color: #fff; display: none;
     text-shadow: 0 0 18px rgba(255,255,255,.25);
   }
   #juice-tally .jt-score.on { display: inline; opacity: 1; }
@@ -518,8 +630,9 @@
   }
   #gauge.score-pulse { box-shadow: 0 0 0 1px rgba(147,197,253,.5), 0 0 14px rgba(56,189,248,.35); }
   #juice-tally.tally-fade {
-    transition: opacity .4s ease, filter .4s ease, transform .4s ease !important;
-    opacity: .2 !important; filter: blur(1.5px); transform: scale(.96);
+    transition: opacity .85s ease, filter .85s ease, transform .85s ease !important;
+    opacity: 0 !important; filter: blur(2px); transform: scale(.94);
+    pointer-events: none;
   }
   #hand-banner {
     position: fixed; left: 50%; top: 120px; transform: translate(-50%, -50%) scale(.3);
@@ -590,6 +703,267 @@
     70% { opacity: 1; }
     100% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; filter: brightness(1); }
   }
+
+  /* ── 모바일 / 플레이 가능 레이아웃 ───────────────── */
+  @media (max-width: 720px) {
+    html, body { height: auto; min-height: 100%; }
+    body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    button, .card { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+    #topbar {
+      gap: 6px; padding: 6px 8px;
+      align-items: center; position: sticky; top: 0; z-index: 42;
+      background: rgba(10, 28, 18, .94); backdrop-filter: blur(8px);
+    }
+    #logo { font-size: 13px; line-height: 1.15; flex-shrink: 0; }
+    #logo small { display: none; }
+    #jokerbar {
+      order: 0; flex: 1 1 auto; min-width: 0;
+      gap: 4px; flex-wrap: nowrap; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      justify-content: flex-end;
+    }
+    #jokerbar::-webkit-scrollbar { display: none; }
+    .jokerslot {
+      width: 36px; min-width: 36px; min-height: 32px;
+      padding: 4px 2px; font-size: 0; flex-shrink: 0;
+      border-radius: 8px;
+    }
+    .jokerslot:not(.filled)::before {
+      content: '＋'; font-size: 14px; color: #64748b; font-weight: 700;
+    }
+    .jokerslot.filled {
+      width: auto; min-width: 56px; max-width: 88px; padding: 5px 7px;
+    }
+    .jokerslot .jname {
+      font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .jokerslot .jdesc { display: none; }
+    .jokerslot.filled .jtip {
+      left: auto; right: 0; transform: none; max-width: min(220px, 72vw);
+      top: calc(100% + 6px);
+    }
+    #moneybox { font-size: 13px; margin-left: 0; flex-shrink: 0; }
+    #top-help { display: inline-flex; padding: 6px 8px; }
+
+    #main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        "round score"
+        "preview preview"
+        "played played"
+        "hand hand";
+      gap: 6px;
+      padding: 6px 8px;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+      align-items: start;
+      box-sizing: border-box;
+    }
+    #side, #table { display: contents; }
+    #roundpanel {
+      grid-area: round; min-width: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 8px 10px;
+      border-radius: 12px 0 0 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-right: none;
+      background: rgba(0,0,0,.28);
+    }
+    #scorepanel {
+      grid-area: score; min-width: 0;
+      padding: 8px 10px;
+      border-radius: 0 12px 12px 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-left: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.28);
+    }
+    #roundpanel.day, #roundpanel.night {
+      background: rgba(0,0,0,.28);
+      border-color: rgba(255,255,255,.12);
+    }
+    #previewbox {
+      grid-area: preview; padding: 8px 10px; min-height: 0;
+      display: block !important;
+    }
+    #playlog-panel,
+    #seedinfo,
+    .side-help { display: none !important; }
+
+    #roundlabel { font-size: 12.5px; }
+    #roundlabel .round-meta { display: none; }
+    #seasonline {
+      font-size: 9.5px; margin-top: 2px; line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    #bossbanner { padding: 6px 8px; font-size: 10.5px; margin-top: 6px !important; }
+    .statline { font-size: 11px; margin: 1px 0; }
+    .statline b { font-size: 13px; }
+    #target-val, #score-val { font-size: 15px !important; }
+    #gauge { height: 7px; margin: 3px 0 2px; }
+    .golevel { font-size: 10px; margin-top: 2px; }
+
+    #playedarea {
+      grid-area: played; min-height: 0; padding: 6px 8px; gap: 4px;
+    }
+    /* 안내 문구만 있을 땐 숨김 — 예상점수·손패가 주역 */
+    #playedarea:has(.hint) { display: none; }
+    #playedarea:has(.card) { min-height: 72px; }
+    #playresult .r-score { font-size: 18px; }
+    #playresult .r-hand { font-size: 13px; }
+    #playresult .r-formula { font-size: 12px; }
+
+    #handarea {
+      grid-area: hand;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px 5px;
+      justify-items: center;
+      align-content: start;
+      padding: 4px 2px 8px;
+      min-height: 0;
+    }
+
+    .card {
+      width: calc((100vw - 26px - 15px) / 4);
+      max-width: 78px;
+      height: auto;
+      aspect-ratio: 64 / 98;
+      padding: 5px 3px 4px;
+    }
+    /* 손패 격자 칸만 100% — 낸 패/연출은 위 고정 크기 유지 */
+    #handarea .card {
+      width: 100%;
+      max-width: 78px;
+    }
+    #playedarea .card,
+    #juice-cards .card {
+      width: calc((100vw - 26px - 15px) / 4);
+      max-width: 78px;
+      height: auto;
+      aspect-ratio: 64 / 98;
+    }
+    #juice-cards .juice-card-wrap {
+      width: calc((100vw - 26px - 15px) / 4);
+      max-width: 78px;
+    }
+    .card .art { font-size: clamp(16px, 5.5vw, 24px); margin-top: 4px; }
+    .card.kwang .art { font-size: clamp(14px, 4.8vw, 20px); }
+    .card.kwang .gwangmark {
+      width: clamp(18px, 6vw, 26px); height: clamp(18px, 6vw, 26px);
+      font-size: clamp(11px, 3.5vw, 14px);
+    }
+    .card.tti .ribbon { height: 34%; font-size: 8px; }
+    .card:hover { transform: none; }
+    .card.sel { transform: translateY(-12px); }
+
+    #actions {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 46;
+      /* display:contents로 main 자식이 되므로 기존 칸에 주차 (화면 위치는 fixed) */
+      grid-area: round;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 7px; align-items: stretch;
+      margin: 0;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+      background: rgba(12, 36, 24, .98);
+      border-top: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 -8px 24px rgba(0,0,0,.35);
+      width: auto;
+    }
+    .bigbtn {
+      width: 100%; min-width: 0; min-height: 46px;
+      padding: 11px 8px; font-size: 14px;
+      box-shadow: 0 2px 0 rgba(0,0,0,.35);
+    }
+    #btn-play, #btn-discard { width: 100%; }
+    #deckbox {
+      display: inline-flex; align-items: center; justify-content: center;
+      align-self: center; padding: 8px 10px; font-size: 11px; border-radius: 10px;
+    }
+    #btn-gukjin {
+      grid-column: 1 / -1; width: 100%; min-height: 38px;
+      font-size: 12px; padding: 7px 10px; border-radius: 10px;
+    }
+    #btn-gukjin.on { display: block; }
+
+    /* 춘향: 우측 하단 캐릭터 + 말풍선 (액션바 위) */
+    #chunhyang {
+      right: 6px; left: auto; width: 118px;
+      bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+      transform: none; z-index: 41; pointer-events: auto;
+      gap: 4px;
+    }
+    #ch-figure { display: block; width: 72px; margin: 0 auto; }
+    #ch-figure svg { width: 72px; height: auto; }
+    #ch-face { font-size: 16px; top: 12px; }
+    #ch-btn { display: none !important; }
+    #ch-bubble {
+      width: 100%; font-size: 11px; padding: 6px 8px; min-height: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,.4);
+    }
+    #ch-bubble:empty { display: none; }
+    #ch-bubble::after { display: none; }
+    #ch-hint-tabs button { font-size: 10px; padding: 5px 4px; }
+
+    #modal-overlay { padding: 0; align-items: flex-end; }
+    #modal {
+      padding: 16px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+      border-radius: 16px 16px 0 0;
+      max-height: min(88vh, 100%); width: 100%; max-width: 100%;
+      margin: 0;
+    }
+    #modal.gostop-modal { max-width: 100%; padding: 20px 14px calc(18px + env(safe-area-inset-bottom, 0px)); }
+    .choicebtn { min-width: 0; flex: 1 1 140px; }
+    .choicebtn.gs-simple {
+      min-width: 0; padding: 16px 10px; min-height: 64px;
+      flex-direction: column; gap: 8px;
+    }
+    .choicebtn.gs-simple .t { font-size: 18px; }
+    .choicebtn.gs-simple .gs-tip {
+      display: block !important; position: static; transform: none;
+      left: auto; bottom: auto; width: 100%; max-width: none;
+      margin: 0; padding: 0; border: none; background: transparent;
+      box-shadow: none; font-size: 11px; font-weight: 600;
+      color: rgba(255,255,255,.88); text-align: center; line-height: 1.4;
+    }
+    .choicebtn.gs-simple .gs-tip::after { display: none; }
+    .choicebtn .gs-tip b { color: #fef3c7; }
+    .shop-offers { gap: 8px; }
+    .offer { min-width: 0; flex: 1 1 100%; }
+    .shop-bottom { flex-direction: column; align-items: stretch; }
+    #btn-nextround { width: 100%; min-height: 48px; }
+    .hb-row { padding: 8px 10px; gap: 8px; }
+    .hb-name { font-size: 12.5px; }
+    .hb-cond { font-size: 11px; }
+    .hb-mult { font-size: 14px; }
+
+    #previewbox .pv-hand { font-size: 13px; margin-bottom: 5px; }
+    #previewbox .pv-box { padding: 5px 4px; }
+    #previewbox .pv-box .val { font-size: 14px; }
+    #previewbox .pv-total { padding: 6px 8px; }
+    #previewbox .pv-total .tv { font-size: 17px; }
+
+    #juice-tally .jt-chips,
+    #juice-tally .jt-mult { font-size: 20px; }
+    #juice-tally .jt-score { font-size: 24px; }
+    #juice-cards { gap: 6px; min-height: 100px; align-items: flex-end; }
+    #juice-skip-hint { font-size: 12px; bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  @media (max-width: 720px) and (max-height: 700px) {
+    #seasonline { display: none; }
+    #handarea { padding-top: 10px; gap: 4px; }
+    .card.sel { transform: translateY(-8px); }
+    #chunhyang { transform: scale(.9); transform-origin: bottom right; }
+  }
+
+  @media (max-width: 720px) and (hover: none) {
+    .jokerslot.filled:active .jtip,
+    .jokerslot.filled:focus-within .jtip { display: block; }
+  }
+
 </style>
 </head>
 <body>
@@ -598,32 +972,28 @@
   <div id="logo">화투로<small>고스톱 · 무한의 판</small></div>
   <div id="jokerbar"></div>
   <div id="moneybox"></div>
+  <button type="button" id="top-help" class="smallbtn" onclick="openHelp()" title="족보표 / 도움말">📖</button>
 </div>
 
 <div id="main">
   <aside id="side">
-    <div class="panel">
+    <div class="panel" id="roundpanel">
       <div id="roundlabel"></div>
       <div id="seasonline"></div>
       <div id="bossbanner" style="display:none; margin-top:8px;"></div>
-      <div style="margin-top:8px;">
-        <div class="statline"><span>목표 점수</span><b id="target-val"></b></div>
-        <div id="gauge"><div id="gauge-fill"></div></div>
-        <div class="statline"><span>현재 점수</span><b id="score-val"></b></div>
-        <div class="golevel" id="golevel" style="display:none;"></div>
-      </div>
+    </div>
+    <div class="panel" id="scorepanel">
+      <div class="statline"><span>목표 점수</span><b id="target-val"></b></div>
+      <div id="gauge"><div id="gauge-fill"></div></div>
+      <div class="statline"><span>현재 점수</span><b id="score-val"></b></div>
+      <div class="golevel" id="golevel" style="display:none;"></div>
     </div>
     <div class="panel" id="previewbox"></div>
-    <div class="panel">
-      <div class="statline"><span>내기</span><b id="plays-val"></b></div>
-      <div class="statline"><span>버리기</span><b id="discards-val"></b></div>
-      <div class="statline"><span>덱</span><b id="deck-val"></b></div>
-    </div>
     <div class="panel" id="playlog-panel" style="display:none;">
       <div style="font-size:11px; color:var(--gold-soft); font-weight:800; margin-bottom:5px;">이번 판 내기 기록</div>
       <div id="playlog"></div>
     </div>
-    <button class="smallbtn" onclick="openHelp()">📖 족보표 / 도움말</button>
+    <button class="smallbtn side-help" onclick="openHelp()">📖 족보표 / 도움말</button>
     <div id="seedinfo"></div>
   </aside>
 
@@ -633,13 +1003,18 @@
     <div id="actions">
       <button id="btn-play" class="bigbtn" onclick="playSelected()"></button>
       <button id="btn-discard" class="bigbtn" onclick="discardSelected()"></button>
-      <button id="btn-gukjin" onclick="toggleGukjin()" style="display:none;"></button>
+      <div id="deckbox" title="남은 덱"><span class="deck-ico">🂠</span>덱 <b id="deck-val">0</b></div>
+      <button id="btn-gukjin" onclick="toggleGukjin()"></button>
     </div>
   </main>
 </div>
 
 <div id="chunhyang">
   <div id="ch-bubble"></div>
+  <div id="ch-hint-tabs" hidden>
+    <button type="button" data-hint="play" onclick="setTouchHint('play')">내기 감</button>
+    <button type="button" data-hint="discard" onclick="setTouchHint('discard')">버리기 감</button>
+  </div>
   <div id="ch-figure">
     <svg viewBox="0 0 120 190" width="110" xmlns="http://www.w3.org/2000/svg" aria-label="춘향이">
       <path d="M60 78 C36 86 26 138 22 182 L98 182 C94 138 84 86 60 78Z" fill="#d63a63"/>
@@ -961,7 +1336,7 @@ let runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() 
 let rng = mulberry32(runSeed);
 
 const state = {
-  screen: 'play', // play | gostop | settle | shop | gameover | victory | help | prep
+  screen: 'play', // play | gostop | settle | shop | gameover | victory | help | prep | welcome
   round: 1,
   baseTarget: TARGETS[0],
   target: TARGETS[0],
@@ -986,6 +1361,7 @@ const state = {
   chunhyangNext: false, // 상점에서 다음 달 훈수 예약
   drunk: false,         // 이번 달 춘향이 훈수 활성 (라운드 시작 시 예약 소비)
   hoverReact: null,     // 내기/버리기 호버 예측 표정 { mood, text } | null
+  touchHintMode: 'play', // 모바일: 패 선택 시 보여줄 훈수 (play|discard)
   lastPlay: null,       // { cards 스냅샷, result, scoreBefore }
   juicing: false,       // 연출 중 입력 잠금 (중간값은 state에 안 넣음)
   dealing: false,       // 손패 드로우 연출 중
@@ -1091,20 +1467,20 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
     return;
   }
   applyAngaeFaceDown(drawn, isRoundStart);
+  // 연출 전까지 덱에 되돌려, 장수 표시가 한 장씩(33→32→31) 줄어들게
+  for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
 
   state.dealing = true;
-  render(); // 패 없는/모자란 상태 노출
+  render(); // 패 없는/모자란 상태 노출 (덱 카운트는 아직 유지)
   await new Promise((r) => setTimeout(r, isRoundStart ? 160 : 240));
   if (state.pendingGoStop || state.screen === 'gostop') {
-    // 뽑으려다 고/스톱으로 막히면 덱에 되돌림
-    for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
+    // 아직 손패로 안 옮김 — 카드는 덱에 그대로
     state.dealInUids = null;
     state.dealing = false;
     render();
     return;
   }
   if (playGen != null && playGen !== state.playFadeGen) {
-    for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
     state.dealInUids = null;
     state.dealing = false;
     render();
@@ -1114,14 +1490,15 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
   for (let i = 0; i < drawn.length; i++) {
     if (state.pendingGoStop || state.screen === 'gostop' ||
         (playGen != null && playGen !== state.playFadeGen)) {
-      for (let j = drawn.length - 1; j >= i; j--) state.deck.push(drawn[j]);
+      // 미지급분은 덱에 남아 있음
       state.dealInUids = null;
       state.dealing = false;
       render();
       return;
     }
-    state.hand.push(drawn[i]);
-    state.dealInUids = [drawn[i].uid];
+    const card = state.deck.pop(); // drawn[i]와 동일 참조
+    state.hand.push(card);
+    state.dealInUids = [card.uid];
     render();
     try { sfxChip(); } catch (_) {}
     await new Promise((r) => setTimeout(r, 105));
@@ -1280,8 +1657,6 @@ function playSelected() {
   }
   state.playsLeft--;
   state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
-  // 이번 내기로 목표 달성 → 고/스톱 전까지 드로우 금지
-  state.pendingGoStop = state.roundScore >= state.target && state.round !== ROUNDS;
 
   // 낸 패 스냅샷 (국진 모드 포함) — 코어→flat, 월·칩 순으로 정렬해 연출/표시
   const fromRects = {};
@@ -1299,7 +1674,9 @@ function playSelected() {
 
   state.hand = state.hand.filter((c) => !state.selected.includes(c.uid));
   state.selected = [];
-  // 보충은 연출 후 — 목표 달성 시엔 고 선택 후에만
+  // 목표 달성 + 더 낼 패가 있을 때만 고/스톱 대기 (드로우 보류)
+  state.pendingGoStop = state.roundScore >= state.target && state.round !== ROUNDS
+    && cardsRemaining() > 0;
 
   // 고/스톱·게임오버는 연출 끝난 뒤에 (모달 중첩·조기 전환 방지)
   state.juicing = true;
@@ -1310,11 +1687,10 @@ function playSelected() {
     state.juicing = false;
     document.body.classList.remove('juicing');
 
-    // 목표 달성: 드로우 없이 바로 고/스톱
-    if (state.pendingGoStop || (state.roundScore >= state.target && state.round !== ROUNDS)) {
-      state.pendingGoStop = true;
+    // 목표 달성: 드로우 없이 고/스톱(또는 패 없으면 정산)
+    if (state.roundScore >= state.target && state.round !== ROUNDS) {
       checkAfterPlay();
-      render(); // 팝업 먼저
+      render();
       await new Promise((r) => setTimeout(r, 500));
       if (playGen !== state.playFadeGen) return;
       const pa = $('playedarea');
@@ -1356,10 +1732,20 @@ function playSelected() {
   });
 }
 
+function cardsRemaining() {
+  return state.hand.length + state.deck.length;
+}
+
 function checkAfterPlay() {
   if (state.roundScore >= state.target) {
     if (state.round === ROUNDS) { victory(); return; }
-    // 내기 0이어도 고/스톱 선택 — 고 시 내기 +1로 이어갈 수 있음
+    // 더 낼 패가 없으면 고 불가 → 바로 정산
+    if (cardsRemaining() === 0) {
+      state.pendingGoStop = false;
+      settle();
+      return;
+    }
+    // 내기 0이어도 고/스톱 선택 — 고 시 내기 +1·드로우로 이어갈 수 있음
     state.screen = 'gostop';
   } else if (state.playsLeft === 0) {
     gameOver(state.goLevel > 0 ? '고박' : '목표 미달');
@@ -1516,7 +1902,7 @@ function gameOver(reason) {
 function victory() {
   state.screen = 'victory';
 }
-function restart() {
+function resetRun() {
   runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() * 4294967296) >>> 0);
   rng = mulberry32(runSeed);
   Object.assign(state, {
@@ -1524,14 +1910,41 @@ function restart() {
     deck: [], hand: [], selected: [], jokers: [], money: 4, boss: null, usedBosses: [],
     nextBoss: null, bossCandidates: null, shopOffers: [], rerollCost: 2,
     kwangSoldThisRound: 0, mitjangChips: 0, makgeolli: 0,
-    chunhyangNext: false, drunk: false, hoverReact: null, tempReact: null,
+    chunhyangNext: false, drunk: false, hoverReact: null, tempReact: null, touchHintMode: 'play',
     lastPlay: null, juicing: false, dealing: false, pendingGoStop: false, playLog: [],
     settleData: null, gameOverReason: '',
     stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
   });
   state.baseTarget = TARGETS[0];
   state.target = TARGETS[0];
+}
+
+function hasSeenHowto() {
+  try { return localStorage.getItem('hwatro_howto_seen') === '1'; }
+  catch (_) { return false; }
+}
+
+function markHowtoSeen() {
+  try { localStorage.setItem('hwatro_howto_seen', '1'); }
+  catch (_) {}
+}
+
+function dismissWelcome() {
+  if (state.screen !== 'welcome') return;
+  markHowtoSeen();
   state.screen = 'prep';
+  render();
+}
+
+function restart() {
+  resetRun();
+  state.screen = 'prep';
+  render();
+}
+
+function boot() {
+  resetRun();
+  state.screen = hasSeenHowto() ? 'prep' : 'welcome';
   render();
 }
 
@@ -1651,6 +2064,45 @@ function clearChunhyangHover() {
   renderChunhyang();
 }
 
+function isTouchUI() {
+  return window.matchMedia('(max-width: 720px), (hover: none)').matches;
+}
+
+function setTouchHint(mode) {
+  if (mode !== 'play' && mode !== 'discard') return;
+  state.touchHintMode = mode;
+  renderChunhyang();
+}
+
+function bindActionLongPress(btn, action) {
+  if (!btn || btn.dataset.lpBound) return;
+  btn.dataset.lpBound = '1';
+  let timer = null;
+  let long = false;
+  const clear = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  btn.addEventListener('pointerdown', (e) => {
+    if (!isTouchUI() || !state.drunk || state.screen !== 'play') return;
+    if (e.pointerType === 'mouse') return;
+    long = false;
+    clear();
+    timer = setTimeout(() => {
+      long = true;
+      setTouchHint(action);
+      try { if (navigator.vibrate) navigator.vibrate(12); } catch (_) {}
+    }, 380);
+  });
+  const end = () => { clear(); };
+  btn.addEventListener('pointerup', end);
+  btn.addEventListener('pointercancel', end);
+  btn.addEventListener('pointerleave', end);
+  btn.addEventListener('click', (e) => {
+    if (!long) return;
+    long = false;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true);
+}
+
 /* ================================================================
    렌더링 (상태 → DOM 단방향)
    ================================================================ */
@@ -1732,18 +2184,42 @@ function renderChunhyang() {
   const hint = chunhyangHint();
   const face = $('ch-face');
   const bubble = $('ch-bubble');
+  const tabs = $('ch-hint-tabs');
+  const touchUI = isTouchUI();
+  const canTouchHint = touchUI && state.drunk && state.screen === 'play' && state.selected.length >= 1;
+  const selPredict = canTouchHint
+    ? chunhyangHoverPredict(state.touchHintMode || 'play')
+    : null;
+
+  if (tabs) {
+    if (canTouchHint) {
+      tabs.hidden = false;
+      tabs.querySelectorAll('button').forEach((b) => {
+        b.classList.toggle('on', b.dataset.hint === (state.touchHintMode || 'play'));
+      });
+    } else {
+      tabs.hidden = true;
+    }
+  }
+
   if (state.tempReact && Date.now() < state.tempReact.expires) {
     face.textContent = state.tempReact.mood;
     bubble.textContent = state.tempReact.text;
   } else if (state.hoverReact) {
     face.textContent = state.hoverReact.mood;
     bubble.textContent = state.hoverReact.text;
+  } else if (selPredict) {
+    const tag = state.touchHintMode === 'discard' ? '버리기' : '내기';
+    face.textContent = selPredict.mood;
+    bubble.textContent = `[${tag}] ${selPredict.text}`;
   } else if (hint) {
     face.textContent = hint.mood;
     bubble.textContent = hint.text;
   } else if (state.drunk) {
     face.textContent = '😊';
-    bubble.textContent = '이번 달 훈수 중이에요. 패 고르고 버튼에 올려보세요~';
+    bubble.textContent = touchUI
+      ? '패를 고르면 감이 와요. 버튼 길게 누르거나 아래 탭으로 내기/버리기 감을 바꿔요.'
+      : '이번 달 훈수 중이에요. 패 고르고 버튼에 올려보세요~';
   } else if (state.screen === 'prep' || state.screen === 'shop') {
     face.textContent = state.chunhyangNext ? '😄' : '😴';
     bubble.textContent = state.chunhyangNext
@@ -1751,7 +2227,7 @@ function renderChunhyang() {
       : '다음 달 훈수는 3냥이에요. 시작 전에 예약해 주세요.';
   } else {
     face.textContent = '😴';
-    bubble.textContent = '이번 달은 훈수 없어요… (상점에서 다음 달 예약)';
+    bubble.textContent = touchUI ? '' : '이번 달은 훈수 없어요… (상점에서 다음 달 예약)';
   }
   const btn = $('ch-btn');
   if (state.screen === 'prep' || state.screen === 'shop') {
@@ -1780,7 +2256,7 @@ function renderTopbar() {
     const j = state.jokers[i];
     if (j) {
       const def = JOKER_BY_ID[j.id];
-      slots += `<div class="jokerslot filled">
+      slots += `<div class="jokerslot filled" tabindex="0">
         <div class="jname">${def.icon} ${def.name}</div>
         <div class="jtip">${esc(def.desc)}${def.id === 'mitjang' ? `<br>누적 +${state.mitjangChips}점` : ''}</div>
       </div>`;
@@ -1795,10 +2271,16 @@ function renderTopbar() {
 function renderSide() {
   const bossTag = isBossRound(state.round) ? ' <span class="bak">(박)</span>' : '';
   const M = MONTHS[state.round - 1];
-  $('roundlabel').innerHTML = `${M.flower} ${state.round}월 · ${M.name} ${isNight() ? '🌙' : '☀️'}` +
-    ` <span style="color:#94a3b8;font-size:11px">(판 ${state.round}/${ROUNDS})</span>${bossTag}`;
-  $('seasonline').innerHTML = `이달의 패: <b style="color:#fde68a">${state.round}월 카드 칩 ×2</b><br>` +
-    (isNight() ? '밤 🌙 — 띠·피·쌍피 칩 +2' : '낮 ☀️ — 광·열끗 칩 +2');
+  const night = isNight();
+  const rp = $('roundpanel');
+  if (rp) {
+    rp.classList.toggle('day', !night);
+    rp.classList.toggle('night', night);
+  }
+  $('roundlabel').innerHTML = `${M.flower} ${state.round}월 · ${M.name} ${night ? '🌙' : '☀️'}` +
+    ` <span class="round-meta">(판 ${state.round}/${ROUNDS})</span>${bossTag}`;
+  $('seasonline').innerHTML = `이달의 패: <b>${state.round}월 카드 칩 ×2</b><br>` +
+    (night ? '밤 — 띠·피·쌍피 칩 +2' : '낮 — 광·열끗 칩 +2');
 
   const bb = $('bossbanner');
   if (state.boss) {
@@ -1824,24 +2306,37 @@ function renderSide() {
     gl.textContent = `🔥 ${state.goLevel}고! (목표 ×${goMult(state.goLevel)} · 성공 시 +${goBonus(state.goLevel)}냥)`;
   } else gl.style.display = 'none';
 
-  // 프리뷰
+  // 프리뷰 — 항상 같은 틀 유지 (모바일에서 깜빡임 방지)
   const pv = $('previewbox');
   const sel = selectedCards();
+  let handName = '—';
+  let chips = '—', mult = '—', flat = '—', score = '—';
+  let flatOff = true;
   if (sel.length === 0) {
-    pv.innerHTML = `<div class="pv-empty">손패에서 카드를 1~5장 선택하면<br>족보와 예상 점수가 여기 표시됩니다.</div>`;
+    handName = '패를 선택하세요';
   } else if (sel.some((c) => c.faceDown)) {
-    pv.innerHTML = `<div class="pv-hand">?</div><div class="pv-empty">뒷면 카드가 포함되어 있어<br>점수를 미리 볼 수 없습니다.</div>`;
+    handName = '뒷면 포함 · 미리보기 불가';
   } else {
     const r = computeScore(sel, scoreEnv());
-    pv.innerHTML = `
-      <div class="pv-hand">${HAND_BY_ID[r.handId].name}</div>
-      <div class="pv-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span>${r.flat ? ` + ${fmt(r.flat)}` : ''}</div>
-      <div class="pv-score">= ${fmt(r.score)}점</div>`;
+    handName = HAND_BY_ID[r.handId].name;
+    chips = fmt(r.chips);
+    mult = fmtMult(r.mult);
+    flat = fmt(r.flat);
+    score = fmt(r.score);
+    flatOff = !r.flat;
   }
+  pv.innerHTML = `
+    <div class="pv-hand">${handName}</div>
+    <div class="pv-boxes">
+      <div class="pv-box chips"><span class="lbl">기본합</span><span class="val">${chips}</span></div>
+      <div class="pv-op">×</div>
+      <div class="pv-box mult"><span class="lbl">배수</span><span class="val">${mult}</span></div>
+      <div class="pv-op">+</div>
+      <div class="pv-box flat${flatOff ? ' off' : ''}"><span class="lbl">+점수</span><span class="val">${flat}</span></div>
+    </div>
+    <div class="pv-total"><span class="tl">예상 점수</span><span class="tv">${score}</span></div>`;
 
-  $('plays-val').textContent = `${state.playsLeft} / 4`;
-  $('discards-val').textContent = state.boss === 'bibaram' ? '금지 (비바람)' : `${state.discardsLeft} / 4`;
-  $('deck-val').textContent = `${state.deck.length}장`;
+  $('deck-val').textContent = `${state.deck.length}`;
 
   const lp = $('playlog-panel');
   if (state.playLog.length > 0) {
@@ -1876,42 +2371,100 @@ function renderTable() {
   } else {
     pa.dataset.playSig = '';
     pa.classList.remove('juice-stage', 'play-fade-out');
-    pa.innerHTML = `<div class="hint">여기에 낸 패와 점수가 표시됩니다 — 카드를 선택하고 [내기]를 누르세요</div>`;
+    pa.innerHTML = `<div class="hint">카드를 고르고 <b>내기</b>를 누르세요</div>`;
   }
 
   $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true })).join('');
 
   const n = state.selected.length;
   const canAct = state.screen === 'play' && !state.juicing && !state.dealing;
-  $('btn-play').textContent = `내기 (${state.playsLeft}회 남음)`;
+  const shortAct = window.matchMedia('(max-width: 720px)').matches;
+  $('btn-play').textContent = shortAct ? `내기 (${state.playsLeft})` : `내기 (${state.playsLeft}회 남음)`;
   $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0;
-  $('btn-discard').textContent = `버리기 (${state.discardsLeft}회 남음)`;
+  $('btn-discard').textContent = shortAct ? `버리기 (${state.discardsLeft})` : `버리기 (${state.discardsLeft}회 남음)`;
   $('btn-discard').disabled = !canAct || n < 1 || n > 5 || state.discardsLeft <= 0;
   // 춘향 호버 예측 — 매 render마다 리스너 재바인딩
   $('btn-play').onmouseenter = () => setChunhyangHover('play');
   $('btn-play').onmouseleave = () => clearChunhyangHover();
   $('btn-discard').onmouseenter = () => setChunhyangHover('discard');
   $('btn-discard').onmouseleave = () => clearChunhyangHover();
+  bindActionLongPress($('btn-play'), 'play');
+  bindActionLongPress($('btn-discard'), 'discard');
 
   const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
   const bg = $('btn-gukjin');
   if (g && canAct) {
-    bg.style.display = 'inline-block';
+    bg.classList.add('on');
     bg.textContent = `국진 모드: ${g.asPi ? '쌍피' : '열끗'} (전환)`;
-  } else bg.style.display = 'none';
+  } else {
+    bg.classList.remove('on');
+  }
 }
 
 function renderModal() {
   const ov = $('modal-overlay');
   const m = $('modal');
   const screens = {
-    prep: prepHTML, gostop: gostopHTML, settle: settleHTML, shop: shopHTML,
+    welcome: welcomeHTML, prep: prepHTML, gostop: gostopHTML, settle: settleHTML, shop: shopHTML,
     gameover: gameoverHTML, victory: victoryHTML, help: helpHTML,
   };
   const fn = screens[state.screen];
-  if (!fn) { ov.classList.remove('show'); return; }
+  if (!fn) {
+    m.classList.remove('gostop-modal');
+    ov.classList.remove('show', 'gostop-open');
+    return;
+  }
   m.innerHTML = fn();
+  const isGoStop = state.screen === 'gostop';
+  m.classList.toggle('gostop-modal', isGoStop);
+  ov.classList.toggle('gostop-open', isGoStop);
   ov.classList.add('show');
+}
+
+function welcomeHTML() {
+  return `
+    <h2>🎴 화투로 — 고스톱: 무한의 판</h2>
+    <div class="sub" style="margin-bottom:10px">한국 화투 48장으로 족보를 맞춰 목표 점수를 넘기는 <b>1인 런</b>입니다.
+      1월부터 12월까지 한 해를 버텨보세요.</div>
+    <div class="help-sections">
+      <div class="help-card hc-round">
+        <div class="hc-title"><span class="ico">🃏</span>기본 플레이</div>
+        <div class="hc-body">
+          손패 <b>8장</b>에서 1~5장을 고른 뒤 <b>내기</b>로 점수를 쌓습니다.
+          마음에 안 들면 <b>버리기</b>로 패를 갈아끼울 수 있어요.
+          판마다 내기·버리기 각 <b>4회</b>.
+        </div>
+      </div>
+      <div class="help-card hc-time">
+        <div class="hc-title"><span class="ico">✨</span>점수 · 족보</div>
+        <div class="hc-body">
+          점수 = (<b>족보 구성 카드</b> 칩) × 배수 + 나머지 칩.
+          이달의 패는 칩 <b>×2</b>. 홀수 달은 낮(광·열끗 +2), 짝수 달은 밤(띠·피 +2).
+        </div>
+      </div>
+      <div class="help-card hc-rule">
+        <div class="hc-title"><span class="ico">🔥</span>고 / 스톱</div>
+        <div class="hc-body">
+          목표를 넘기면 <b>스톱</b>(정산) 또는 <b>고</b>(목표↑ · 내기 +1 · 보너스).
+          고는 무제한이지만, 실패하면 <b>고박 = 런 종료</b>.
+          <b>3·6·9·12월</b>은 박 라운드(디버프)가 붙습니다.
+        </div>
+      </div>
+      <div class="help-card hc-helper">
+        <div class="hc-title"><span class="ico">🏪</span>상점 · 춘향</div>
+        <div class="hc-body">
+          판을 클리어하면 상점에서 <b>특수패</b>를 사고팝니다.
+          준비/상점에서 <b>3냥</b>에 춘향 훈수를 예약하면 그 달 내내 패를 봐줍니다.
+        </div>
+      </div>
+    </div>
+    <div class="sub" style="margin-top:12px;font-size:12px;color:#94a3b8">자세한 족보표는 언제든 <b>📖 도움말</b>에서 볼 수 있어요.</div>
+    <div class="modal-actions">
+      <button class="choicebtn btn-stop" style="text-align:center" onclick="dismissWelcome()">
+        <div class="t">알겠어요 — 시작하기</div>
+        <div class="d">1월 준비 화면으로 이동합니다</div>
+      </button>
+    </div>`;
 }
 
 function prepHTML() {
@@ -1937,18 +2490,23 @@ function gostopHTML() {
   const n = state.goLevel + 1; // 다음 고 단계 (무제한)
   const newTarget = goTarget(state.baseTarget, n, state.roundScore);
   const floored = newTarget > Math.ceil(state.baseTarget * goMult(n));
+  const stopTip = state.goLevel > 0
+    ? `지금 정산하고 다음 판으로<br>(${state.goLevel}고 보너스 <b>+${goBonus(state.goLevel)}냥</b> 확보)`
+    : '지금 정산하고 안전하게 다음 판으로';
+  const goTip = `새 목표 <b>${fmt(newTarget)}점</b>${floored ? ' (상향)' : ` (×${goMult(n)})`}<br>`
+    + `내기 <b>+1</b> · 손패 보충 · 성공 시 <b>+${goBonus(n)}냥</b><br>`
+    + `실패 시 <b>고박 = 런 종료</b>`;
   return `
     <h2>🎉 목표 달성!</h2>
-    <div class="sub">현재 <b style="color:#93c5fd">${fmt(state.roundScore)}점</b> / 목표 ${fmt(state.target)}점 · 남은 내기 <b>${state.playsLeft}회</b></div>
+    <div class="sub">${fmt(state.roundScore)} / ${fmt(state.target)}점 · 내기 ${state.playsLeft} · 패 ${cardsRemaining()}</div>
     <div class="modal-actions">
-      <button class="choicebtn btn-stop" onclick="chooseStop()">
+      <button class="choicebtn btn-stop gs-simple" onclick="chooseStop()">
         <div class="t">✋ 스톱</div>
-        <div class="d">지금 정산하고 안전하게 다음 판으로${state.goLevel > 0 ? `<br>(${state.goLevel}고 보너스 +${goBonus(state.goLevel)}냥 확보)` : ''}</div>
+        <div class="gs-tip">${stopTip}</div>
       </button>
-      <button class="choicebtn btn-go" onclick="chooseGo()">
-        <div class="t">🔥 ${n}고!</div>
-        <div class="d">새 목표 <b>${fmt(newTarget)}점</b> ${floored ? '(점수를 크게 넘겨 목표 상향!)' : `(원래 목표 ×${goMult(n)})`}<br>
-        내기 <b>+1회</b> · 손패 보충 · 성공 시 <b>+${goBonus(n)}냥</b> · 못 넘으면 <b>고박 = 런 종료</b></div>
+      <button class="choicebtn btn-go gs-simple" onclick="chooseGo()">
+        <div class="t">🔥 ${n}고</div>
+        <div class="gs-tip">${goTip}</div>
       </button>
     </div>`;
 }
@@ -2675,7 +3233,7 @@ async function playJuiceSequence(snap, fromRects = null) {
 }
 
 // ── 시작 ───────────────────────────────────────────────────
-restart(); // prep 화면부터 (1월 시작 전 훈수 예약 가능)
+boot(); // 첫 방문이면 룰 안내 → 이후 prep (1월 시작 전 훈수 예약)
 </script>
 </body>
 </html>
