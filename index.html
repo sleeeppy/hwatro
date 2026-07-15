@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>화투로 — 고스톱: 무한의 판</title>
+<style>
+  :root {
+    --felt: #1a4a2e; --felt-dark: #113020;
+    --panel: rgba(0,0,0,.34); --panel-line: rgba(255,255,255,.12);
+    --ink: #1f2937; --red: #c0392b; --gold: #d4af37; --gold-soft: #e8cd7a;
+    --chip-blue: #60a5fa; --mult-red: #f87171;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: radial-gradient(ellipse at 50% 20%, var(--felt), var(--felt-dark) 75%);
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    color: #f1f5f9; overflow-x: hidden;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; border-radius: 8px; }
+  button:disabled { opacity: .38; cursor: not-allowed; }
+
+  /* ── 상단바 ─────────────────────────── */
+  #topbar {
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    background: rgba(0,0,0,.35); border-bottom: 1px solid var(--panel-line);
+    flex-wrap: wrap;
+  }
+  #logo { font-weight: 900; font-size: 17px; color: var(--gold-soft); letter-spacing: 1px; white-space: nowrap; }
+  #logo small { display: block; font-size: 10px; font-weight: 400; color: #cbd5e1; letter-spacing: 2px; }
+  #jokerbar { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+  .jokerslot {
+    width: 118px; min-height: 54px; border-radius: 9px; padding: 6px 8px;
+    background: rgba(255,255,255,.07); border: 1px dashed rgba(255,255,255,.22);
+    font-size: 10.5px; color: #94a3b8; display: flex; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .jokerslot.filled {
+    border: 1px solid var(--gold); background: linear-gradient(160deg, #3b2f14, #241c0b);
+    color: #fde68a; display: block; cursor: help;
+  }
+  .jokerslot .jname { font-weight: 800; font-size: 12px; }
+  .jokerslot .jdesc { font-size: 9.5px; color: #d6c58a; margin-top: 2px; line-height: 1.35; }
+  #moneybox { font-size: 16px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
+  #moneybox .delta { font-size: 12px; color: #a3e635; }
+
+  /* ── 본문 레이아웃 ───────────────────── */
+  #main { display: flex; gap: 14px; padding: 14px 16px 30px; align-items: flex-start; flex-wrap: wrap; }
+  #side {
+    width: 235px; min-width: 215px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .panel { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 12px; }
+  #table { flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+
+  #roundlabel { font-size: 14px; font-weight: 800; color: #e2e8f0; }
+  #roundlabel .bak { color: #fca5a5; }
+  #bossbanner {
+    border: 1px solid rgba(252,165,165,.5); background: rgba(127,29,29,.45);
+    border-radius: 10px; padding: 8px 10px; font-size: 11.5px; line-height: 1.45; color: #fecaca;
+  }
+  #bossbanner b { color: #fee2e2; }
+  #bossbanner .nullified { color: #86efac; font-weight: 700; }
+
+  .statline { display: flex; justify-content: space-between; font-size: 12.5px; margin: 3px 0; color: #cbd5e1; }
+  .statline b { color: #fff; font-size: 14px; }
+  #target-val { color: var(--gold-soft); font-size: 16px; }
+  #score-val { color: #93c5fd; font-size: 16px; }
+  #gauge { height: 10px; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; margin: 6px 0 2px; }
+  #gauge > div { height: 100%; background: linear-gradient(90deg, #38bdf8, #a3e635); transition: width .35s ease; }
+  .golevel { font-size: 11.5px; color: #fbbf24; margin-top: 4px; font-weight: 700; }
+
+  #previewbox { min-height: 74px; }
+  #previewbox .pv-hand { font-weight: 900; font-size: 15px; color: var(--gold-soft); }
+  #previewbox .pv-formula { font-size: 13px; margin-top: 3px; color: #e2e8f0; }
+  #previewbox .pv-formula .c { color: var(--chip-blue); font-weight: 800; }
+  #previewbox .pv-formula .m { color: var(--mult-red); font-weight: 800; }
+  #previewbox .pv-score { font-size: 19px; font-weight: 900; color: #fff; margin-top: 3px; }
+  #previewbox .pv-empty { font-size: 11.5px; color: #94a3b8; line-height: 1.5; }
+
+  #playlog { font-size: 11px; color: #cbd5e1; }
+  #playlog div { display: flex; justify-content: space-between; padding: 1.5px 0; }
+  #playlog .lognum { color: #64748b; }
+
+  /* ── 낸 패 / 손패 ────────────────────── */
+  #playedarea {
+    min-height: 152px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.16);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 12px; flex-wrap: wrap; position: relative;
+  }
+  #playedarea .hint { color: rgba(255,255,255,.35); font-size: 12.5px; }
+  #playresult { text-align: center; width: 100%; }
+  #playresult .r-hand { font-size: 15px; font-weight: 900; color: var(--gold-soft); }
+  #playresult .r-formula { font-size: 13px; color: #e2e8f0; }
+  #playresult .r-formula .c { color: var(--chip-blue); font-weight: 800; }
+  #playresult .r-formula .m { color: var(--mult-red); font-weight: 800; }
+  #playresult .r-score { font-size: 26px; font-weight: 900; color: #fff; animation: pop .45s ease; }
+  @keyframes pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
+
+  #handarea { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 116px; }
+  #actions { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .bigbtn { padding: 12px 26px; font-size: 15px; font-weight: 900; border-radius: 10px; box-shadow: 0 3px 0 rgba(0,0,0,.4); }
+  #btn-play { background: linear-gradient(180deg, #dc2626, #991b1b); color: #fff; }
+  #btn-discard { background: linear-gradient(180deg, #2563eb, #1e40af); color: #fff; }
+  #btn-gukjin { background: linear-gradient(180deg, #7c3aed, #5b21b6); color: #fff; padding: 9px 14px; font-size: 12px; font-weight: 800; }
+  .smallbtn { background: rgba(255,255,255,.14); color: #e2e8f0; padding: 7px 12px; font-size: 12px; font-weight: 700; }
+
+  /* ── 카드 ────────────────────────────── */
+  .card {
+    width: 64px; height: 98px;
+    background: linear-gradient(160deg, #fffbef, #f5ecd4);
+    border-radius: 7px; border: 1.5px solid rgba(0,0,0,.55);
+    box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px rgba(192,57,43,.85), inset 0 0 0 4px rgba(255,255,255,.6);
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    padding: 6px 4px 5px; color: var(--ink); user-select: none; cursor: pointer;
+    transition: transform .13s ease, box-shadow .13s ease; flex-shrink: 0;
+  }
+  .card:hover { transform: translateY(-5px); }
+  .card.sel { transform: translateY(-14px); box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px var(--gold), inset 0 0 0 2.5px rgba(192,57,43,.85); }
+  .card.static { cursor: default; }
+  .card.static:hover { transform: none; }
+  .card .month { font-size: 11px; font-weight: 800; line-height: 1; color: var(--red); align-self: flex-start; margin-left: 2px; }
+  .card .mname { font-size: 8.5px; color: #8a6d3b; align-self: flex-start; margin: 1px 0 0 2px; letter-spacing: -0.5px; }
+  .card .art { font-size: 25px; line-height: 1; margin-top: 7px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+  .card .tag { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: 9px; font-weight: 700; text-align: center; border-radius: 4px; padding: 2px 0; letter-spacing: .5px; }
+  .card.kwang { background: linear-gradient(160deg, #fff8dc, #f3e5ab); box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px var(--gold), inset 0 0 0 4px rgba(255,255,255,.6); }
+  .card.kwang.sel { box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px #fff, inset 0 0 0 2.5px var(--gold); }
+  .card.kwang .gwangmark {
+    margin-top: 3px; width: 27px; height: 27px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe98a, var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900; color: #7c2d12; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  .card.kwang .art { font-size: 21px; }
+  .card.kwang .tag { background: var(--gold); color: #5c3a00; }
+  .card.kwang.rain .tag { background: #475569; color: #dbeafe; }
+  .card.yeol .tag { background: #b45309; color: #fef3c7; }
+  .card.tti .ribbon {
+    margin-top: 5px; width: 15px; height: 42px; border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl; font-size: 9px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.35);
+  }
+  .card.tti.hongdan .ribbon { background: #c0392b; color: #fff; }
+  .card.tti.cheongdan .ribbon { background: #1e40af; color: #fff; }
+  .card.tti.chodan .ribbon { background: #c0392b; color: #c0392b; }
+  .card.tti.bi_tti .ribbon { background: #6b21a8; color: #fff; }
+  .card.tti .tag { background: #7f1d1d; color: #fecaca; }
+  .card.tti.cheongdan .tag { background: #1e3a8a; color: #bfdbfe; }
+  .card.pi .tag { background: #e5e7eb; color: #4b5563; }
+  .card.ssangpi .tag { background: #7c3aed; color: #ede9fe; }
+  .card .chipbadge {
+    position: absolute; top: 3px; right: 3px; font-size: 8.5px; font-weight: 800;
+    background: rgba(37,99,235,.14); color: #1d4ed8; border-radius: 4px; padding: 1px 3px;
+  }
+  .card.facedown {
+    background: repeating-linear-gradient(135deg, #7f1d1d 0 8px, #991b1b 8px 16px);
+    box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px rgba(0,0,0,.4);
+  }
+  .card.facedown .back-q { margin: auto; font-size: 30px; color: rgba(255,255,255,.75); font-weight: 900; }
+  .gukjin-mode {
+    position: absolute; top: 18px; right: 2px; font-size: 8px; font-weight: 800;
+    background: #7c3aed; color: #fff; border-radius: 4px; padding: 1px 3px;
+  }
+
+  /* ── 모달 ────────────────────────────── */
+  #modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.62); display: none;
+    align-items: center; justify-content: center; z-index: 50; padding: 18px; overflow-y: auto;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal {
+    background: linear-gradient(170deg, #1f3d2b, #142a1d);
+    border: 1.5px solid var(--gold); border-radius: 16px; padding: 22px 26px;
+    max-width: 720px; width: 100%; box-shadow: 0 18px 60px rgba(0,0,0,.6);
+    max-height: 92vh; overflow-y: auto;
+  }
+  #modal h2 { margin: 0 0 12px; color: var(--gold-soft); font-size: 19px; }
+  #modal .sub { color: #cbd5e1; font-size: 13px; line-height: 1.55; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .choicebtn { flex: 1; min-width: 190px; padding: 14px; border-radius: 12px; text-align: left; }
+  .choicebtn .t { font-size: 16px; font-weight: 900; }
+  .choicebtn .d { font-size: 11.5px; margin-top: 4px; line-height: 1.45; }
+  .btn-stop { background: linear-gradient(180deg, #16a34a, #15803d); color: #fff; }
+  .btn-go { background: linear-gradient(180deg, #dc2626, #991b1b); color: #fff; }
+
+  .settle-table { width: 100%; font-size: 13.5px; border-collapse: collapse; margin-top: 8px; }
+  .settle-table td { padding: 5px 4px; border-bottom: 1px dashed rgba(255,255,255,.12); }
+  .settle-table td:last-child { text-align: right; font-weight: 800; color: #fbbf24; }
+  .settle-table tr.total td { border-bottom: none; font-size: 15px; font-weight: 900; color: #fff; }
+
+  /* ── 상점 ────────────────────────────── */
+  .shop-offers { display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+  .offer {
+    flex: 1; min-width: 165px; border-radius: 12px; padding: 12px;
+    background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.16);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .offer.sold { opacity: .35; }
+  .offer .o-name { font-weight: 900; font-size: 14.5px; }
+  .offer .o-rarity { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px; display: inline-block; width: fit-content; }
+  .r-common { background: #334155; color: #cbd5e1; }
+  .r-uncommon { background: #14532d; color: #86efac; }
+  .r-rare { background: #7c2d12; color: #fdba74; }
+  .offer .o-desc { font-size: 11.5px; color: #cbd5e1; line-height: 1.5; flex: 1; }
+  .offer .o-buy { background: linear-gradient(180deg, #d97706, #b45309); color: #fff; padding: 8px; font-weight: 800; font-size: 13px; }
+  .owned-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .owned {
+    border: 1px solid var(--gold); background: rgba(212,175,55,.1); border-radius: 9px;
+    padding: 7px 9px; font-size: 11px; min-width: 116px;
+  }
+  .owned .sellbtn { margin-top: 5px; width: 100%; background: rgba(255,255,255,.15); color: #fca5a5; font-size: 10.5px; padding: 4px; font-weight: 700; }
+  .boss-preview {
+    margin-top: 12px; border: 1px solid rgba(252,165,165,.45); background: rgba(127,29,29,.35);
+    border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5; color: #fecaca;
+  }
+  .boss-candidate { display: inline-block; margin: 5px 8px 0 0; padding: 8px 12px; border-radius: 9px; background: rgba(0,0,0,.35); border: 1.5px solid rgba(255,255,255,.2); color: #fecaca; font-size: 12px; font-weight: 700; }
+  .boss-candidate.selected { border-color: var(--gold); background: rgba(212,175,55,.18); color: #fde68a; }
+  .shop-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+  #btn-nextround { background: linear-gradient(180deg, #16a34a, #15803d); color: #fff; padding: 12px 24px; font-size: 15px; font-weight: 900; }
+
+  .handtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .handtable th, .handtable td { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: left; }
+  .handtable th { color: var(--gold-soft); }
+  .handtable td:nth-child(3), .handtable td:nth-child(4) { text-align: right; font-weight: 700; }
+
+  #seedinfo { font-size: 10px; color: #475569; text-align: center; }
+  #seasonline { font-size: 10.5px; color: #a7c4b0; margin-top: 4px; line-height: 1.55; }
+  .card.season { outline: 2px solid rgba(255, 205, 70, .95); outline-offset: 1.5px; }
+
+  /* ── 춘향 조력자 ─────────────────────── */
+  #chunhyang {
+    position: fixed; right: 14px; bottom: 12px; width: 152px; z-index: 40;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  #ch-bubble {
+    background: #fffbef; color: #3f3120; border-radius: 10px; padding: 7px 9px;
+    font-size: 11px; line-height: 1.45; box-shadow: 0 3px 10px rgba(0,0,0,.35);
+    position: relative; width: 100%; text-align: center; min-height: 32px;
+  }
+  #ch-bubble::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: #fffbef; border-bottom: none;
+  }
+  #ch-figure { position: relative; width: 110px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
+  #ch-face { position: absolute; top: 19px; left: 50%; transform: translateX(-50%); font-size: 23px; }
+  #ch-btn {
+    background: linear-gradient(180deg, #d97706, #b45309); color: #fff;
+    font-size: 11px; font-weight: 800; padding: 6px 10px; width: 100%;
+  }
+  @media (max-width: 860px) {
+    #chunhyang { transform: scale(.72); transform-origin: bottom right; right: 6px; bottom: 6px; }
+  }
+  @media (min-width: 861px) {
+    #main { padding-right: 180px; }
+  }
+  .shake { animation: shake .3s ease; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div id="logo">화투로<small>고스톱 · 무한의 판</small></div>
+  <div id="jokerbar"></div>
+  <div id="moneybox"></div>
+</div>
+
+<div id="main">
+  <aside id="side">
+    <div class="panel">
+      <div id="roundlabel"></div>
+      <div id="seasonline"></div>
+      <div id="bossbanner" style="display:none; margin-top:8px;"></div>
+      <div style="margin-top:8px;">
+        <div class="statline"><span>목표 점수</span><b id="target-val"></b></div>
+        <div id="gauge"><div id="gauge-fill"></div></div>
+        <div class="statline"><span>현재 점수</span><b id="score-val"></b></div>
+        <div class="golevel" id="golevel" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="panel" id="previewbox"></div>
+    <div class="panel">
+      <div class="statline"><span>내기</span><b id="plays-val"></b></div>
+      <div class="statline"><span>버리기</span><b id="discards-val"></b></div>
+      <div class="statline"><span>덱</span><b id="deck-val"></b></div>
+    </div>
+    <div class="panel" id="playlog-panel" style="display:none;">
+      <div style="font-size:11px; color:var(--gold-soft); font-weight:800; margin-bottom:5px;">이번 판 내기 기록</div>
+      <div id="playlog"></div>
+    </div>
+    <button class="smallbtn" onclick="openHelp()">📖 족보표 / 도움말</button>
+    <div id="seedinfo"></div>
+  </aside>
+
+  <main id="table">
+    <div id="playedarea"></div>
+    <div id="handarea"></div>
+    <div id="actions">
+      <button id="btn-play" class="bigbtn" onclick="playSelected()"></button>
+      <button id="btn-discard" class="bigbtn" onclick="discardSelected()"></button>
+      <button id="btn-gukjin" onclick="toggleGukjin()" style="display:none;"></button>
+    </div>
+  </main>
+</div>
+
+<div id="chunhyang">
+  <div id="ch-bubble"></div>
+  <div id="ch-figure">
+    <svg viewBox="0 0 120 190" width="110" xmlns="http://www.w3.org/2000/svg" aria-label="춘향이">
+      <path d="M60 78 C36 86 26 138 22 182 L98 182 C94 138 84 86 60 78Z" fill="#d63a63"/>
+      <path d="M60 78 C36 86 26 138 22 182 L60 182 Z" fill="rgba(0,0,0,.10)"/>
+      <path d="M60 56 C40 56 34 74 37 88 L83 88 C86 74 80 56 60 56Z" fill="#fdf3e7"/>
+      <ellipse cx="34" cy="80" rx="9" ry="14" fill="#fdf3e7"/>
+      <ellipse cx="86" cy="80" rx="9" ry="14" fill="#fdf3e7"/>
+      <path d="M52 58 L60 70 L68 58" stroke="#efe3d0" stroke-width="3" fill="none"/>
+      <path d="M58 70 L53 90" stroke="#d63a63" stroke-width="4" stroke-linecap="round"/>
+      <path d="M62 70 L69 86" stroke="#d63a63" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="60" cy="32" r="21" fill="#241a12"/>
+      <circle cx="60" cy="36" r="17" fill="#ffe3c7"/>
+      <path d="M43 30 C48 18 72 18 77 30 C70 24 50 24 43 30Z" fill="#241a12"/>
+      <circle cx="60" cy="12" r="7.5" fill="#241a12"/>
+      <rect x="48" y="8" width="24" height="3" rx="1.5" fill="#d4af37" transform="rotate(-8 60 10)"/>
+      <circle cx="48" cy="42" r="3" fill="rgba(230,90,120,.35)"/>
+      <circle cx="72" cy="42" r="3" fill="rgba(230,90,120,.35)"/>
+    </svg>
+    <div id="ch-face">😴</div>
+  </div>
+  <button id="ch-btn" onclick="giveMakgeolli()">🍶 막걸리 주기</button>
+</div>
+
+<div id="modal-overlay"><div id="modal"></div></div>
+
+<script>
+/* ================================================================
+   ==== ENGINE START ==== (순수 로직 — DOM 접근 없음, Node 테스트 가능)
+   ================================================================ */
+
+// ── 시드 RNG ──────────────────────────────────────────────
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffle(arr, rng) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ── 카드 데이터 (한국식 화투 48장) ─────────────────────────
+const MONTHS = [
+  { n: 1,  name: '송학',   flower: '🌲', yeolArt: null,  gwangArt: '🕊️' },
+  { n: 2,  name: '매조',   flower: '🌸', yeolArt: '🐦', gwangArt: null },
+  { n: 3,  name: '벚꽃',   flower: '🌸', yeolArt: null,  gwangArt: '🏯' },
+  { n: 4,  name: '흑싸리', flower: '🌿', yeolArt: '🐦‍⬛', gwangArt: null },
+  { n: 5,  name: '난초',   flower: '🪻', yeolArt: '🌉', gwangArt: null },
+  { n: 6,  name: '모란',   flower: '🌺', yeolArt: '🦋', gwangArt: null },
+  { n: 7,  name: '홍싸리', flower: '🍀', yeolArt: '🐗', gwangArt: null },
+  { n: 8,  name: '공산',   flower: '🌕', yeolArt: '🪿', gwangArt: '🌕' },
+  { n: 9,  name: '국진',   flower: '🌼', yeolArt: '🍶', gwangArt: null },
+  { n: 10, name: '단풍',   flower: '🍁', yeolArt: '🦌', gwangArt: null },
+  { n: 11, name: '오동',   flower: '🍂', yeolArt: null,  gwangArt: '🐔' },
+  { n: 12, name: '비',     flower: '🌧️', yeolArt: '🐦', gwangArt: '☔' },
+];
+
+// type: kwang | yeol | tti | ssangpi | pi
+// tags: hongdan | cheongdan | chodan | bi_tti | godori | bikwang | dual
+function buildDeck() {
+  const d = [];
+  const add = (month, type, tags = []) => d.push({ month, type, tags, asPi: false, faceDown: false });
+  add(1, 'kwang');                 add(1, 'tti', ['hongdan']);   add(1, 'pi'); add(1, 'pi');
+  add(2, 'yeol', ['godori']);      add(2, 'tti', ['hongdan']);   add(2, 'pi'); add(2, 'pi');
+  add(3, 'kwang');                 add(3, 'tti', ['hongdan']);   add(3, 'pi'); add(3, 'pi');
+  add(4, 'yeol', ['godori']);      add(4, 'tti', ['chodan']);    add(4, 'pi'); add(4, 'pi');
+  add(5, 'yeol');                  add(5, 'tti', ['chodan']);    add(5, 'pi'); add(5, 'pi');
+  add(6, 'yeol');                  add(6, 'tti', ['cheongdan']); add(6, 'pi'); add(6, 'pi');
+  add(7, 'yeol');                  add(7, 'tti', ['chodan']);    add(7, 'pi'); add(7, 'pi');
+  add(8, 'kwang');                 add(8, 'yeol', ['godori']);   add(8, 'pi'); add(8, 'pi');
+  add(9, 'yeol', ['dual']);        add(9, 'tti', ['cheongdan']); add(9, 'pi'); add(9, 'pi');
+  add(10, 'yeol');                 add(10, 'tti', ['cheongdan']);add(10, 'pi'); add(10, 'pi');
+  add(11, 'kwang');                add(11, 'ssangpi');           add(11, 'pi'); add(11, 'pi');
+  add(12, 'kwang', ['bikwang']);   add(12, 'yeol');              add(12, 'tti', ['bi_tti']); add(12, 'ssangpi');
+  d.forEach((c, i) => (c.uid = i));
+  return d;
+}
+
+const CHIP = { kwang: 15, yeol: 10, tti: 8, ssangpi: 6, pi: 3 };
+const effType = (c) => (c.tags.includes('dual') && c.asPi) ? 'ssangpi' : c.type;
+const baseChip = (c) => CHIP[effType(c)];
+
+// ── 족보표 (배열 순서 = 판정 우선순위) ─────────────────────
+const HANDS = [
+  { id: 'ogwang',     name: '오광',           chips: 100, mult: 12 },
+  { id: 'sagwang',    name: '사광',           chips: 60,  mult: 8  },
+  { id: 'chongtong',  name: '총통',           chips: 50,  mult: 7  },
+  { id: 'godori',     name: '고도리',         chips: 45,  mult: 6  },
+  { id: 'samgwang',   name: '삼광',           chips: 40,  mult: 5  },
+  { id: 'bisamgwang', name: '비삼광',         chips: 32,  mult: 4  },
+  { id: 'dan',        name: '홍단/청단/초단', chips: 30,  mult: 4  },
+  { id: 'month3',     name: '같은 달 3장',    chips: 25,  mult: 3  },
+  { id: 'yeol3',      name: '열끗 셋',        chips: 20,  mult: 3  },
+  { id: 'tti3',       name: '띠 셋',          chips: 18,  mult: 2  },
+  { id: 'pi5',        name: '피 5장',         chips: 15,  mult: 2  },
+  { id: 'month2',     name: '같은 달 2장',    chips: 10,  mult: 2  },
+  { id: 'none',       name: '무조합',         chips: 5,   mult: 1  },
+];
+const HAND_BY_ID = Object.fromEntries(HANDS.map((h) => [h.id, h]));
+
+// 12판 = 1월(송학) → 12월(비). 3·6·9·12월(환절기)은 박 라운드.
+const ROUNDS = 12;
+const TARGETS = [320, 480, 660, 880, 1150, 1500, 2000, 2600, 3400, 4400, 5700, 7400];
+const BOSS_ROUNDS = [3, 6, 9, 12];
+const MILD_BOSSES = ['pibak', 'gwangbak', 'meongbak'];
+// 고 무제한: n고 = 목표 ×(1+0.5n), 성공 보너스 n(n+3)냥 (4, 10, 18, 28, 40…)
+const goMult = (n) => 1 + 0.5 * n;
+const goBonus = (n) => n * (n + 3);
+
+// ── 족보 판정 (고정 우선순위, 첫 매치) ─────────────────────
+function detectHand(cards) {
+  const kw = cards.filter((c) => c.type === 'kwang');
+  const monthCount = {};
+  for (const c of cards) monthCount[c.month] = (monthCount[c.month] || 0) + 1;
+  const maxMonth = Math.max(0, ...Object.values(monthCount));
+
+  if (kw.length === 5) return 'ogwang';
+  if (kw.length === 4) return 'sagwang';
+  if (maxMonth >= 4) return 'chongtong';
+  if (cards.filter((c) => c.tags.includes('godori')).length === 3) return 'godori';
+  if (kw.length === 3) return kw.some((c) => c.tags.includes('bikwang')) ? 'bisamgwang' : 'samgwang';
+  for (const t of ['hongdan', 'cheongdan', 'chodan'])
+    if (cards.filter((c) => c.tags.includes(t)).length === 3) return 'dan';
+  if (maxMonth >= 3) return 'month3';
+  if (cards.filter((c) => effType(c) === 'yeol').length >= 3) return 'yeol3';
+  if (cards.filter((c) => c.type === 'tti').length >= 3) return 'tti3';
+  if (cards.length === 5 && cards.every((c) => ['pi', 'ssangpi'].includes(effType(c)))) return 'pi5';
+  if (maxMonth >= 2) return 'month2';
+  return 'none';
+}
+
+// ── 특수패 12종 ────────────────────────────────────────────
+// 훅 ctx: { cards, handId, boss, mitjangChips }
+const JOKERS = [
+  { id: 'pi_merchant', name: '피장사꾼', icon: '🧺', rarity: 'common', price: 4, kind: '+칩',
+    desc: '낸 피 1장당 +4칩, 쌍피 1장당 +8칩',
+    addChips: (x) => x.cards.reduce((s, c) => s + (effType(c) === 'pi' ? 4 : effType(c) === 'ssangpi' ? 8 : 0), 0) },
+  { id: 'meongtta', name: '멍따', icon: '🐂', rarity: 'common', price: 4, kind: '+칩',
+    desc: '낸 열끗 1장당 +6칩',
+    addChips: (x) => x.cards.filter((c) => effType(c) === 'yeol').length * 6 },
+  { id: 'ssakssuri', name: '싹쓸이', icon: '🧹', rarity: 'uncommon', price: 6, kind: '+칩',
+    desc: '정확히 5장을 낼 때 +30칩',
+    addChips: (x) => (x.cards.length === 5 ? 30 : 0) },
+  { id: 'jjokjipge', name: '쪽집게', icon: '🎯', rarity: 'common', price: 4, kind: '+배수',
+    desc: "족보가 '같은 달 2장'이면 +2배수",
+    addMult: (x) => (x.handId === 'month2' ? 2 : 0) },
+  { id: 'godori_kkun', name: '고도리꾼', icon: '🐦', rarity: 'uncommon', price: 6, kind: '+배수',
+    desc: '낸 고도리 새(2·4·8월 열끗) 1장당 +3배수',
+    addMult: (x) => x.cards.filter((c) => c.tags.includes('godori')).length * 3 },
+  { id: 'dangol', name: '단골손님', icon: '🏮', rarity: 'uncommon', price: 6, kind: '+배수',
+    desc: '족보가 홍단/청단/초단 또는 띠 셋이면 +6배수',
+    addMult: (x) => (x.handId === 'dan' || x.handId === 'tti3' ? 6 : 0) },
+  { id: 'bigwang_usan', name: '비광우산', icon: '☔', rarity: 'uncommon', price: 6, kind: '×배수',
+    desc: '낸 패에 12월(비) 카드가 1장 이상이면 배수 ×2',
+    xMult: (x) => (x.cards.some((c) => c.month === 12) ? 2 : 1) },
+  { id: 'heundeulgi', name: '흔들기', icon: '🌀', rarity: 'uncommon', price: 7, kind: '×배수',
+    desc: '낸 패에 같은 달 2장 이상이 있으면 배수 ×1.5 (흔들기 금지 판에선 무효)',
+    xMult: (x) => {
+      if (x.boss === 'no_shake') return 1;
+      const m = {};
+      for (const c of x.cards) { m[c.month] = (m[c.month] || 0) + 1; if (m[c.month] >= 2) return 1.5; }
+      return 1;
+    } },
+  { id: 'poktan', name: '폭탄', icon: '💣', rarity: 'rare', price: 9, kind: '×배수',
+    desc: "족보가 '같은 달 3장' 또는 '총통'이면 배수 ×3",
+    xMult: (x) => (x.handId === 'month3' || x.handId === 'chongtong' ? 3 : 1) },
+  { id: 'mitjang', name: '밑장빼기', icon: '🃏', rarity: 'rare', price: 8, kind: '성장',
+    desc: '버리기 1회 사용마다 영구 +8칩 누적 (모든 내기에 가산, 판매 시 소멸)',
+    addChips: (x) => x.mitjangChips },
+  { id: 'gwangpari', name: '광팔이', icon: '💰', rarity: 'common', price: 3, kind: '경제',
+    desc: '광을 낼 때마다 +1냥 (판당 최대 3냥)' },
+  { id: 'pibak_boheom', name: '피박보험', icon: '🛡️', rarity: 'rare', price: 8, kind: '방어',
+    desc: '피박·광박·멍박 디버프 무효 + 매 판 정산 시 +1냥' },
+];
+const JOKER_BY_ID = Object.fromEntries(JOKERS.map((j) => [j.id, j]));
+
+// ── 박 라운드 디버프 6종 ──────────────────────────────────
+const BOSSES = [
+  { id: 'pibak',    name: '피박',        desc: '피·쌍피의 카드 칩이 0 (족보 판정에는 카운트)' },
+  { id: 'gwangbak', name: '광박',        desc: '광·비광의 카드 칩이 0' },
+  { id: 'meongbak', name: '멍박',        desc: '열끗의 카드 칩이 0' },
+  { id: 'no_shake', name: '흔들기 금지', desc: '같은 달 2장/3장/총통 족보가 무조합으로 강등 (흔들기 특수패도 무효)' },
+  { id: 'bibaram',  name: '비바람',      desc: '이 판 동안 버리기 사용 불가' },
+  { id: 'angae',    name: '안개',        desc: '손패 중 3장이 뒷면으로 온다 (내는 순간 공개)' },
+];
+const BOSS_BY_ID = Object.fromEntries(BOSSES.map((b) => [b.id, b]));
+
+// ── 카드 1장의 칩 (계절/밤낮 보정 → 박 디버프 순서로 적용) ──
+// env: { boss, jokerIds, mitjangChips, seasonMonth?, night? }
+function cardChip(c, env) {
+  let chip = baseChip(c);
+  const t = effType(c);
+  if (env.seasonMonth && c.month === env.seasonMonth) chip *= 2;          // 이달의 패
+  if (env.night === false && (t === 'kwang' || t === 'yeol')) chip += 3;  // 낮: 광·열끗
+  if (env.night === true && (t === 'tti' || t === 'ssangpi' || t === 'pi')) chip += 3; // 밤: 띠·피
+  if (!env.jokerIds.includes('pibak_boheom')) {
+    if (env.boss === 'pibak' && (t === 'pi' || t === 'ssangpi')) chip = 0;
+    if (env.boss === 'gwangbak' && t === 'kwang') chip = 0;
+    if (env.boss === 'meongbak' && t === 'yeol') chip = 0;
+  }
+  return chip;
+}
+
+// ── 점수 계산 (순수 함수 — 프리뷰와 실정산이 공유) ─────────
+// 반환: { handId, chips, mult, score, kwangPlayed }
+function computeScore(cards, env) {
+  let handId = detectHand(cards);
+  if (env.boss === 'no_shake' && ['month2', 'month3', 'chongtong'].includes(handId)) handId = 'none';
+  const hd = HAND_BY_ID[handId];
+  let chips = hd.chips;
+  let mult = hd.mult;
+
+  for (const c of cards) chips += cardChip(c, env);
+
+  const ctx = { cards, handId, boss: env.boss, mitjangChips: env.mitjangChips };
+  for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addChips) chips += j.addChips(ctx); }
+  for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addMult)  mult  += j.addMult(ctx); }
+  for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.xMult)    mult  *= j.xMult(ctx); }
+
+  return {
+    handId, chips, mult,
+    score: Math.floor(chips * mult),
+    kwangPlayed: cards.filter((c) => c.type === 'kwang').length,
+  };
+}
+
+// ── 손패 최적 조합 탐색 (춘향 훈수 · 봇 시뮬레이션 공용) ────
+function* combosOf(arr, k, start = 0, cur = []) {
+  if (cur.length === k) { yield [...cur]; return; }
+  for (let i = start; i <= arr.length - (k - cur.length); i++) {
+    cur.push(arr[i]);
+    yield* combosOf(arr, k, i + 1, cur);
+    cur.pop();
+  }
+}
+// 뒷면 카드는 제외하고 1~5장 전 부분집합을 평가 (국진은 양쪽 모드 모두 시도)
+function evaluateHand(hand, env) {
+  const avail = hand.filter((c) => !c.faceDown);
+  const guk = avail.find((c) => c.tags.includes('dual'));
+  const gukOrig = guk ? guk.asPi : null;
+  let best = null;
+  for (let k = 1; k <= Math.min(5, avail.length); k++) {
+    for (const sub of combosOf(avail, k)) {
+      const modes = guk && sub.includes(guk) ? [false, true] : [null];
+      for (const m of modes) {
+        if (m !== null) guk.asPi = m;
+        const r = computeScore(sub, env);
+        if (!best || r.score > best.score) best = { cards: [...sub], gukAsPi: m, ...r };
+      }
+    }
+  }
+  if (guk) guk.asPi = gukOrig;
+  return best;
+}
+
+/* ================================================================
+   ==== ENGINE END ====
+   ================================================================ */
+
+// ── 게임 상태 ──────────────────────────────────────────────
+const seedParam = new URLSearchParams(location.search).get('seed');
+let runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() * 4294967296) >>> 0);
+let rng = mulberry32(runSeed);
+
+const state = {
+  screen: 'play', // play | gostop | settle | shop | gameover | victory | help
+  round: 1,
+  baseTarget: TARGETS[0],
+  target: TARGETS[0],
+  goLevel: 0,
+  roundScore: 0,
+  playsLeft: 4,
+  discardsLeft: 4,
+  deck: [],
+  hand: [],
+  selected: [],       // uid 배열 (인덱스 금지)
+  jokers: [],         // { id, paid }
+  money: 4,
+  boss: null,
+  usedBosses: [],
+  nextBoss: null,       // 다음 박 라운드 확정 디버프 (3·6판용)
+  bossCandidates: null, // 최종(12월) 라운드용 후보 2종 [id, id]
+  shopOffers: [],       // { joker, sold }
+  rerollCost: 2,
+  kwangSoldThisRound: 0,
+  mitjangChips: 0,
+  makgeolli: 0,         // 막걸리 보유 병 수 (최대 3)
+  drunk: false,         // 이번 판 춘향이 훈수 활성화 여부
+  lastPlay: null,       // { cards 스냅샷, result }
+  playLog: [],
+  settleData: null,
+  gameOverReason: '',
+  stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
+  helpReturn: null,
+};
+
+const hasJoker = (id) => state.jokers.some((j) => j.id === id);
+const jokerIds = () => state.jokers.map((j) => j.id);
+const isBossRound = (r) => BOSS_ROUNDS.includes(r);
+// 판 번호 = 월. 홀수 달 = 낮(광·열끗 +3칩), 짝수 달 = 밤(띠·피 +3칩)
+const isNight = () => state.round % 2 === 0;
+const scoreEnv = () => ({
+  boss: state.boss, jokerIds: jokerIds(), mitjangChips: state.mitjangChips,
+  seasonMonth: state.round, night: isNight(),
+});
+
+function addMoney(n) {
+  state.money += n;
+  if (n > 0) state.stats.totalEarned += n;
+}
+
+// ── 판 진행 ────────────────────────────────────────────────
+function startRound() {
+  state.deck = shuffle(buildDeck(), rng);
+  state.hand = [];
+  state.selected = [];
+  state.roundScore = 0;
+  state.playsLeft = 4;
+  state.discardsLeft = 4;
+  state.goLevel = 0;
+  state.baseTarget = TARGETS[state.round - 1];
+  state.target = state.baseTarget;
+  state.kwangSoldThisRound = 0;
+  state.drunk = false;
+  state.lastPlay = null;
+  state.playLog = [];
+
+  state.boss = isBossRound(state.round) ? state.nextBoss : null;
+  state.nextBoss = null;
+  state.bossCandidates = null;
+  if (state.boss) {
+    state.usedBosses.push(state.boss);
+    if (state.boss === 'bibaram') state.discardsLeft = 0;
+  }
+
+  refillHand(true);
+  state.screen = 'play';
+  render();
+}
+
+function refillHand(isRoundStart = false) {
+  const drawn = [];
+  while (state.hand.length < 8 && state.deck.length > 0) {
+    const c = state.deck.pop();
+    state.hand.push(c);
+    drawn.push(c);
+  }
+  if (state.boss === 'angae') {
+    // 뒷면은 항상 최대 3장 유지 — 새로 뽑힌 카드 중에서만 지정 (공개된 카드는 다시 안 뒤집힘)
+    const pool = isRoundStart ? [...state.hand] : [...drawn];
+    let downCount = state.hand.filter((c) => c.faceDown).length;
+    const candidates = pool.filter((c) => !c.faceDown);
+    shuffle(candidates, rng);
+    for (const c of candidates) {
+      if (downCount >= 3) break;
+      c.faceDown = true;
+      downCount++;
+    }
+  }
+  sortHand();
+}
+
+const TYPE_ORDER = { kwang: 0, yeol: 1, tti: 2, ssangpi: 3, pi: 4 };
+function sortHand() {
+  state.hand.sort((a, b) => {
+    if (a.faceDown !== b.faceDown) return a.faceDown ? 1 : -1; // 뒷면은 맨 뒤 (정렬로 정보 누출 방지)
+    if (a.month !== b.month) return a.month - b.month;
+    return TYPE_ORDER[a.type] - TYPE_ORDER[b.type];
+  });
+}
+
+function selectedCards() {
+  return state.selected.map((uid) => state.hand.find((c) => c.uid === uid)).filter(Boolean);
+}
+
+function toggleSelect(uid) {
+  if (state.screen !== 'play') return;
+  const i = state.selected.indexOf(uid);
+  if (i >= 0) state.selected.splice(i, 1);
+  else {
+    if (state.selected.length >= 5) { flashActions(); return; }
+    state.selected.push(uid);
+  }
+  render();
+}
+
+function toggleGukjin() {
+  if (state.screen !== 'play') return;
+  const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
+  if (!g) return;
+  g.asPi = !g.asPi;
+  render();
+}
+
+// ── 내기 ───────────────────────────────────────────────────
+function playSelected() {
+  if (state.screen !== 'play') return;
+  const cards = selectedCards();
+  if (cards.length < 1 || cards.length > 5 || state.playsLeft <= 0) return;
+
+  // 안개: 뒷면 카드 공개 — 뒷면 국진은 점수가 높은 모드 자동 선택
+  for (const c of cards) {
+    if (c.faceDown) {
+      c.faceDown = false;
+      if (c.tags.includes('dual')) {
+        c.asPi = false;
+        const a = computeScore(cards, scoreEnv()).score;
+        c.asPi = true;
+        const b = computeScore(cards, scoreEnv()).score;
+        c.asPi = b > a;
+      }
+    }
+  }
+
+  const result = computeScore(cards, scoreEnv());
+
+  // 경제 트리거 (실정산에서만)
+  if (hasJoker('gwangpari') && result.kwangPlayed > 0) {
+    const n = Math.min(result.kwangPlayed, 3 - state.kwangSoldThisRound);
+    if (n > 0) { addMoney(n); state.kwangSoldThisRound += n; }
+  }
+
+  state.roundScore += result.score;
+  if (result.score > state.stats.bestSingle) {
+    state.stats.bestSingle = result.score;
+    state.stats.bestSingleHand = HAND_BY_ID[result.handId].name;
+  }
+  state.playsLeft--;
+  state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
+
+  // 낸 패 스냅샷 (국진 모드 포함)
+  state.lastPlay = {
+    cards: cards.map((c) => ({ ...c, tags: [...c.tags] })),
+    result,
+  };
+
+  state.hand = state.hand.filter((c) => !state.selected.includes(c.uid));
+  state.selected = [];
+  refillHand();
+  checkAfterPlay();
+  render();
+}
+
+function checkAfterPlay() {
+  if (state.roundScore >= state.target) {
+    if (state.round === ROUNDS) { victory(); return; }
+    if (state.playsLeft === 0) { settle(); return; }
+    state.screen = 'gostop'; // 고는 무제한 — 남은 내기가 있는 한 계속 선택 가능
+  } else if (state.playsLeft === 0) {
+    gameOver(state.goLevel > 0 ? '고박' : '목표 미달');
+  }
+}
+
+function chooseGo() {
+  if (state.screen !== 'gostop') return;
+  state.goLevel++;
+  state.target = Math.ceil(state.baseTarget * goMult(state.goLevel));
+  state.screen = 'play';
+  checkAfterPlay(); // 연쇄 고: 이미 새 목표를 넘었으면 즉시 재판정
+  render();
+}
+
+function chooseStop() {
+  if (state.screen !== 'gostop') return;
+  settle();
+  render();
+}
+
+// ── 버리기 ─────────────────────────────────────────────────
+function discardSelected() {
+  if (state.screen !== 'play') return;
+  const cards = selectedCards();
+  if (cards.length < 1 || cards.length > 5 || state.discardsLeft <= 0) return;
+  state.discardsLeft--;
+  if (hasJoker('mitjang')) state.mitjangChips += 8;
+  state.hand = state.hand.filter((c) => !state.selected.includes(c.uid));
+  state.selected = [];
+  refillHand();
+  render();
+}
+
+// ── 정산 ───────────────────────────────────────────────────
+function settle() {
+  const interest = Math.min(Math.floor(state.money / 5), 5); // 정산 진입 시점 보유금 기준, 가장 먼저
+  const base = isBossRound(state.round) ? 6 : 4;
+  const playBonus = state.playsLeft;
+  const goB = state.goLevel > 0 ? goBonus(state.goLevel) : 0;
+  const insBonus = hasJoker('pibak_boheom') ? 1 : 0;
+  const total = interest + base + playBonus + goB + insBonus;
+  state.settleData = { interest, base, playBonus, goBonus: goB, insBonus, total, moneyBefore: state.money };
+  addMoney(total);
+  state.screen = 'settle';
+}
+
+// ── 상점 ───────────────────────────────────────────────────
+function openShop() {
+  state.rerollCost = 2;
+  state.shopOffers = genOffers();
+  const next = state.round + 1;
+  state.nextBoss = null;
+  state.bossCandidates = null;
+  if (isBossRound(next)) {
+    const pool = (next === 3 ? MILD_BOSSES : BOSSES.map((b) => b.id))
+      .filter((id) => !state.usedBosses.includes(id));
+    shuffle(pool, rng);
+    if (next === ROUNDS) {
+      state.bossCandidates = pool.slice(0, 2);
+      if (state.bossCandidates.length === 1) state.nextBoss = state.bossCandidates[0];
+    } else {
+      state.nextBoss = pool[0];
+    }
+  }
+  state.screen = 'shop';
+  render();
+}
+
+function genOffers() {
+  const owned = jokerIds();
+  const pool = JOKERS.filter((j) => !owned.includes(j.id));
+  const offers = [];
+  for (let i = 0; i < 3; i++) {
+    const avail = pool.filter((j) => !offers.some((o) => o.joker.id === j.id));
+    if (!avail.length) break;
+    const r = rng();
+    const want = r < 0.6 ? 'common' : r < 0.9 ? 'uncommon' : 'rare';
+    let cands = avail.filter((j) => j.rarity === want);
+    if (!cands.length) cands = avail;
+    offers.push({ joker: cands[Math.floor(rng() * cands.length)], sold: false });
+  }
+  return offers;
+}
+
+function buyJoker(i) {
+  if (state.screen !== 'shop') return;
+  const offer = state.shopOffers[i];
+  if (!offer || offer.sold) return;
+  if (state.jokers.length >= 5 || state.money < offer.joker.price) { flashActions(); return; }
+  state.money -= offer.joker.price;
+  state.jokers.push({ id: offer.joker.id, paid: offer.joker.price });
+  offer.sold = true;
+  render();
+}
+
+function sellJoker(i) {
+  if (state.screen !== 'shop') return;
+  const j = state.jokers[i];
+  if (!j) return;
+  addMoney(Math.floor(j.paid / 2));
+  if (j.id === 'mitjang') state.mitjangChips = 0;
+  state.jokers.splice(i, 1);
+  render();
+}
+
+function reroll() {
+  if (state.screen !== 'shop' || state.money < state.rerollCost) return;
+  state.money -= state.rerollCost;
+  state.rerollCost++;
+  state.shopOffers = genOffers();
+  render();
+}
+
+function pickBossCandidate(id) {
+  if (state.screen !== 'shop' || !state.bossCandidates) return;
+  state.nextBoss = id;
+  render();
+}
+
+function nextRound() {
+  if (state.screen !== 'shop') return;
+  if (isBossRound(state.round + 1) && !state.nextBoss) { flashActions(); return; }
+  state.round++;
+  startRound();
+}
+
+// ── 종료 ───────────────────────────────────────────────────
+function gameOver(reason) {
+  state.gameOverReason = reason;
+  state.screen = 'gameover';
+}
+function victory() {
+  state.screen = 'victory';
+}
+function restart() {
+  runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() * 4294967296) >>> 0);
+  rng = mulberry32(runSeed);
+  Object.assign(state, {
+    round: 1, goLevel: 0, roundScore: 0, playsLeft: 4, discardsLeft: 4,
+    selected: [], jokers: [], money: 4, boss: null, usedBosses: [],
+    nextBoss: null, bossCandidates: null, shopOffers: [], rerollCost: 2,
+    kwangSoldThisRound: 0, mitjangChips: 0, makgeolli: 0, drunk: false,
+    lastPlay: null, playLog: [],
+    settleData: null, gameOverReason: '',
+    stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
+  });
+  startRound();
+}
+
+// ── 도움말 ─────────────────────────────────────────────────
+function openHelp() {
+  if (state.screen === 'help') return;
+  state.helpReturn = state.screen;
+  state.screen = 'help';
+  render();
+}
+function closeHelp() {
+  state.screen = state.helpReturn || 'play';
+  state.helpReturn = null;
+  render();
+}
+
+// ── 조력자: 춘향 ───────────────────────────────────────────
+function giveMakgeolli() {
+  if (state.screen !== 'play' || state.drunk || state.makgeolli <= 0) return;
+  state.makgeolli--;
+  state.drunk = true;
+  render();
+}
+
+function buyMakgeolli() {
+  if (state.screen !== 'shop' || state.money < 3 || state.makgeolli >= 3) return;
+  state.money -= 3;
+  state.makgeolli++;
+  render();
+}
+
+// 훈수: 손패 최고 조합 평가 + 부족하면 덱 위를 훔쳐보고 버리기 촉을 알려줌
+function chunhyangHint() {
+  if (!state.drunk || (state.screen !== 'play' && state.screen !== 'gostop')) return null;
+  const env = scoreEnv();
+  const best = evaluateHand(state.hand, env);
+  if (!best) return { mood: '😐', text: '어머, 패가 없네요…' };
+  const pace = Math.max(1, state.target - state.roundScore) / Math.max(1, state.playsLeft);
+  const tier = HANDS.findIndex((h) => h.id === best.handId);
+  if (tier >= 0 && tier <= 6)
+    return { mood: '😍', text: `${HAND_BY_ID[best.handId].name}이 손에 있어요! 최고 ${fmt(best.score)}점 각!` };
+  if (best.score >= pace * 1.5)
+    return { mood: '😊', text: `이 손패면 넉넉해요~ 최고 ${fmt(best.score)}점까지 보여요.` };
+  if (best.score >= pace * 0.9)
+    return { mood: '🙂', text: `나쁘지 않아요. 한 내기에 ${fmt(Math.ceil(pace))}점씩이면 돼요.` };
+  if (state.discardsLeft > 0 && state.deck.length > 0) {
+    const keep = new Set(best.cards.map((c) => c.uid));
+    const junk = state.hand
+      .filter((c) => !keep.has(c.uid) && !c.faceDown)
+      .sort((a, b) => cardChip(a, env) - cardChip(b, env))
+      .slice(0, 3);
+    if (junk.length) {
+      const incoming = state.deck.slice(-junk.length);
+      const trial = [...state.hand.filter((c) => !junk.includes(c)), ...incoming];
+      const tb = evaluateHand(trial, env);
+      if (tb && tb.score > best.score * 1.1)
+        return { mood: '🤔', text: '음… 버리면 좋은 패가 올 것 같은 촉이 와요!' };
+    }
+  }
+  return { mood: '😰', text: `패가 안 좋아요… 지금은 최고 ${fmt(best.score)}점뿐이에요.` };
+}
+
+/* ================================================================
+   렌더링 (상태 → DOM 단방향)
+   ================================================================ */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const fmt = (n) => n.toLocaleString('ko-KR');
+const fmtMult = (m) => (Number.isInteger(m) ? m : m.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''));
+
+const TTI_LABEL = { hongdan: '홍단', cheongdan: '청단', chodan: '초단', bi_tti: '비단' };
+
+function cardHTML(card, opts = {}) {
+  const M = MONTHS[card.month - 1];
+  if (card.faceDown && !opts.reveal) {
+    const selCls = opts.selectable && state.selected.includes(card.uid) ? ' sel' : '';
+    const click = opts.selectable ? ` onclick="toggleSelect(${card.uid})"` : '';
+    return `<div class="card facedown${selCls}${opts.selectable ? '' : ' static'}"${click}><div class="back-q">?</div></div>`;
+  }
+  const t = effType(card);
+  let cls = `card ${t === 'ssangpi' && card.type === 'yeol' ? 'ssangpi' : card.type}`;
+  let body = '', tag = '', badge = '';
+  if (card.type === 'kwang') {
+    if (card.tags.includes('bikwang')) cls += ' rain';
+    body = `<div class="art">${M.gwangArt}</div><div class="gwangmark">光</div>`;
+    tag = card.tags.includes('bikwang') ? '비광' : '광';
+  } else if (card.type === 'yeol') {
+    body = `<div class="art">${M.yeolArt}</div>`;
+    if (card.tags.includes('dual')) {
+      tag = card.asPi ? '국진→쌍피' : '국진·열끗';
+      badge = `<div class="gukjin-mode">${card.asPi ? '쌍피' : '열끗'}</div>`;
+      if (card.asPi) cls = 'card ssangpi';
+    } else {
+      tag = card.tags.includes('godori') ? '열끗·새' : '열끗';
+    }
+  } else if (card.type === 'tti') {
+    const color = card.tags.find((x) => TTI_LABEL[x]) || 'bi_tti';
+    cls += ' ' + color;
+    body = `<div class="ribbon">${color === 'chodan' ? '' : TTI_LABEL[color]}</div>`;
+    tag = TTI_LABEL[color];
+  } else {
+    body = `<div class="art">${M.flower}</div>`;
+    tag = card.type === 'ssangpi' ? '쌍피' : '피';
+  }
+  const chip = cardChip(card, scoreEnv());
+  if (card.month === state.round) cls += ' season'; // 이달의 패 강조
+  const selCls = opts.selectable && state.selected.includes(card.uid) ? ' sel' : '';
+  const click = opts.selectable ? ` onclick="toggleSelect(${card.uid})"` : '';
+  return `<div class="${cls}${selCls}${opts.selectable ? '' : ' static'}"${click}>
+    <div class="chipbadge">+${chip}</div>
+    <div class="month">${card.month}月</div>
+    <div class="mname">${M.name}</div>
+    ${body}${badge}
+    <div class="tag">${tag}</div>
+  </div>`;
+}
+
+function render() {
+  renderTopbar();
+  renderSide();
+  renderTable();
+  renderChunhyang();
+  renderModal();
+}
+
+function renderChunhyang() {
+  const hint = chunhyangHint();
+  const face = $('ch-face');
+  const bubble = $('ch-bubble');
+  if (hint) {
+    face.textContent = hint.mood;
+    bubble.textContent = hint.text;
+  } else if (state.drunk) {
+    face.textContent = '😊';
+    bubble.textContent = '좋은 판 되세요~';
+  } else {
+    face.textContent = '😴';
+    bubble.textContent = state.makgeolli > 0
+      ? '막걸리 한 잔 주시면 패 봐드릴게요~'
+      : '막걸리가 있으면 훈수 둘 텐데… (상점 3냥)';
+  }
+  const btn = $('ch-btn');
+  btn.textContent = `🍶 막걸리 주기 (${state.makgeolli}병)`;
+  btn.disabled = !(state.screen === 'play' && !state.drunk && state.makgeolli > 0);
+}
+
+function renderTopbar() {
+  let slots = '';
+  for (let i = 0; i < 5; i++) {
+    const j = state.jokers[i];
+    if (j) {
+      const def = JOKER_BY_ID[j.id];
+      slots += `<div class="jokerslot filled" title="${esc(def.desc)}">
+        <div class="jname">${def.icon} ${def.name}</div>
+        <div class="jdesc">${esc(def.kind)}${def.id === 'mitjang' ? ` · 현재 +${state.mitjangChips}칩` : ''}</div>
+      </div>`;
+    } else {
+      slots += `<div class="jokerslot">특수패<br>빈 슬롯</div>`;
+    }
+  }
+  $('jokerbar').innerHTML = slots;
+  $('moneybox').textContent = `💰 ${state.money}냥`;
+}
+
+function renderSide() {
+  const bossTag = isBossRound(state.round) ? ' <span class="bak">(박)</span>' : '';
+  const M = MONTHS[state.round - 1];
+  $('roundlabel').innerHTML = `${M.flower} ${state.round}월 · ${M.name} ${isNight() ? '🌙' : '☀️'}` +
+    ` <span style="color:#94a3b8;font-size:11px">(판 ${state.round}/${ROUNDS})</span>${bossTag}`;
+  $('seasonline').innerHTML = `이달의 패: <b style="color:#fde68a">${state.round}월 카드 칩 ×2</b><br>` +
+    (isNight() ? '밤 🌙 — 띠·피·쌍피 칩 +3' : '낮 ☀️ — 광·열끗 칩 +3');
+
+  const bb = $('bossbanner');
+  if (state.boss) {
+    const b = BOSS_BY_ID[state.boss];
+    const nullified = hasJoker('pibak_boheom') && MILD_BOSSES.includes(state.boss);
+    bb.style.display = 'block';
+    bb.innerHTML = `⚠ <b>${b.name}</b> — ${esc(b.desc)}${nullified ? ' <span class="nullified">→ 피박보험으로 무효!</span>' : ''}`;
+  } else bb.style.display = 'none';
+
+  $('target-val').textContent = fmt(state.target);
+  $('score-val').textContent = fmt(state.roundScore);
+  $('gauge-fill').style.width = Math.min(100, (state.roundScore / state.target) * 100) + '%';
+
+  const gl = $('golevel');
+  if (state.goLevel > 0) {
+    gl.style.display = 'block';
+    gl.textContent = `🔥 ${state.goLevel}고! (목표 ×${goMult(state.goLevel)} · 성공 시 +${goBonus(state.goLevel)}냥)`;
+  } else gl.style.display = 'none';
+
+  // 프리뷰
+  const pv = $('previewbox');
+  const sel = selectedCards();
+  if (sel.length === 0) {
+    pv.innerHTML = `<div class="pv-empty">손패에서 카드를 1~5장 선택하면<br>족보와 예상 점수가 여기 표시됩니다.</div>`;
+  } else if (sel.some((c) => c.faceDown)) {
+    pv.innerHTML = `<div class="pv-hand">?</div><div class="pv-empty">뒷면 카드가 포함되어 있어<br>점수를 미리 볼 수 없습니다.</div>`;
+  } else {
+    const r = computeScore(sel, scoreEnv());
+    pv.innerHTML = `
+      <div class="pv-hand">${HAND_BY_ID[r.handId].name}</div>
+      <div class="pv-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span></div>
+      <div class="pv-score">= ${fmt(r.score)}점</div>`;
+  }
+
+  $('plays-val').textContent = `${state.playsLeft} / 4`;
+  $('discards-val').textContent = state.boss === 'bibaram' ? '금지 (비바람)' : `${state.discardsLeft} / 4`;
+  $('deck-val').textContent = `${state.deck.length}장`;
+
+  const lp = $('playlog-panel');
+  if (state.playLog.length > 0) {
+    lp.style.display = 'block';
+    $('playlog').innerHTML = state.playLog
+      .map((p, i) => `<div><span><span class="lognum">${i + 1}.</span> ${esc(p.hand)}</span><b>${fmt(p.score)}</b></div>`)
+      .join('');
+  } else lp.style.display = 'none';
+
+  $('seedinfo').textContent = `seed: ${runSeed}`;
+}
+
+function renderTable() {
+  const pa = $('playedarea');
+  if (state.lastPlay) {
+    const r = state.lastPlay.result;
+    pa.innerHTML =
+      state.lastPlay.cards.map((c) => cardHTML(c, { reveal: true })).join('') +
+      `<div id="playresult">
+        <div class="r-hand">${HAND_BY_ID[r.handId].name}</div>
+        <div class="r-formula"><span class="c">${fmt(r.chips)}칩</span> × <span class="m">${fmtMult(r.mult)}배</span></div>
+        <div class="r-score">+${fmt(r.score)}점</div>
+      </div>`;
+  } else {
+    pa.innerHTML = `<div class="hint">여기에 낸 패와 점수가 표시됩니다 — 카드를 선택하고 [내기]를 누르세요</div>`;
+  }
+
+  $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true })).join('');
+
+  const n = state.selected.length;
+  $('btn-play').textContent = `내기 (${state.playsLeft}회 남음)`;
+  $('btn-play').disabled = state.screen !== 'play' || n < 1 || n > 5 || state.playsLeft <= 0;
+  $('btn-discard').textContent = `버리기 (${state.discardsLeft}회 남음)`;
+  $('btn-discard').disabled = state.screen !== 'play' || n < 1 || n > 5 || state.discardsLeft <= 0;
+
+  const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
+  const bg = $('btn-gukjin');
+  if (g && state.screen === 'play') {
+    bg.style.display = 'inline-block';
+    bg.textContent = `국진 모드: ${g.asPi ? '쌍피' : '열끗'} (전환)`;
+  } else bg.style.display = 'none';
+}
+
+function renderModal() {
+  const ov = $('modal-overlay');
+  const m = $('modal');
+  const screens = { gostop: gostopHTML, settle: settleHTML, shop: shopHTML, gameover: gameoverHTML, victory: victoryHTML, help: helpHTML };
+  const fn = screens[state.screen];
+  if (!fn) { ov.classList.remove('show'); return; }
+  m.innerHTML = fn();
+  ov.classList.add('show');
+}
+
+function gostopHTML() {
+  const n = state.goLevel + 1; // 다음 고 단계 (무제한)
+  const newTarget = Math.ceil(state.baseTarget * goMult(n));
+  return `
+    <h2>🎉 목표 달성!</h2>
+    <div class="sub">현재 <b style="color:#93c5fd">${fmt(state.roundScore)}점</b> / 목표 ${fmt(state.target)}점 · 남은 내기 <b>${state.playsLeft}회</b></div>
+    <div class="modal-actions">
+      <button class="choicebtn btn-stop" onclick="chooseStop()">
+        <div class="t">✋ 스톱</div>
+        <div class="d">지금 정산하고 안전하게 다음 판으로${state.goLevel > 0 ? `<br>(${state.goLevel}고 보너스 +${goBonus(state.goLevel)}냥 확보)` : ''}</div>
+      </button>
+      <button class="choicebtn btn-go" onclick="chooseGo()">
+        <div class="t">🔥 ${n}고!</div>
+        <div class="d">새 목표 <b>${fmt(newTarget)}점</b> (원래 목표 ×${goMult(n)})<br>
+        성공 시 정산에 <b>+${goBonus(n)}냥</b> · 남은 내기 안에 못 넘으면 <b>고박 = 런 종료</b></div>
+      </button>
+    </div>`;
+}
+
+function settleHTML() {
+  const d = state.settleData;
+  const rows = [
+    [`이자 (보유 ${d.moneyBefore}냥 → 5냥당 1냥, 최대 5냥)`, d.interest],
+    [`기본 상금${isBossRound(state.round) ? ' (박 라운드)' : ''}`, d.base],
+    [`남은 내기 ${d.playBonus}회`, d.playBonus],
+  ];
+  if (d.goBonus) rows.push([`고 보너스 (${state.goLevel}고)`, d.goBonus]);
+  if (d.insBonus) rows.push(['피박보험', d.insBonus]);
+  return `
+    <h2>💰 ${state.round}월 (${MONTHS[state.round - 1].name}) 클리어!</h2>
+    <table class="settle-table">
+      ${rows.map(([k, v]) => `<tr><td>${k}</td><td>+${v}냥</td></tr>`).join('')}
+      <tr class="total"><td>합계</td><td>+${d.total}냥 → 보유 ${state.money}냥</td></tr>
+    </table>
+    <div class="modal-actions"><button class="choicebtn btn-stop" style="text-align:center" onclick="openShop()"><div class="t">🏪 상점으로</div></button></div>`;
+}
+
+function shopHTML() {
+  const offers = state.shopOffers.map((o, i) => {
+    const j = o.joker;
+    const cant = state.money < j.price || state.jokers.length >= 5;
+    return `<div class="offer${o.sold ? ' sold' : ''}">
+      <div class="o-name">${j.icon} ${j.name}</div>
+      <span class="o-rarity r-${j.rarity}">${{ common: '커먼', uncommon: '언커먼', rare: '레어' }[j.rarity]}</span>
+      <div class="o-desc">${esc(j.desc)}</div>
+      ${o.sold ? '<div style="text-align:center;font-weight:800;color:#94a3b8">판매 완료</div>'
+        : `<button class="o-buy" onclick="buyJoker(${i})" ${cant ? 'disabled' : ''}>${j.price}냥에 구매</button>`}
+    </div>`;
+  }).join('');
+
+  const owned = state.jokers.length
+    ? state.jokers.map((j, i) => {
+        const def = JOKER_BY_ID[j.id];
+        return `<div class="owned"><b>${def.icon} ${def.name}</b><br><span style="color:#94a3b8">${esc(def.desc)}</span>
+          <button class="sellbtn" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button></div>`;
+      }).join('')
+    : '<span style="color:#64748b;font-size:12px">보유한 특수패가 없습니다</span>';
+
+  const next = state.round + 1;
+  let bossInfo = '';
+  if (isBossRound(next)) {
+    if (state.bossCandidates && state.bossCandidates.length > 1) {
+      bossInfo = `<div class="boss-preview">⚠ <b>다음은 ${next}월 — 대박 라운드!</b> 디버프 2종 중 하나를 선택하세요:<br>
+        ${state.bossCandidates.map((id) => {
+          const b = BOSS_BY_ID[id];
+          return `<button class="boss-candidate${state.nextBoss === id ? ' selected' : ''}" onclick="pickBossCandidate('${id}')">${b.name} — ${esc(b.desc)}</button>`;
+        }).join('')}</div>`;
+    } else if (state.nextBoss) {
+      const b = BOSS_BY_ID[state.nextBoss];
+      bossInfo = `<div class="boss-preview">⚠ <b>다음 ${next}월은 박 라운드:</b> ${b.name} — ${esc(b.desc)}</div>`;
+    }
+  }
+
+  const makDisabled = state.money < 3 || state.makgeolli >= 3;
+  const makInfo = `<div class="boss-preview" style="border-color:rgba(212,175,55,.45);background:rgba(120,85,20,.22);color:#fde68a">
+    🍶 <b>막걸리</b> — 3냥 · 소지 ${state.makgeolli}/3병 · 춘향이에게 주면 그 판 동안 패를 봐주고 훈수를 둡니다.
+    <button class="smallbtn" style="margin-left:8px" onclick="buyMakgeolli()" ${makDisabled ? 'disabled' : ''}>구매</button>
+  </div>`;
+
+  const needPick = isBossRound(next) && !state.nextBoss;
+  const nm = MONTHS[next - 1];
+  return `
+    <h2>🏪 상점 <span style="font-size:13px;color:#fbbf24">보유 ${state.money}냥</span></h2>
+    <div style="font-size:11.5px;color:#94a3b8;margin-bottom:2px">내 특수패 (${state.jokers.length}/5)</div>
+    <div class="owned-row">${owned}</div>
+    <div class="shop-offers">${offers}</div>
+    ${makInfo}
+    ${bossInfo}
+    <div class="shop-bottom">
+      <button class="smallbtn" onclick="reroll()" ${state.money < state.rerollCost ? 'disabled' : ''}>🔄 리롤 ${state.rerollCost}냥</button>
+      <div style="font-size:12px;color:#cbd5e1">다음: ${nm.flower} ${next}월 · ${nm.name} · 목표 ${fmt(TARGETS[next - 1])}점</div>
+      <button id="btn-nextround" onclick="nextRound()" ${needPick ? 'disabled title="디버프를 먼저 선택하세요"' : ''}>다음 판으로 →</button>
+    </div>`;
+}
+
+function gameoverHTML() {
+  return `
+    <h2>☠ 런 종료 — ${esc(state.gameOverReason)}</h2>
+    <div class="sub">
+      도달: ${state.round}월 / ${ROUNDS}월 (${fmt(state.roundScore)} / ${fmt(state.target)}점)<br>
+      최고 한 방: ${fmt(state.stats.bestSingle)}점${state.stats.bestSingleHand ? ` (${esc(state.stats.bestSingleHand)})` : ''}<br>
+      총 획득: ${fmt(state.stats.totalEarned)}냥 · 특수패 ${state.jokers.length}개
+    </div>
+    <div class="modal-actions"><button class="choicebtn btn-go" style="text-align:center" onclick="restart()"><div class="t">🔄 다시 도전</div></button></div>`;
+}
+
+function victoryHTML() {
+  return `
+    <h2>🏆 승리! 12월 대박까지 한 해를 완주했습니다!</h2>
+    <div class="sub">
+      최종 점수: ${fmt(state.roundScore)} / ${fmt(state.target)}점<br>
+      최고 한 방: ${fmt(state.stats.bestSingle)}점${state.stats.bestSingleHand ? ` (${esc(state.stats.bestSingleHand)})` : ''}<br>
+      총 획득: ${fmt(state.stats.totalEarned)}냥 · 최종 특수패 ${state.jokers.length}개
+    </div>
+    <div class="modal-actions"><button class="choicebtn btn-stop" style="text-align:center" onclick="restart()"><div class="t">🔄 새 런 시작</div></button></div>`;
+}
+
+function helpHTML() {
+  const rows = HANDS.map((h) => {
+    const cond = {
+      ogwang: '광 5장 전부', sagwang: '광 4장 (비광 무관)', chongtong: '같은 달 4장',
+      godori: '2·4·8월 열끗(새) 3장', samgwang: '광 3장 (비광 제외)', bisamgwang: '광 3장 (비광 포함)',
+      dan: '홍단·청단·초단 중 한 세트 3장', month3: '같은 달 3장', yeol3: '열끗 3장 이상',
+      tti3: '띠 3장 이상 (비단 포함)', pi5: '낸 5장 전부 피·쌍피', month2: '같은 달 2장', none: '해당 없음',
+    }[h.id];
+    return `<tr><td>${h.name}</td><td>${cond}</td><td>${h.chips}칩</td><td>×${h.mult}</td></tr>`;
+  }).join('');
+  return `
+    <h2>📖 족보표</h2>
+    <div class="sub" style="margin-bottom:8px">위에서부터 먼저 성립하는 족보 하나로 판정 · 점수 = (족보 칩 + 낸 카드 칩 합) × 배수</div>
+    <table class="handtable">
+      <tr><th>족보</th><th>조건</th><th>기본칩</th><th>배수</th></tr>${rows}
+    </table>
+    <div class="sub" style="margin-top:10px">
+      카드 칩: 광 15 · 열끗 10 · 띠 8 · 쌍피 6 · 피 3<br>
+      <b>시간 시스템</b>: 판 = 1월(송학)→12월(비). 이달의 패는 칩 ×2, 홀수 달 낮☀️엔 광·열끗 +3칩, 짝수 달 밤🌙엔 띠·피 +3칩.<br>
+      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
+      9월 국진 열끗은 열끗↔쌍피 전환 가능. 3·6·9·12월은 박 라운드(디버프).<br>
+      🍶 상점에서 막걸리를 사서 춘향이에게 주면 그 판 동안 패를 봐주고 훈수를 둡니다.
+    </div>
+    <div class="modal-actions"><button class="choicebtn btn-stop" style="text-align:center" onclick="closeHelp()"><div class="t">닫기</div></button></div>`;
+}
+
+function flashActions() {
+  const el = $('actions');
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+}
+
+// ── 시작 ───────────────────────────────────────────────────
+startRound();
+</script>
+</body>
+</html>
