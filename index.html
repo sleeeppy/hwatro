@@ -31,7 +31,7 @@
   #logo small { display: block; font-size: 10px; font-weight: 400; color: #cbd5e1; letter-spacing: 2px; }
   #jokerbar { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
   .jokerslot {
-    width: 118px; min-height: 54px; border-radius: 9px; padding: 6px 8px;
+    width: 118px; min-height: 42px; border-radius: 9px; padding: 8px;
     background: rgba(255,255,255,.07); border: 1px dashed rgba(255,255,255,.22);
     font-size: 10.5px; color: #94a3b8; display: flex; align-items: center; justify-content: center;
     text-align: center;
@@ -237,10 +237,121 @@
   .shop-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
   #btn-nextround { background: linear-gradient(180deg, #16a34a, #15803d); color: #fff; padding: 12px 24px; font-size: 15px; font-weight: 900; }
 
-  .handtable { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .handtable th, .handtable td { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: left; }
-  .handtable th { color: var(--gold-soft); }
-  .handtable td:nth-child(3) { text-align: right; font-weight: 700; }
+  .handbook {
+    display: flex; flex-direction: column; gap: 5px;
+    margin: 4px 0 2px;
+  }
+  .handbook-legend {
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+    font-size: 11px; color: #94a3b8; margin-bottom: 8px;
+  }
+  .handbook-legend .lg {
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .handbook-legend .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .hb-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 10px; align-items: center;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.08);
+    border-left: 3px solid rgba(148,163,184,.45);
+  }
+  .hb-row.t-s { border-left-color: #fbbf24; background: linear-gradient(90deg, rgba(251,191,36,.12), rgba(0,0,0,.18)); }
+  .hb-row.t-a { border-left-color: #f87171; background: linear-gradient(90deg, rgba(248,113,113,.1), rgba(0,0,0,.18)); }
+  .hb-row.t-b { border-left-color: #60a5fa; background: linear-gradient(90deg, rgba(96,165,250,.1), rgba(0,0,0,.18)); }
+  .hb-row.t-c { border-left-color: #86efac; background: linear-gradient(90deg, rgba(134,239,172,.08), rgba(0,0,0,.18)); }
+  .hb-row.t-d { border-left-color: #64748b; opacity: .85; }
+  .hb-rank {
+    width: 26px; height: 26px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; color: #0f172a;
+    background: rgba(232,205,122,.9);
+  }
+  .hb-row.t-a .hb-rank { background: #fca5a5; }
+  .hb-row.t-b .hb-rank { background: #93c5fd; }
+  .hb-row.t-c .hb-rank { background: #86efac; }
+  .hb-row.t-d .hb-rank { background: #94a3b8; }
+  .hb-name {
+    font-size: 13.5px; font-weight: 900; color: #f8fafc;
+    letter-spacing: -0.2px;
+  }
+  .hb-cond {
+    font-size: 11.5px; color: #94a3b8; margin-top: 2px; line-height: 1.4;
+  }
+  .hb-mult {
+    font-size: 15px; font-weight: 900; color: var(--mult-red);
+    font-variant-numeric: tabular-nums;
+    min-width: 3.2ch; text-align: right;
+    text-shadow: 0 1px 0 rgba(0,0,0,.35);
+  }
+  .hb-row.t-s .hb-mult { color: #fbbf24; }
+  .chip-legend {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 12px 0 4px;
+  }
+  .chip-legend span {
+    font-size: 11px; font-weight: 700; color: #e2e8f0;
+    background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 999px; padding: 4px 9px;
+  }
+  .chip-legend span b { color: var(--chip-blue); }
+  .help-sections {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 14px;
+  }
+  .help-card {
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,.24);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+  .help-card.hc-time {
+    border-color: rgba(125,211,252,.28);
+    background: linear-gradient(135deg, rgba(14,116,144,.22), rgba(0,0,0,.2));
+  }
+  .help-card.hc-round {
+    border-color: rgba(252,165,165,.28);
+    background: linear-gradient(135deg, rgba(127,29,29,.28), rgba(0,0,0,.2));
+  }
+  .help-card.hc-rule {
+    border-color: rgba(167,243,208,.25);
+    background: linear-gradient(135deg, rgba(6,78,59,.28), rgba(0,0,0,.2));
+  }
+  .help-card.hc-helper {
+    border-color: rgba(251,191,36,.35);
+    background: linear-gradient(135deg, rgba(120,85,20,.32), rgba(0,0,0,.2));
+  }
+  .help-card .hc-title {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 900; color: #f8fafc;
+    margin-bottom: 8px;
+  }
+  .help-card .hc-title .ico {
+    width: 22px; height: 22px; border-radius: 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; background: rgba(255,255,255,.1);
+  }
+  .help-card .hc-body {
+    font-size: 12px; color: #cbd5e1; line-height: 1.55;
+  }
+  .help-card .hc-body b { color: #fde68a; font-weight: 800; }
+  .help-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 8px;
+  }
+  .help-tags span {
+    font-size: 11px; font-weight: 700; color: #e2e8f0;
+    background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px; padding: 5px 9px;
+  }
+  .help-tags span em {
+    font-style: normal; color: #93c5fd; font-weight: 800;
+  }
 
   #seedinfo { font-size: 10px; color: #475569; text-align: center; }
   #seasonline { font-size: 10.5px; color: #a7c4b0; margin-top: 4px; line-height: 1.55; }
@@ -706,14 +817,14 @@ function detectHand(cards) { return detectHandInfo(cards).handId; }
 // ── 특수패 12종 ────────────────────────────────────────────
 // 훅 ctx: { cards, handId, core, boss, mitjangChips }
 const JOKERS = [
-  { id: 'pi_merchant', name: '피장사꾼', icon: '🧺', rarity: 'common', price: 4, kind: '+칩',
-    desc: '낸 피 1장당 +4칩, 쌍피 1장당 +8칩',
+  { id: 'pi_merchant', name: '피장사꾼', icon: '🧺', rarity: 'common', price: 4, kind: '+점수',
+    desc: '낸 피 1장당 +4점, 쌍피 1장당 +8점 (배수 밖)',
     addChips: (x) => x.cards.reduce((s, c) => s + (effType(c) === 'pi' ? 4 : effType(c) === 'ssangpi' ? 8 : 0), 0) },
-  { id: 'meongtta', name: '멍따', icon: '🐂', rarity: 'common', price: 4, kind: '+칩',
-    desc: '낸 열끗 1장당 +6칩',
+  { id: 'meongtta', name: '멍따', icon: '🐂', rarity: 'common', price: 4, kind: '+점수',
+    desc: '낸 열끗 1장당 +6점 (배수 밖)',
     addChips: (x) => x.cards.filter((c) => effType(c) === 'yeol').length * 6 },
-  { id: 'ssakssuri', name: '싹쓸이', icon: '🧹', rarity: 'uncommon', price: 6, kind: '+칩',
-    desc: '정확히 5장을 낼 때 +30칩',
+  { id: 'ssakssuri', name: '싹쓸이', icon: '🧹', rarity: 'uncommon', price: 6, kind: '+점수',
+    desc: '정확히 5장을 낼 때 +30점 (배수 밖)',
     addChips: (x) => (x.cards.length === 5 ? 30 : 0) },
   { id: 'jjokjipge', name: '쪽집게', icon: '🎯', rarity: 'common', price: 4, kind: '+배수',
     desc: "족보가 '같은 달 2장'이면 +2배수",
@@ -742,7 +853,7 @@ const JOKERS = [
     desc: "족보가 '같은 달 3장' 또는 '총통'이면 배수 ×3",
     xMult: (x) => (x.handId === 'month3' || x.handId === 'chongtong' ? 3 : 1) },
   { id: 'mitjang', name: '밑장빼기', icon: '🃏', rarity: 'rare', price: 8, kind: '성장',
-    desc: '버리기 1회 사용마다 영구 +8칩 누적 (모든 내기에 가산, 판매 시 소멸)',
+    desc: '버리기 1회 사용마다 영구 +8점 누적 (배수 밖, 판매 시 소멸)',
     addChips: (x) => x.mitjangChips },
   { id: 'gwangpari', name: '광팔이', icon: '💰', rarity: 'common', price: 3, kind: '경제',
     desc: '광을 낼 때마다 +1냥 (판당 최대 3냥)' },
@@ -799,7 +910,8 @@ function computeScore(cards, env) {
   }
 
   const ctx = { cards, handId, core, boss: env.boss, mitjangChips: env.mitjangChips };
-  for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addChips) chips += j.addChips(ctx); }
+  // +칩 특수패는 배수 밖(flat)으로만 가산
+  for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addChips) flat += j.addChips(ctx); }
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.addMult)  mult  += j.addMult(ctx); }
   for (const id of env.jokerIds) { const j = JOKER_BY_ID[id]; if (j.xMult)    mult  *= j.xMult(ctx); }
 
@@ -1668,11 +1780,9 @@ function renderTopbar() {
     const j = state.jokers[i];
     if (j) {
       const def = JOKER_BY_ID[j.id];
-      const mit = def.id === 'mitjang' ? ` · 현재 +${state.mitjangChips}칩` : '';
       slots += `<div class="jokerslot filled">
         <div class="jname">${def.icon} ${def.name}</div>
-        <div class="jdesc">${esc(def.kind)}${mit}</div>
-        <div class="jtip">${esc(def.desc)}${def.id === 'mitjang' ? `<br>누적 +${state.mitjangChips}칩` : ''}</div>
+        <div class="jtip">${esc(def.desc)}${def.id === 'mitjang' ? `<br>누적 +${state.mitjangChips}점` : ''}</div>
       </div>`;
     } else {
       slots += `<div class="jokerslot">특수패<br>빈 슬롯</div>`;
@@ -1943,29 +2053,78 @@ function victoryHTML() {
 }
 
 function helpHTML() {
-  const rows = HANDS.map((h) => {
-    const cond = {
-      ogwang: '광 5장 전부', sagwang: '광 4장 (비광 무관)', chongtong: '같은 달 4장',
-      godori: '2·4·8월 열끗(새) 3장', samgwang: '광 3장 (비광 제외)', bisamgwang: '광 3장 (비광 포함)',
-      dan: '홍단·청단·초단 중 한 세트 3장', month3: '같은 달 3장',
-      yeol3: '열끗 3장 이상 (배수 타는 건 칩 높은 3장)',
-      tti3: '띠 3장 이상 (비단 제외, 배수 타는 건 칩 높은 3장)',
-      pi5: '피·쌍피만, 쌍피=2로 환산해 합 5 이상', month2: '같은 달 2장', none: '해당 없음',
-    }[h.id];
-    return `<tr><td>${h.name}</td><td>${cond}</td><td>×${h.mult}</td></tr>`;
+  const conds = {
+    ogwang: '광 5장 전부', sagwang: '광 4장 (비광 무관)', chongtong: '같은 달 4장',
+    godori: '2·4·8월 열끗(새) 3장', samgwang: '광 3장 (비광 제외)', bisamgwang: '광 3장 (비광 포함)',
+    dan: '홍단·청단·초단 중 한 세트 3장', month3: '같은 달 3장',
+    yeol3: '열끗 3장 이상 (배수 타는 건 칩 높은 3장)',
+    tti3: '띠 3장 이상 (비단 제외, 배수 타는 건 칩 높은 3장)',
+    pi5: '피·쌍피만, 쌍피=2로 환산해 합 5 이상', month2: '같은 달 2장', none: '해당 없음',
+  };
+  const rows = HANDS.map((h, i) => {
+    const tier = i <= 1 ? 's' : i <= 5 ? 'a' : i <= 8 ? 'b' : i <= 11 ? 'c' : 'd';
+    return `<div class="hb-row t-${tier}">
+      <div class="hb-rank">${i + 1}</div>
+      <div>
+        <div class="hb-name">${h.name}</div>
+        <div class="hb-cond">${conds[h.id]}</div>
+      </div>
+      <div class="hb-mult">×${h.mult}</div>
+    </div>`;
   }).join('');
   return `
     <h2>📖 족보표</h2>
-    <div class="sub" style="margin-bottom:8px">위에서부터 먼저 성립하는 족보 하나로 판정 · 점수 = (<b>족보를 구성한 카드</b>의 칩) × 배수 + 나머지 낸 카드 칩</div>
-    <table class="handtable">
-      <tr><th>족보</th><th>조건</th><th>배수</th></tr>${rows}
-    </table>
-    <div class="sub" style="margin-top:10px">
-      카드 칩: 광 12 · 열끗 8 · 띠 6 · 쌍피 5 · 피 2<br>
-      <b>시간 시스템</b>: 판 = 1월(송학)→12월(비). 이달의 패는 칩 ×2, 홀수 달 낮☀️엔 광·열끗 +2칩, 짝수 달 밤🌙엔 띠·피 +2칩.<br>
-      한 판 = 내기 4회 + 버리기 4회, 손패 8장. 목표 도달 시 <b>고</b>(무제한! n고 = 목표 ×${'{'}1+0.5n${'}'}과 현재 점수+25% 중 큰 쪽, 내기 +1회·버리기 추가 없음, 보너스 n(n+3)냥, 실패 시 고박) 또는 <b>스톱</b>(정산).<br>
-      9월 국진 열끗은 열끗↔쌍피 전환 가능. 3·6·9·12월은 박 라운드(디버프).<br>
-      🍶 준비/상점에서 춘향 훈수를 예약(3냥)하면 그 달 내내 패를 봐줍니다. 패를 고른 뒤 내기·버리기에 마우스를 올리면 다음 패를 예측해 표정이 바뀝니다.
+    <div class="sub" style="margin-bottom:6px">위에서부터 먼저 성립하는 족보 <b>하나</b>로 판정합니다.<br>
+      점수 = (<b>족보 구성 카드</b> 칩) × 배수 + 나머지 낸 카드 칩</div>
+    <div class="handbook-legend">
+      <span class="lg"><span class="dot" style="background:#fbbf24"></span>최고</span>
+      <span class="lg"><span class="dot" style="background:#f87171"></span>상위</span>
+      <span class="lg"><span class="dot" style="background:#60a5fa"></span>중위</span>
+      <span class="lg"><span class="dot" style="background:#86efac"></span>기본</span>
+      <span class="lg"><span class="dot" style="background:#64748b"></span>무조합</span>
+    </div>
+    <div class="handbook">${rows}</div>
+    <div class="chip-legend">
+      <span>광 <b>12</b></span><span>열끗 <b>8</b></span><span>띠 <b>6</b></span>
+      <span>쌍피 <b>5</b></span><span>피 <b>2</b></span>
+    </div>
+    <div class="help-sections">
+      <div class="help-card hc-time">
+        <div class="hc-title"><span class="ico">🌓</span>시간 · 계절</div>
+        <div class="hc-body">
+          판은 <b>1월(송학)→12월(비)</b>로 흐릅니다. 이달의 패는 칩 <b>×2</b>.
+        </div>
+        <div class="help-tags">
+          <span>☀️ 홀수 달 낮 · 광·열끗 <em>+2</em></span>
+          <span>🌙 짝수 달 밤 · 띠·피 <em>+2</em></span>
+        </div>
+      </div>
+      <div class="help-card hc-round">
+        <div class="hc-title"><span class="ico">🎯</span>한 판 · 고/스톱</div>
+        <div class="hc-body">
+          내기 <b>4회</b> · 버리기 <b>4회</b> · 손패 <b>8장</b>. 목표를 넘기면 <b>고</b> 또는 <b>스톱</b>.
+          고는 무제한 — 목표 ×(1+0.5n)과 현재 점수+25% 중 큰 쪽, 내기 +1 · 손패 보충, 보너스 n(n+3)냥.
+          실패하면 <b>고박 = 런 종료</b>.
+        </div>
+      </div>
+      <div class="help-card hc-rule">
+        <div class="hc-title"><span class="ico">🃏</span>특수 규칙</div>
+        <div class="hc-body">
+          9월 <b>국진</b>은 열끗 ↔ 쌍피 전환 가능.
+          <b>3·6·9·12월</b>은 박 라운드(디버프).
+        </div>
+        <div class="help-tags">
+          <span>국진 모드 전환</span>
+          <span>박 라운드 디버프</span>
+        </div>
+      </div>
+      <div class="help-card hc-helper">
+        <div class="hc-title"><span class="ico">🍶</span>춘향 훈수</div>
+        <div class="hc-body">
+          준비/상점에서 <b>3냥</b>에 다음 달 훈수를 예약하면 그 달 내내 패를 봐줍니다.
+          패를 고른 뒤 내기·버리기에 마우스를 올리면 다음 패를 예측해 표정이 바뀝니다.
+        </div>
+      </div>
     </div>
     <div class="modal-actions"><button class="choicebtn btn-stop" style="text-align:center" onclick="closeHelp()"><div class="t">닫기</div></button></div>`;
 }
@@ -2018,9 +2177,9 @@ function juiceBreakdown(snap) {
     isCore: coreSet.has(c),
   }));
   const coreSum = steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0);
-  const flatSum = steps.filter((s) => !s.isCore).reduce((a, s) => a + s.chip, 0);
-  const jokerChips = Math.max(0, result.chips - coreSum);
-  return { handBase: 0, steps, jokerChips, flatSum, mult: result.mult, score: result.score, handId: result.handId };
+  const cardFlat = steps.filter((s) => !s.isCore).reduce((a, s) => a + s.chip, 0);
+  const jokerChips = Math.max(0, result.flat - cardFlat);
+  return { handBase: 0, steps, jokerChips, flatSum: result.flat, mult: result.mult, score: result.score, handId: result.handId };
 }
 
 // ── Web Audio 신스 (파일 없음) ─────────────────────────────
@@ -2416,15 +2575,19 @@ async function playJuiceSequence(snap, fromRects = null) {
     }
 
     if (bd.jokerChips > 0 && !JUICE.skip) {
-      chips += bd.jokerChips;
-      chipsEl.textContent = fmt(chips);
+      ensureFlatUI();
+      const from = flat;
+      flat += bd.jokerChips;
+      await animateNumber(flatEl, from, flat, 180);
+      flatEl.style.transform = 'scale(1.18)';
       sfxChip();
-      await juiceWait(160);
+      await juiceWait(100);
+      flatEl.style.transform = '';
     }
 
     if (JUICE.skip) {
       wraps.forEach((w) => w.classList.add('landed'));
-      chips = bd.handBase + bd.steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0) + bd.jokerChips;
+      chips = bd.handBase + bd.steps.filter((s) => s.isCore).reduce((a, s) => a + s.chip, 0);
       flat = bd.flatSum;
       chipsEl.textContent = fmt(chips);
       if (flat > 0) {

@@ -164,6 +164,15 @@ console.log('[5] 특수패·박 회귀');
   const none12 = [bikwang, pick((c) => c.month === 1 && c.type === 'pi')[0]];
   const rNone = E.computeScore(none12, env({ jokerIds: ['bigwang_usan'] }));
   assert(rNone.handId === 'none' && rNone.mult === 1, `무조합+12월 우산 미발동 (실제 ${rNone.mult})`);
+  // +칩 특수패는 flat(배수 밖)
+  const yeol3 = pick((c) => c.type === 'yeol' && !c.tags.includes('dual')).slice(0, 3);
+  const rMeong = E.computeScore(yeol3, env({ jokerIds: ['meongtta'] }));
+  assert(rMeong.handId === 'yeol3' && rMeong.chips === 24 && rMeong.flat === 18 && rMeong.score === 24 * 3 + 18,
+    `멍따는 flat +18 (실제 chips ${rMeong.chips} flat ${rMeong.flat} score ${rMeong.score})`);
+  const pi2 = pick((c) => c.type === 'pi').slice(0, 2);
+  const rPi = E.computeScore(pi2, env({ jokerIds: ['pi_merchant'] }));
+  assert(rPi.flat === 8 && rPi.score === rPi.chips * rPi.mult + 8,
+    `피장사꾼도 flat (실제 flat ${rPi.flat} score ${rPi.score})`);
 }
 
 // ─── 6. evaluateHand (춘향 훈수 엔진) ─────────────────────
