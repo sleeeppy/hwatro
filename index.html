@@ -60,7 +60,7 @@
   }
   #moneybox { font-size: 19px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
   #moneybox .delta { font-size: 13px; color: #a3e635; }
-  #top-help {
+  #top-help, #top-tutor {
     display: none; flex-shrink: 0;
     background: rgba(255,255,255,.14); color: #e2e8f0;
     padding: 7px 10px; font-size: 13px; font-weight: 800; border-radius: 8px;
@@ -105,7 +105,11 @@
   .statline b { color: #fff; font-size: 16px; }
   #target-val { color: var(--gold-soft); font-size: 19px; }
   #score-val { color: #93c5fd; font-size: 19px; }
-  #gauge { height: 12px; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; margin: 6px 0 2px; }
+  .score-frac { font-variant-numeric: tabular-nums; }
+  .score-slash { color: #64748b; font-weight: 800; }
+  #need-val { color: #fca5a5; font-size: 16px; }
+  #need-val.done { color: #86efac; }
+  #gauge { height: 12px; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; margin: 6px 0 12px; }
   #gauge > div { height: 100%; background: linear-gradient(90deg, #38bdf8, #a3e635); transition: width .35s ease; }
   .golevel { font-size: 11.5px; color: #fbbf24; margin-top: 4px; font-weight: 700; }
 
@@ -174,6 +178,95 @@
   /* pop 애니 제거: 카드 선택 시 render가 DOM을 다시 그리며 반복 재생되던 버그 방지 */
 
   #handarea { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 140px; }
+  #jan-aura-hint {
+    text-align: center; font-size: 12px; font-weight: 700; color: #bef264;
+    margin: 0 0 8px; text-shadow: 0 1px 0 rgba(0,0,0,.35);
+  }
+  #jan-aura-hint[hidden] { display: none !important; }
+  /* 추천 — 연두 글로우 + 우상단 ✦ (선택되면 둘 다 끔, 링 안 쌓음) */
+  #handarea .card.coach-aura:not(.sel) {
+    box-shadow:
+      0 3px 8px rgba(0,0,0,.45),
+      0 0 12px rgba(163, 230, 53, .7),
+      inset 0 0 0 2.5px rgba(192,57,43,.85),
+      inset 0 0 0 4px rgba(255,255,255,.6);
+    animation: coachAuraPulse 1.5s ease-in-out infinite;
+    z-index: 2;
+  }
+  #handarea .card.kwang.coach-aura:not(.sel) {
+    box-shadow:
+      0 3px 8px rgba(0,0,0,.45),
+      0 0 12px rgba(163, 230, 53, .7),
+      inset 0 0 0 2.5px var(--gold),
+      inset 0 0 0 4px rgba(255,255,255,.6);
+  }
+  #handarea .card.coach-aura:not(.sel)::before {
+    content: '✦';
+    position: absolute;
+    top: -7px; right: -7px;
+    z-index: 4;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; line-height: 1;
+    color: #14532d;
+    background: radial-gradient(circle at 40% 35%, #ecfccb, #a3e635);
+    border: 1.5px solid #65a30d;
+    box-shadow: 0 0 8px rgba(163, 230, 53, .85);
+    pointer-events: none;
+    animation: coachSpark 1.5s ease-in-out infinite;
+  }
+  @keyframes coachAuraPulse {
+    0%,100% { filter: brightness(1.02) saturate(1.08); }
+    50% { filter: brightness(1.1) saturate(1.25); }
+  }
+  @keyframes coachSpark {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+  /* Balatro식 스포트라이트 코치 */
+  #coach-root {
+    display: none; position: fixed; inset: 0; z-index: 85;
+    pointer-events: none;
+  }
+  #coach-root.on { display: block; }
+  #coach-root .coach-block {
+    position: fixed; background: rgba(0,0,0,.72); pointer-events: auto;
+  }
+  #coach-root .coach-ring {
+    position: fixed; pointer-events: none;
+    border: 2px solid rgba(253,224,71,.9);
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.25), 0 0 28px rgba(250,204,21,.45);
+  }
+  #coach-root .coach-panel {
+    position: fixed; pointer-events: auto; z-index: 2;
+    max-width: min(340px, calc(100vw - 28px));
+    background: linear-gradient(165deg, #1e3a2a, #122018);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px; padding: 14px 16px 12px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.55);
+    color: #e2e8f0; font-size: 13.5px; line-height: 1.5; font-weight: 600;
+  }
+  #coach-root .coach-panel b { color: #fde68a; }
+  #coach-root .coach-panel .coach-title {
+    font-size: 14px; font-weight: 900; color: #fef3c7; margin-bottom: 6px;
+  }
+  #coach-root .coach-actions {
+    display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
+  }
+  #coach-root .coach-actions button {
+    border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 800; cursor: pointer;
+  }
+  #coach-root .coach-next {
+    background: linear-gradient(180deg, #d97706, #b45309); color: #fff;
+    border: none;
+  }
+  #coach-root .coach-skip {
+    background: rgba(255,255,255,.08); color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,.18);
+  }
+
   #actions { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
   #deckbox {
     display: inline-flex; align-items: center; gap: 6px;
@@ -205,7 +298,15 @@
     transition: transform .13s ease, box-shadow .13s ease; flex-shrink: 0;
   }
   .card:hover { transform: translateY(-5px); }
-  .card.sel { transform: translateY(-16px); box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px var(--gold), inset 0 0 0 2.5px rgba(192,57,43,.85); }
+  /* 선택 — 위로 들림이 본체, 하늘색은 얇은 테두리만 */
+  .card.sel {
+    transform: translateY(-18px) scale(1.03);
+    box-shadow:
+      0 14px 18px rgba(0,0,0,.42),
+      0 0 0 2px #38bdf8,
+      inset 0 0 0 2.5px rgba(192,57,43,.85),
+      inset 0 0 0 4px rgba(255,255,255,.55);
+  }
   .card.static { cursor: default; }
   .card.static:hover { transform: none; }
   .card .month { font-size: 13px; font-weight: 800; line-height: 1; color: var(--red); align-self: flex-start; margin-left: 2px; }
@@ -213,7 +314,13 @@
   .card .art { font-size: 30px; line-height: 1; margin-top: 8px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
   .card .tag { position: absolute; bottom: 5px; left: 5px; right: 5px; font-size: 10px; font-weight: 700; text-align: center; border-radius: 4px; padding: 2px 0; letter-spacing: .5px; }
   .card.kwang { background: linear-gradient(160deg, #fff8dc, #f3e5ab); box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 0 0 2.5px var(--gold), inset 0 0 0 4px rgba(255,255,255,.6); }
-  .card.kwang.sel { box-shadow: 0 10px 16px rgba(0,0,0,.5), 0 0 0 3px #fff, inset 0 0 0 2.5px var(--gold); }
+  .card.kwang.sel {
+    box-shadow:
+      0 14px 18px rgba(0,0,0,.42),
+      0 0 0 2px #7dd3fc,
+      inset 0 0 0 2.5px var(--gold),
+      inset 0 0 0 4px rgba(255,255,255,.55);
+  }
   .card.kwang .gwangmark {
     margin-top: 3px; width: 32px; height: 32px; border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffe98a, var(--gold));
@@ -310,34 +417,147 @@
   .settle-table tr.total td { border-bottom: none; font-size: 15px; font-weight: 900; color: #fff; }
 
   /* ── 상점 ────────────────────────────── */
-  .shop-offers { display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
-  .offer {
-    flex: 1; min-width: 165px; border-radius: 12px; padding: 12px;
-    background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.16);
-    display: flex; flex-direction: column; gap: 6px;
+  #modal.shop-modal {
+    max-width: 860px;
+    padding: 18px 20px 16px;
+    background: linear-gradient(165deg, #1a3326 0%, #122018 55%, #0e1a14 100%);
   }
-  .offer.sold { opacity: .35; }
-  .offer .o-name { font-weight: 900; font-size: 14.5px; }
-  .offer .o-rarity { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px; display: inline-block; width: fit-content; }
+  .shop-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .shop-head h2 { margin: 0; font-size: 20px; }
+  .shop-head .shop-sub {
+    margin-top: 4px; font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45;
+  }
+  .shop-wallet {
+    display: flex; flex-direction: column; align-items: flex-end;
+    padding: 8px 14px; border-radius: 12px;
+    background: rgba(0,0,0,.35); border: 1px solid rgba(251,191,36,.35);
+  }
+  .shop-wallet .lbl { font-size: 10px; font-weight: 700; color: #94a3b8; letter-spacing: .04em; }
+  .shop-wallet b { font-size: 22px; font-weight: 900; color: #fbbf24; line-height: 1.15; }
+  .shop-sec { margin-bottom: 14px; }
+  .shop-sec-h {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 8px;
+  }
+  .shop-sec-h span { color: #94a3b8; font-weight: 700; }
+  .shop-offers {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .offer {
+    position: relative;
+    border-radius: 14px; padding: 14px 12px 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(0,0,0,.28));
+    border: 1px solid rgba(255,255,255,.14);
+    display: flex; flex-direction: column; gap: 6px;
+    min-width: 0;
+    transition: border-color .15s, transform .15s;
+  }
+  .offer:not(.sold):hover { border-color: rgba(253,230,138,.45); transform: translateY(-1px); }
+  .offer.sold { opacity: .4; filter: grayscale(.35); }
+  .offer .o-icon {
+    font-size: 28px; line-height: 1; text-align: center;
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,.35));
+  }
+  .offer .o-name { font-weight: 900; font-size: 14px; color: #f8fafc; text-align: center; }
+  .offer .o-meta {
+    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+  }
+  .offer .o-rarity {
+    font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px;
+  }
+  .offer .o-kind {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+    background: rgba(255,255,255,.08); color: #94a3b8;
+  }
   .r-common { background: #334155; color: #cbd5e1; }
   .r-uncommon { background: #14532d; color: #86efac; }
   .r-rare { background: #7c2d12; color: #fdba74; }
-  .offer .o-desc { font-size: 11.5px; color: #cbd5e1; line-height: 1.5; flex: 1; }
-  .offer .o-buy { background: linear-gradient(180deg, #d97706, #b45309); color: #fff; padding: 8px; font-weight: 800; font-size: 13px; }
-  .owned-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .offer .o-desc {
+    font-size: 11.5px; color: #cbd5e1; line-height: 1.45; flex: 1;
+    text-align: center; min-height: 2.9em;
+  }
+  .offer .o-buy {
+    background: linear-gradient(180deg, #eab308, #b45309);
+    color: #fff; padding: 9px; font-weight: 900; font-size: 13px;
+    border-radius: 9px; border: none; width: 100%;
+  }
+  .offer .o-buy:disabled { opacity: .45; cursor: not-allowed; }
+  .offer .o-sold-tag {
+    text-align: center; font-weight: 800; color: #94a3b8; font-size: 12px; padding: 8px 0 2px;
+  }
+  .owned-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .owned {
-    border: 1px solid var(--gold); background: rgba(212,175,55,.1); border-radius: 9px;
-    padding: 7px 9px; font-size: 11px; min-width: 116px;
+    border: 1px solid rgba(212,175,55,.45); background: rgba(212,175,55,.1);
+    border-radius: 10px; padding: 8px 10px; font-size: 11px; min-width: 120px; max-width: 200px;
   }
-  .owned .sellbtn { margin-top: 5px; width: 100%; background: rgba(255,255,255,.15); color: #fca5a5; font-size: 10.5px; padding: 4px; font-weight: 700; }
-  .boss-preview {
-    margin-top: 12px; border: 1px solid rgba(252,165,165,.45); background: rgba(127,29,29,.35);
-    border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5; color: #fecaca;
+  .owned b { color: #fde68a; font-size: 12px; }
+  .owned .od { color: #94a3b8; display: block; margin-top: 3px; line-height: 1.4; }
+  .owned .sellbtn {
+    margin-top: 6px; width: 100%; background: rgba(255,255,255,.1); color: #fca5a5;
+    font-size: 10.5px; padding: 5px; font-weight: 700; border-radius: 7px; border: 1px solid rgba(252,165,165,.25);
   }
-  .boss-candidate { display: inline-block; margin: 5px 8px 0 0; padding: 8px 12px; border-radius: 9px; background: rgba(0,0,0,.35); border: 1.5px solid rgba(255,255,255,.2); color: #fecaca; font-size: 12px; font-weight: 700; }
+  .owned-empty {
+    color: #64748b; font-size: 12px; padding: 10px 12px;
+    border-radius: 10px; border: 1px dashed rgba(255,255,255,.12); width: 100%;
+  }
+  .shop-utils {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .shop-util {
+    border-radius: 12px; padding: 12px 14px; font-size: 12px; line-height: 1.5;
+    border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22);
+  }
+  .shop-util .su-title { font-weight: 900; font-size: 13px; color: #f8fafc; margin-bottom: 6px; }
+  .shop-util.su-mak {
+    border-color: rgba(212,175,55,.4);
+    background: linear-gradient(135deg, rgba(120,85,20,.28), rgba(0,0,0,.2));
+    color: #fde68a;
+  }
+  .shop-util.su-boss {
+    border-color: rgba(252,165,165,.4);
+    background: linear-gradient(135deg, rgba(127,29,29,.32), rgba(0,0,0,.2));
+    color: #fecaca;
+  }
+  .shop-util.su-boss.full { grid-column: 1 / -1; }
+  .boss-candidate {
+    display: block; width: 100%; text-align: left; margin-top: 6px;
+    padding: 8px 10px; border-radius: 9px; background: rgba(0,0,0,.35);
+    border: 1.5px solid rgba(255,255,255,.2); color: #fecaca; font-size: 12px; font-weight: 700;
+  }
   .boss-candidate.selected { border-color: var(--gold); background: rgba(212,175,55,.18); color: #fde68a; }
-  .shop-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
-  #btn-nextround { background: linear-gradient(180deg, #16a34a, #15803d); color: #fff; padding: 12px 24px; font-size: 15px; font-weight: 900; }
+  .shop-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 4px; gap: 12px; flex-wrap: wrap;
+    padding-top: 12px; border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .shop-footer .sf-next {
+    font-size: 12px; color: #cbd5e1; line-height: 1.45; font-weight: 600;
+  }
+  .shop-footer .sf-next b { color: #fde68a; }
+  #btn-nextround {
+    background: linear-gradient(180deg, #22c55e, #15803d); color: #fff;
+    padding: 12px 22px; font-size: 15px; font-weight: 900; border-radius: 11px; border: none;
+  }
+  #btn-nextround:disabled { opacity: .45; }
+  .shop-reroll {
+    font-size: 11.5px; font-weight: 800; padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.08); color: #e2e8f0; border: 1px solid rgba(255,255,255,.16);
+  }
+  .shop-reroll:disabled { opacity: .4; }
+  .boss-preview {
+    border-radius: 12px; padding: 12px 14px; font-size: 12px; line-height: 1.5;
+    border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22);
+  }
+
+  .side-nav { display: flex; flex-direction: column; gap: 6px; }
+  .side-tutor {
+    font-size: 12px !important; padding: 8px 10px !important;
+    background: rgba(253,230,138,.1) !important; color: #fde68a !important;
+    border: 1px solid rgba(253,230,138,.28) !important;
+  }
 
   .handbook {
     display: flex; flex-direction: column; gap: 5px;
@@ -355,7 +575,7 @@
   }
   .hb-row {
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr) auto;
+    grid-template-columns: 28px 30px minmax(0, 1fr) auto;
     gap: 10px; align-items: center;
     padding: 9px 12px;
     border-radius: 10px;
@@ -373,6 +593,10 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 11px; font-weight: 900; color: #0f172a;
     background: rgba(232,205,122,.9);
+  }
+  .hb-vis {
+    text-align: center; font-size: 18px; line-height: 1;
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,.35));
   }
   .hb-row.t-a .hb-rank { background: #fca5a5; }
   .hb-row.t-b .hb-rank { background: #93c5fd; }
@@ -456,7 +680,25 @@
   }
 
   #seedinfo { font-size: 10px; color: #475569; text-align: center; }
-  .card.season { outline: 2px solid rgba(255, 205, 70, .95); outline-offset: 1.5px; }
+  /* 이달의 패 ×2 — 따뜻한 바탕 + 좌하단 뱃지 (테두리 채널 안 씀) */
+  .card.season:not(.kwang) {
+    background: linear-gradient(165deg, #fff7ed, #f5e6c8 55%, #ffedd5);
+  }
+  .card.season::after {
+    content: '×2';
+    position: absolute;
+    left: -6px; bottom: -6px;
+    z-index: 3;
+    font-size: 11px; font-weight: 900; line-height: 1;
+    color: #7c2d12;
+    background: linear-gradient(180deg, #fef3c7, #f59e0b);
+    border: 1.5px solid #c2410c;
+    border-radius: 6px;
+    padding: 3px 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.4);
+    pointer-events: none;
+    letter-spacing: -0.5px;
+  }
 
   /* ── 춘향 조력자 ─────────────────────── */
   #chunhyang {
@@ -1192,7 +1434,7 @@
       top: calc(100% + 6px);
     }
     #moneybox { font-size: 13px; margin-left: 0; flex-shrink: 0; }
-    #top-help { display: inline-flex; padding: 6px 8px; }
+    #top-help, #top-tutor { display: inline-flex; padding: 6px 8px; }
 
     #main {
       display: grid;
@@ -1236,7 +1478,7 @@
     }
     #playlog-panel,
     #seedinfo,
-    .side-help { display: none !important; }
+    .side-nav { display: none !important; }
 
     #roundlabel { font-size: 12.5px; }
     #roundlabel .round-meta { display: none; }
@@ -1249,7 +1491,8 @@
     .statline { font-size: 11px; margin: 1px 0; }
     .statline b { font-size: 13px; }
     #target-val, #score-val { font-size: 15px !important; }
-    #gauge { height: 7px; margin: 3px 0 2px; }
+    #need-val { font-size: 13px !important; }
+    #gauge { height: 7px; margin: 3px 0 8px; }
     .golevel { font-size: 10px; margin-top: 2px; }
 
     #playedarea {
@@ -1304,7 +1547,7 @@
     }
     .card.tti .ribbon { height: 34%; font-size: 8px; }
     .card:hover { transform: none; }
-    .card.sel { transform: translateY(-12px); }
+    .card.sel { transform: translateY(-12px) scale(1.02); }
 
     #actions {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 46;
@@ -1378,9 +1621,10 @@
     }
     .choicebtn.gs-simple .gs-tip::after { display: none; }
     .choicebtn .gs-tip b { color: #fef3c7; }
-    .shop-offers { gap: 8px; }
-    .offer { min-width: 0; flex: 1 1 100%; }
-    .shop-bottom { flex-direction: column; align-items: stretch; }
+    .shop-offers { grid-template-columns: 1fr; gap: 8px; }
+    .shop-utils { grid-template-columns: 1fr; }
+    .shop-footer { flex-direction: column; align-items: stretch; }
+    #btn-nextround { width: 100%; }
     #btn-nextround { width: 100%; min-height: 48px; }
     .hb-row { padding: 8px 10px; gap: 8px; }
     .hb-name { font-size: 12.5px; }
@@ -1412,7 +1656,7 @@
   @media (max-width: 720px) and (max-height: 700px) {
     #seasonline { display: none; }
     #handarea { padding-top: 10px; gap: 4px; }
-    .card.sel { transform: translateY(-8px); }
+    .card.sel { transform: translateY(-8px) scale(1.02); }
     #chunhyang { transform: scale(.9); transform-origin: bottom right; }
   }
 
@@ -1430,6 +1674,7 @@
   <div id="jokerbar"></div>
   <div id="moneybox"></div>
   <button type="button" id="top-help" class="smallbtn" onclick="openHelp()" title="족보표 / 도움말">📖</button>
+  <button type="button" id="top-tutor" class="smallbtn" onclick="replayTutorials()" title="튜토리얼 다시 보기">✨</button>
 </div>
 
 <div id="main">
@@ -1440,9 +1685,9 @@
       <div id="bossbanner" style="display:none; margin-top:8px;"></div>
     </div>
     <div class="panel" id="scorepanel">
-      <div class="statline"><span>목표 점수</span><b id="target-val"></b></div>
+      <div class="statline"><span>점수</span><b class="score-frac"><span id="score-val">0</span><span class="score-slash"> / </span><span id="target-val">0</span></b></div>
       <div id="gauge"><div id="gauge-fill"></div></div>
-      <div class="statline"><span>현재 점수</span><b id="score-val"></b></div>
+      <div class="statline"><span>남은 점수</span><b id="need-val"></b></div>
       <div class="golevel" id="golevel" style="display:none;"></div>
     </div>
     <div class="panel" id="previewbox"></div>
@@ -1450,7 +1695,10 @@
       <div style="font-size:11px; color:var(--gold-soft); font-weight:800; margin-bottom:5px;">이번 판 내기 기록</div>
       <div id="playlog"></div>
     </div>
-    <button class="smallbtn side-help" onclick="openHelp()">📖 족보표 / 도움말</button>
+    <div class="side-nav">
+      <button class="smallbtn side-help" onclick="openHelp()">📖 족보표 / 도움말</button>
+      <button class="smallbtn side-tutor" onclick="replayTutorials()">✨ 튜토리얼 다시 보기</button>
+    </div>
     <div id="seedinfo"></div>
   </aside>
 
@@ -1502,6 +1750,7 @@
   <div id="juice-skip-hint">클릭하면 연출 스킵</div>
 </div>
 <div id="go-cascade" aria-hidden="true"><div class="go-stage" id="go-cascade-stage"></div></div>
+<div id="coach-root" aria-hidden="true"></div>
 
 <div id="go-anim-preview" aria-hidden="true">
   <div class="gap-inner">
@@ -1604,7 +1853,7 @@ const HANDS = [
   { id: 'month3',     name: '같은 달 3장',    mult: 3  },
   { id: 'yeol3',      name: '열끗 셋',        mult: 3  },
   { id: 'tti3',       name: '띠 셋',          mult: 2  },
-  { id: 'pi5',        name: '피 5장',         mult: 2  },
+  { id: 'pi5',        name: '피 5장',         mult: 3  },
   { id: 'month2',     name: '같은 달 2장',    mult: 2  },
   { id: 'none',       name: '무조합',         mult: 1  },
 ];
@@ -1822,6 +2071,8 @@ const seedParam = new URLSearchParams(location.search).get('seed');
 let runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() * 4294967296) >>> 0);
 let rng = mulberry32(runSeed);
 
+const JAN_AURA_USES = 3; // 1월 조합 오라·일괄선택 횟수
+
 const state = {
   screen: 'play', // play | gostop | settle | shop | gameover | victory | help | prep | welcome
   round: 1,
@@ -1858,6 +2109,14 @@ const state = {
   gameOverReason: '',
   stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
   helpReturn: null,
+  janAuraLeft: 0,       // 1월 조합 오라 남은 횟수
+  janAuraCharged: false, // 이번 추천 선택이 횟수를 이미 썼는지 (취소 시 환불)
+  coachStep: null,      // null | 'hand' | 'play' | 'scored' | 'junk' | 'gostop' | 'shop'
+  coachPendingScored: false, // 내기 연출 후 점수 설명 일시정지
+  coachAfterDeal: null, // 드로우 끝난 뒤 이어갈 코치 스텝
+  janTutorJunkPending: false, // 1월: 조합 튜토 다음 보충에서 버리기 유도
+  playFadeGen: 0,
+  dealGen: 0,
 };
 
 const hasJoker = (id) => state.jokers.some((j) => j.id === id);
@@ -1897,6 +2156,13 @@ function startRound() {
   state.playLog = [];
   state.pendingGoStop = false;
   state.dealing = false;
+  state.janAuraLeft = state.round === 1 ? JAN_AURA_USES : 0;
+  state.janAuraCharged = false;
+  state.coachStep = null;
+  state.coachPendingScored = false;
+  state.coachAfterDeal = null;
+  // 튜토 미완이면: 첫 손 조합 → 바로 다음 보충은 버리기
+  state.janTutorJunkPending = state.round === 1 && !hasSeenJanCoach();
 
   state.boss = isBossRound(state.round) ? state.nextBoss : null;
   state.nextBoss = null;
@@ -1937,46 +2203,162 @@ function refillHand(isRoundStart = false) {
 }
 
 // 빈 자리 상태에서 한 장씩 드로우 → 연출 후 정렬
+/** 1월 개국 손패에 족보가 있도록 drawn(8장)을 재구성. state.deck는 나머지. */
+function ensureJanOpeningCombo(drawn) {
+  const env = scoreEnv();
+  const ok = (cards) => {
+    const r = evaluateHand(cards, env);
+    return r && r.handId && r.handId !== 'none';
+  };
+  if (ok(drawn)) return;
+
+  for (let n = 0; n < 48; n++) {
+    const pool = [...drawn, ...state.deck];
+    shuffle(pool, rng);
+    const trial = pool.slice(0, 8);
+    if (ok(trial)) {
+      drawn.length = 0;
+      drawn.push(...trial);
+      state.deck = pool.slice(8);
+      return;
+    }
+  }
+
+  // 최후: 같은 달 2장 강제
+  const pool = [...drawn, ...state.deck];
+  const byM = {};
+  for (const c of pool) (byM[c.month] = byM[c.month] || []).push(c);
+  let pair = null;
+  for (const g of Object.values(byM)) {
+    if (g.length >= 2) { pair = [g[0], g[1]]; break; }
+  }
+  if (!pair) return;
+  const set = new Set(pair);
+  const rest = shuffle(pool.filter((c) => !set.has(c)), rng);
+  drawn.length = 0;
+  drawn.push(pair[0], pair[1], ...rest.slice(0, 6));
+  state.deck = rest.slice(6);
+}
+
+/** 1월 버리기 튜토용 — drawn(8장)에 족보가 없도록 재구성 */
+function ensureJanNoCombo(drawn) {
+  const env = scoreEnv();
+  const isNone = (cards) => {
+    const r = evaluateHand(cards.filter((c) => !c.faceDown), env);
+    return !r || !r.handId || r.handId === 'none';
+  };
+  if (isNone(drawn)) return;
+
+  for (let n = 0; n < 64; n++) {
+    const pool = [...drawn, ...state.deck];
+    shuffle(pool, rng);
+    const trial = pool.slice(0, 8);
+    if (isNone(trial)) {
+      drawn.length = 0;
+      drawn.push(...trial);
+      state.deck = pool.slice(8);
+      return;
+    }
+  }
+
+  // 최후: 같은 달·피5 피하기
+  const pool = [...drawn, ...state.deck];
+  shuffle(pool, rng);
+  const pick = [];
+  const months = {};
+  let piSum = 0;
+  const tryAdd = (c, strict) => {
+    if (pick.includes(c)) return false;
+    const m = months[c.month] || 0;
+    if (strict && m >= 1) return false;
+    const addPi = piCount(c);
+    if (strict && piSum + addPi >= 5) return false;
+    pick.push(c);
+    months[c.month] = m + 1;
+    piSum += addPi;
+    return true;
+  };
+  for (const c of pool) {
+    if (pick.length >= 8) break;
+    tryAdd(c, true);
+  }
+  for (const c of pool) {
+    if (pick.length >= 8) break;
+    tryAdd(c, false);
+  }
+  const set = new Set(pick);
+  drawn.length = 0;
+  drawn.push(...pick);
+  state.deck = pool.filter((c) => !set.has(c));
+}
+
 async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
   // 고/스톱 대기 중에는 절대 보충하지 않음
   if (state.pendingGoStop && !isRoundStart) return;
   if (state.screen === 'gostop') return;
 
-  const drawn = [];
+  const dealGen = (state.dealGen = (state.dealGen || 0) + 1);
+  const aborted = () =>
+    dealGen !== state.dealGen ||
+    state.screen === 'welcome' || state.screen === 'prep' ||
+    (playGen != null && playGen !== state.playFadeGen);
+
+  let drawn = [];
   while (state.hand.length + drawn.length < 8 && state.deck.length > 0) {
     drawn.push(state.deck.pop());
   }
-  if (!drawn.length) {
+
+  // 1월 튜토 2단계: 조합 직후 보충 → 손패 리셋 후 무조합으로 버리기 유도
+  const junkTutorDeal = !isRoundStart && state.round === 1 && state.janTutorJunkPending;
+  if (junkTutorDeal) {
+    for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
+    drawn = [];
+    for (let i = state.hand.length - 1; i >= 0; i--) state.deck.push(state.hand[i]);
+    state.hand = [];
+    state.selected = [];
+    while (drawn.length < 8 && state.deck.length > 0) drawn.push(state.deck.pop());
+    applyAngaeFaceDown(drawn, false);
+    ensureJanNoCombo(drawn);
+  } else if (!drawn.length) {
     if (!state.pendingGoStop) {
       sortHand();
+      state.dealing = false;
       render();
+    } else {
+      state.dealing = false;
     }
     return;
+  } else {
+    applyAngaeFaceDown(drawn, isRoundStart);
+    // 1월 첫 배분만 — 손패에 족보 최소 1개 보장
+    if (isRoundStart && state.round === 1 && state.hand.length === 0) {
+      ensureJanOpeningCombo(drawn);
+    }
   }
-  applyAngaeFaceDown(drawn, isRoundStart);
+
+  if (!drawn.length) {
+    state.dealing = false;
+    render();
+    return;
+  }
+
   // 연출 전까지 덱에 되돌려, 장수 표시가 한 장씩(33→32→31) 줄어들게
   for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
 
   state.dealing = true;
   render(); // 패 없는/모자란 상태 노출 (덱 카운트는 아직 유지)
   await new Promise((r) => setTimeout(r, isRoundStart ? 160 : 240));
-  if (state.pendingGoStop || state.screen === 'gostop') {
+  if (aborted() || state.pendingGoStop || state.screen === 'gostop') {
     // 아직 손패로 안 옮김 — 카드는 덱에 그대로
     state.dealInUids = null;
     state.dealing = false;
-    render();
-    return;
-  }
-  if (playGen != null && playGen !== state.playFadeGen) {
-    state.dealInUids = null;
-    state.dealing = false;
+    if (junkTutorDeal && !aborted()) state.janTutorJunkPending = true; // 보류 유지
     render();
     return;
   }
 
   for (let i = 0; i < drawn.length; i++) {
-    if (state.pendingGoStop || state.screen === 'gostop' ||
-        (playGen != null && playGen !== state.playFadeGen)) {
+    if (aborted() || state.pendingGoStop || state.screen === 'gostop') {
       // 미지급분은 덱에 남아 있음
       state.dealInUids = null;
       state.dealing = false;
@@ -1992,12 +2374,33 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
   }
 
   await new Promise((r) => setTimeout(r, 360));
+  if (aborted()) {
+    state.dealInUids = null;
+    state.dealing = false;
+    render();
+    return;
+  }
   state.dealInUids = null;
   render();
   await new Promise((r) => setTimeout(r, 40));
+  if (aborted()) {
+    state.dealing = false;
+    render();
+    return;
+  }
   await sortHandAnimated();
+  if (aborted()) {
+    state.dealing = false;
+    render();
+    return;
+  }
   state.dealing = false;
+  if (junkTutorDeal) {
+    state.janTutorJunkPending = false;
+    if (!hasSeenJanCoach()) state.coachStep = 'junk';
+  }
   render();
+  maybeStartJanCoach(isRoundStart);
 }
 
 const TYPE_ORDER = { kwang: 0, yeol: 1, tti: 2, ssangpi: 3, pi: 4 };
@@ -2089,6 +2492,40 @@ function selectedCards() {
 
 function toggleSelect(uid) {
   if (state.screen !== 'play' || state.juicing || state.dealing) return;
+  // 1월 버리기 튜토: 빛나는 약한 패 하나 누르면 추천분(최대 5장) 일괄 선택
+  if (state.coachStep === 'junk') {
+    const junk = getJanJunkSuggest();
+    if (junk.includes(uid)) {
+      const allOn = junk.every((u) => state.selected.includes(u));
+      if (allOn) state.selected = state.selected.filter((u) => !junk.includes(u));
+      else state.selected = junk.slice(0, 5);
+      state.hoverReact = null;
+      render();
+      return;
+    }
+  }
+  // 1월 조합 오라: 빛나는 패 하나 누르면 조합 전체 선택 (토글 취소 시 횟수 환불)
+  const aura = getJanAuraBest();
+  if (aura && aura.uids.includes(uid)) {
+    const allOn = aura.uids.every((u) => state.selected.includes(u));
+    if (allOn) {
+      state.selected = state.selected.filter((u) => !aura.uids.includes(u));
+      if (state.janAuraCharged) {
+        state.janAuraLeft = Math.min(JAN_AURA_USES, state.janAuraLeft + 1);
+        state.janAuraCharged = false;
+      }
+    } else {
+      state.selected = aura.uids.slice(0, 5);
+      if (!state.janAuraCharged) {
+        state.janAuraLeft = Math.max(0, state.janAuraLeft - 1);
+        state.janAuraCharged = true;
+      }
+      if (state.coachStep === 'hand') state.coachStep = 'play';
+    }
+    state.hoverReact = null;
+    render();
+    return;
+  }
   const i = state.selected.indexOf(uid);
   if (i >= 0) state.selected.splice(i, 1);
   else {
@@ -2112,6 +2549,21 @@ function playSelected() {
   if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.playsLeft <= 0) return;
+
+  if (state.coachStep === 'hand' || state.coachStep === 'play') {
+    state.coachPendingScored = true;
+    state.coachStep = null;
+  } else if (state.coachStep === 'junk') {
+    state.coachStep = null;
+    state.janTutorJunkPending = false;
+    markJanCoachSeen();
+  } else if (state.coachStep === 'scored') {
+    state.coachStep = null;
+    state.janTutorJunkPending = false;
+    markJanCoachSeen();
+  }
+  // 내기로 확정 → 추천 횟수는 소모된 채, 다음 손에서 새로 과금
+  state.janAuraCharged = false;
 
   // 안개: 뒷면 카드 공개 — 뒷면 국진은 점수가 높은 모드 자동 선택
   for (const c of cards) {
@@ -2146,10 +2598,19 @@ function playSelected() {
   state.playLog.push({ hand: HAND_BY_ID[result.handId].name, score: result.score });
 
   // 낸 패 스냅샷 (국진 모드 포함) — 코어→flat, 월·칩 순으로 정렬해 연출/표시
+  // 선택 transform(들림·scale) 없이 측정해야 슬롯 착지가 안 어긋남
   const fromRects = {};
   for (const c of cards) {
     const el = document.querySelector(`#handarea [data-uid="${c.uid}"]`);
-    if (el) fromRects[c.uid] = el.getBoundingClientRect();
+    if (!el) continue;
+    const hadSel = el.classList.contains('sel');
+    const prevTr = el.style.transition;
+    el.style.transition = 'none';
+    if (hadSel) el.classList.remove('sel');
+    void el.offsetWidth;
+    fromRects[c.uid] = el.getBoundingClientRect();
+    if (hadSel) el.classList.add('sel');
+    el.style.transition = prevTr;
   }
   const sorted = sortPlayedCards(cards, env);
   state.lastPlay = {
@@ -2176,6 +2637,9 @@ function playSelected() {
 
     // 목표 달성: 드로우 없이 고/스톱(또는 패 없으면 정산)
     if (state.roundScore >= state.target && state.round !== ROUNDS) {
+      if (await pauseForCoachScored(playGen)) return;
+      state.coachAfterDeal = null;
+      // 버리기 튜토 대기 중이면 seen은 고 드로우/스톱에서 처리
       checkAfterPlay();
       render();
       await new Promise((r) => setTimeout(r, 500));
@@ -2192,20 +2656,24 @@ function playSelected() {
       return;
     }
 
+    // 드로우·정렬 끝날 때까지 조합 힌트 숨김 (빈 자리 손패에 오라 뜨지 않게)
+    state.dealing = true;
     render(); // 정렬된 낸 패 + 결과 잠깐 고정
-    await new Promise((r) => setTimeout(r, 750));
-    if (playGen !== state.playFadeGen) return;
+    if (await pauseForCoachScored(playGen)) return;
+    await new Promise((r) => setTimeout(r, 420));
+    if (playGen !== state.playFadeGen) { state.dealing = false; return; }
     const pa = $('playedarea');
     if (pa && state.lastPlay) {
       pa.classList.add('play-fade-out');
       await new Promise((r) => setTimeout(r, 420));
     }
-    if (playGen !== state.playFadeGen) return;
+    if (playGen !== state.playFadeGen) { state.dealing = false; return; }
     state.lastPlay = null;
     if (pa) pa.classList.remove('play-fade-out');
 
     if (state.roundScore >= state.target) {
       // 12월 클리어 등
+      state.dealing = false;
       checkAfterPlay();
       render();
       return;
@@ -2213,7 +2681,11 @@ function playSelected() {
 
     render();
     await dealToHand({ playGen });
-    if (playGen !== state.playFadeGen) return;
+    if (playGen !== state.playFadeGen) { state.dealing = false; return; }
+    if (state.coachAfterDeal) {
+      state.coachStep = state.coachAfterDeal;
+      state.coachAfterDeal = null;
+    }
     checkAfterPlay();
     render();
   });
@@ -2234,6 +2706,7 @@ function checkAfterPlay() {
     }
     // 내기 0이어도 고/스톱 선택 — 고 시 내기 +1·드로우로 이어갈 수 있음
     state.screen = 'gostop';
+    maybeStartGoStopCoach();
   } else if (state.playsLeft === 0) {
     gameOver(state.goLevel > 0 ? '고박' : '목표 미달');
   }
@@ -2241,6 +2714,10 @@ function checkAfterPlay() {
 
 async function chooseGo() {
   if (state.screen !== 'gostop' || state.dealing) return;
+  if (state.coachStep === 'gostop') {
+    state.coachStep = null;
+    markGoStopCoachSeen();
+  }
   const fromLevel = state.goLevel;
   // 밀치기 고: 이미 넘어 있는 문턱 전부를 소급 인정, 선언 단계 = 아직 못 넘은 첫 문턱
   state.goLevel = goLevelReached(state.baseTarget, state.roundScore, state.goLevel) + 1;
@@ -2248,6 +2725,7 @@ async function chooseGo() {
   state.playsLeft++; // 고 보상: 내기 +1 (밀친 단계 수와 무관하게 선언 1회당 1개)
   state.pendingGoStop = false;
   state.screen = 'play';
+  state.dealing = true; // 드로우·정렬 전 조합 힌트 숨김
   render(); // 모달 닫고 모자란 손패 노출
   // 확정 풀스크린은 실제 점프 구간만 (버튼 연출은 1→N 유지)
   await playGoCascade(fromLevel, state.goLevel);
@@ -2258,6 +2736,14 @@ async function chooseGo() {
 
 function chooseStop() {
   if (state.screen !== 'gostop') return;
+  if (state.coachStep === 'gostop') {
+    state.coachStep = null;
+    markGoStopCoachSeen();
+  }
+  if (state.janTutorJunkPending) {
+    state.janTutorJunkPending = false;
+    if (!hasSeenJanCoach()) markJanCoachSeen();
+  }
   state.pendingGoStop = false;
   settle();
   render();
@@ -2268,10 +2754,18 @@ function discardSelected() {
   if (state.screen !== 'play' || state.juicing || state.dealing) return;
   const cards = selectedCards();
   if (cards.length < 1 || cards.length > 5 || state.discardsLeft <= 0) return;
+  if (state.coachStep === 'junk') {
+    state.coachStep = null;
+    markJanCoachSeen();
+  } else if (state.coachStep) {
+    state.coachStep = null;
+    markJanCoachSeen();
+  }
   const uids = cards.map((c) => c.uid);
   state.discardsLeft--;
   if (hasJoker('mitjang')) state.mitjangChips += 8;
   state.selected = [];
+  state.janAuraCharged = false; // 버리기로 확정 → 횟수 소모 확정
   state.hoverReact = null;
   state.discardAnimUids = uids;
   state.juicing = true;
@@ -2284,6 +2778,7 @@ function discardSelected() {
     state.discardAnimUids = null;
     state.juicing = false;
     document.body.classList.remove('juicing');
+    state.dealing = true; // 드로우·정렬 끝날 때까지 조합 힌트 숨김
     render(); // 버린 뒤 빈 자리
     await dealToHand();
   };
@@ -2324,6 +2819,7 @@ function openShop() {
     }
   }
   state.screen = 'shop';
+  maybeStartShopCoach();
   render();
 }
 
@@ -2381,6 +2877,10 @@ function pickBossCandidate(id) {
 function nextRound() {
   if (state.screen !== 'shop') return;
   if (isBossRound(state.round + 1) && !state.nextBoss) { flashActions(); return; }
+  if (state.coachStep === 'shop' || (state.coachStep && String(state.coachStep).startsWith('shop'))) {
+    state.coachStep = null;
+    markShopCoachSeen();
+  }
   state.round++;
   startRound();
 }
@@ -2405,6 +2905,7 @@ function resetRun() {
     lastPlay: null, juicing: false, dealing: false, pendingGoStop: false, playLog: [],
     settleData: null, gameOverReason: '',
     stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
+    janAuraLeft: 0, janAuraCharged: false, coachStep: null, coachPendingScored: false, coachAfterDeal: null, janTutorJunkPending: false,
   });
   state.baseTarget = TARGETS[0];
   state.target = TARGETS[0];
@@ -2418,6 +2919,259 @@ function hasSeenHowto() {
 function markHowtoSeen() {
   try { localStorage.setItem('hwatro_howto_seen', '1'); }
   catch (_) {}
+}
+
+function hasSeenJanCoach() {
+  try { return localStorage.getItem('hwatro_jan_coach_v1') === '1'; }
+  catch (_) { return false; }
+}
+function markJanCoachSeen() {
+  try { localStorage.setItem('hwatro_jan_coach_v1', '1'); }
+  catch (_) {}
+}
+function clearJanCoachSeen() {
+  try { localStorage.removeItem('hwatro_jan_coach_v1'); }
+  catch (_) {}
+}
+function hasSeenShopCoach() {
+  try { return localStorage.getItem('hwatro_shop_coach_v1') === '1'; }
+  catch (_) { return false; }
+}
+function markShopCoachSeen() {
+  try { localStorage.setItem('hwatro_shop_coach_v1', '1'); }
+  catch (_) {}
+}
+function clearShopCoachSeen() {
+  try { localStorage.removeItem('hwatro_shop_coach_v1'); }
+  catch (_) {}
+}
+function hasSeenGoStopCoach() {
+  try { return localStorage.getItem('hwatro_gostop_coach_v1') === '1'; }
+  catch (_) { return false; }
+}
+function markGoStopCoachSeen() {
+  try { localStorage.setItem('hwatro_gostop_coach_v1', '1'); }
+  catch (_) {}
+}
+function clearGoStopCoachSeen() {
+  try { localStorage.removeItem('hwatro_gostop_coach_v1'); }
+  catch (_) {}
+}
+
+/** 사이드/탑바 — 튜토리얼 다시 보기 (런 처음부터) */
+function abortTransientUI() {
+  // 진행 중 내기/드로우/점수게이트 취소
+  state.playFadeGen = (state.playFadeGen || 0) + 1;
+  state.dealGen = (state.dealGen || 0) + 1;
+  releaseCoachGate();
+  try {
+    JUICE.skip = true;
+    if (JUICE.onSkip) JUICE.onSkip();
+    JUICE.running = false;
+    JUICE.skip = false;
+    JUICE.onSkip = null;
+  } catch (_) {}
+
+  document.body.classList.remove('juicing', 'screen-shake', 'punch');
+  const juice = $('juice-root');
+  if (juice) {
+    juice.classList.remove('skipable');
+    juice.onclick = null;
+  }
+  const banner = $('hand-banner');
+  if (banner) {
+    banner.className = '';
+    banner.textContent = '';
+    banner.style.left = '';
+    banner.style.top = '';
+  }
+  const go = $('go-cascade');
+  if (go) {
+    go.classList.remove('on');
+    go.setAttribute('aria-hidden', 'true');
+    const stage = $('go-cascade-stage');
+    if (stage) stage.innerHTML = '';
+  }
+  const coach = $('coach-root');
+  if (coach) {
+    coach.classList.remove('on');
+    coach.setAttribute('aria-hidden', 'true');
+    coach.innerHTML = '';
+  }
+}
+
+function replayTutorials() {
+  clearJanCoachSeen();
+  clearShopCoachSeen();
+  clearGoStopCoachSeen();
+  try { localStorage.removeItem('hwatro_howto_seen'); } catch (_) {}
+  abortTransientUI();
+  resetRun();
+  state.helpReturn = null;
+  state.coachStep = null;
+  state.coachPendingScored = false;
+  state.coachAfterDeal = null;
+  state.janTutorJunkPending = false;
+  state.juicing = false;
+  state.dealing = false;
+  state.screen = 'welcome';
+  render();
+}
+
+/** 1월 조합 오라 — 족보 등급 우선, 동급이면 점수. 코어만 하이라이트 */
+function getJanAuraBest() {
+  if (state.round !== 1 || state.janAuraLeft <= 0) return null;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return null;
+  if (state.hand.length < 1) return null;
+  const env = scoreEnv();
+  // evaluateHand는 flat 패딩으로 낮은 족보가 이길 수 있음 → 오라는 족보 등급 우선
+  const avail = state.hand.filter((c) => !c.faceDown);
+  const guk = avail.find((c) => c.tags.includes('dual'));
+  const gukOrig = guk ? guk.asPi : null;
+  let best = null;
+  for (let k = 1; k <= Math.min(5, avail.length); k++) {
+    for (const sub of combosOf(avail, k)) {
+      const modes = guk && sub.includes(guk) ? [false, true] : [null];
+      for (const m of modes) {
+        if (m !== null) guk.asPi = m;
+        const r = computeScore(sub, env);
+        if (!r.handId || r.handId === 'none') continue;
+        const tier = HANDS.findIndex((h) => h.id === r.handId);
+        if (
+          !best ||
+          tier < best.tier ||
+          (tier === best.tier && r.score > best.score)
+        ) {
+          best = { cards: [...sub], handId: r.handId, score: r.score, tier };
+        }
+      }
+    }
+  }
+  if (guk) guk.asPi = gukOrig;
+
+  if (best) {
+    const { core } = detectHandInfo(best.cards);
+    const picks = (core && core.length) ? core : best.cards;
+    if (!picks.length) return null;
+    return {
+      uids: picks.map((c) => c.uid),
+      handId: best.handId,
+      name: HAND_BY_ID[best.handId].name,
+    };
+  }
+
+  let top = null;
+  for (const c of state.hand) {
+    if (c.faceDown) continue;
+    if (!top || cardChip(c, env) > cardChip(top, env)) top = c;
+  }
+  if (!top) return null;
+  return { uids: [top.uid], handId: 'none', name: '최고 칩 패' };
+}
+
+/** 1월 버리기 추천 — 튜토에선 피·쌍피만, 없으면 저칩 */
+function getJanJunkSuggest() {
+  const env = scoreEnv();
+  const face = state.hand.filter((c) => !c.faceDown);
+  if (!face.length) return [];
+  if (state.coachStep === 'junk') {
+    const pis = face
+      .filter((c) => {
+        const t = effType(c);
+        return t === 'pi' || t === 'ssangpi';
+      })
+      .sort((a, b) => cardChip(a, env) - cardChip(b, env));
+    if (pis.length) return pis.slice(0, 5).map((c) => c.uid);
+  }
+  const rank = (c) => {
+    const t = effType(c);
+    const bias = t === 'pi' ? 0 : t === 'ssangpi' ? 1 : t === 'tti' ? 5 : 10;
+    return bias * 100 + cardChip(c, env);
+  };
+  return [...face].sort((a, b) => rank(a) - rank(b))
+    .slice(0, Math.min(3, face.length))
+    .map((c) => c.uid);
+}
+
+function maybeStartJanCoach(isRoundStart) {
+  if (!isRoundStart || state.round !== 1 || state.screen !== 'play') return;
+  if (hasSeenJanCoach()) return;
+  // 1단계: 개국 조합 보장 후 조합→내기 튜토 (버리기는 다음 보충)
+  state.coachStep = 'hand';
+  render();
+}
+
+function maybeStartShopCoach() {
+  if (state.screen !== 'shop' || state.round !== 1) return;
+  if (hasSeenShopCoach()) return;
+  state.coachStep = 'shop';
+}
+
+function maybeStartGoStopCoach() {
+  if (state.screen !== 'gostop') return;
+  if (hasSeenGoStopCoach()) return;
+  state.coachStep = 'gostop';
+}
+
+let coachGateResolve = null;
+function releaseCoachGate() {
+  if (!coachGateResolve) return;
+  const r = coachGateResolve;
+  coachGateResolve = null;
+  r();
+}
+function waitCoachGate() {
+  return new Promise((r) => { coachGateResolve = r; });
+}
+
+/** 내기 연출 직후 — 점수 설명. 알겠어요/건너뛰기까지 멈춤. true면 이후 중단 */
+async function pauseForCoachScored(playGen) {
+  if (!state.coachPendingScored) return false;
+  state.coachPendingScored = false;
+  state.dealing = true;
+  state.coachStep = 'scored';
+  state.coachAfterDeal = null;
+  render();
+  await waitCoachGate();
+  if (playGen != null && playGen !== state.playFadeGen) {
+    state.dealing = false;
+    state.coachStep = null;
+    return true;
+  }
+  return false;
+}
+
+function coachNext() {
+  // 다음이 필요한 스텝만 (점수 확인·상점 요약)
+  if (state.coachStep === 'scored') {
+    state.coachStep = null;
+    // 버리기 단계가 남았으면 아직 완료 처리하지 않음
+    if (!state.janTutorJunkPending) markJanCoachSeen();
+    render();
+    releaseCoachGate();
+    return;
+  }
+  if (state.coachStep === 'shop') {
+    state.coachStep = null;
+    markShopCoachSeen();
+    render();
+    return;
+  }
+  coachSkip();
+}
+function coachSkip() {
+  const step = state.coachStep;
+  state.coachStep = null;
+  state.coachPendingScored = false;
+  state.coachAfterDeal = null;
+  if (step === 'shop' || (step && String(step).startsWith('shop'))) markShopCoachSeen();
+  else if (step === 'gostop') markGoStopCoachSeen();
+  else {
+    state.janTutorJunkPending = false;
+    markJanCoachSeen();
+  }
+  releaseCoachGate();
+  render();
 }
 
 function dismissWelcome() {
@@ -2620,8 +3374,9 @@ function cardHTML(card, opts = {}) {
     if (dealCls) styleBits.push(`--di:${state.dealInUids.indexOf(card.uid)}`);
     if (discarding) styleBits.push(`--dd:${dd}`);
     const styleAttr = styleBits.length ? ` style="${styleBits.join(';')}"` : '';
+    const auraCls = opts.selectable && opts.auraUids && opts.auraUids.has(card.uid) ? ' coach-aura' : '';
     const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
-    return `<div class="card facedown${selCls}${dealCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
+    return `<div class="card facedown${selCls}${dealCls}${discCls}${auraCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
   }
   const t = effType(card);
   let cls = `card ${t === 'ssangpi' && card.type === 'yeol' ? 'ssangpi' : card.type}`;
@@ -2653,12 +3408,13 @@ function cardHTML(card, opts = {}) {
   const selCls = opts.selectable && state.selected.includes(card.uid) && !discarding ? ' sel' : '';
   const dealCls = state.dealInUids && state.dealInUids.includes(card.uid) ? ' deal-in' : '';
   const discCls = discarding ? ' discarding' : '';
+  const auraCls = opts.selectable && opts.auraUids && opts.auraUids.has(card.uid) ? ' coach-aura' : '';
   const styleBits = [];
   if (dealCls) styleBits.push(`--di:${state.dealInUids.indexOf(card.uid)}`);
   if (discarding) styleBits.push(`--dd:${dd}`);
   const styleAttr = styleBits.length ? ` style="${styleBits.join(';')}"` : '';
   const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
-  return `<div class="${cls}${selCls}${dealCls}${discCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}>
+  return `<div class="${cls}${selCls}${dealCls}${discCls}${auraCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}>
     <div class="chipbadge">+${chip}</div>
     <div class="month">${card.month}月</div>
     <div class="mname">${M.name}</div>
@@ -2673,6 +3429,7 @@ function render() {
   renderTable();
   renderChunhyang();
   renderModal();
+  renderCoach();
 }
 
 function renderChunhyang() {
@@ -2763,6 +3520,14 @@ function renderTopbar() {
   $('moneybox').textContent = `💰 ${state.money}냥`;
 }
 
+function setNeedVal(score) {
+  const el = $('need-val');
+  if (!el) return;
+  const need = Math.max(0, state.target - score);
+  el.textContent = need === 0 ? '달성!' : fmt(need);
+  el.classList.toggle('done', need === 0);
+}
+
 function renderSide() {
   const bossTag = isBossRound(state.round) ? ' <span class="bak">(박)</span>' : '';
   const M = MONTHS[state.round - 1];
@@ -2791,6 +3556,7 @@ function renderSide() {
     ? state.lastPlay.scoreBefore
     : state.roundScore;
   $('score-val').textContent = fmt(displayScore);
+  setNeedVal(displayScore);
   $('gauge-fill').style.width = Math.min(100, (displayScore / state.target) * 100) + '%';
   $('gauge-fill').classList.remove('overflow');
   $('gauge').classList.remove('overflow');
@@ -2869,7 +3635,30 @@ function renderTable() {
     pa.innerHTML = `<div class="hint">카드를 고르고 <b>내기</b>를 누르세요</div>`;
   }
 
-  $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true })).join('');
+  const aura = getJanAuraBest();
+  const junkUids = state.coachStep === 'junk' ? new Set(getJanJunkSuggest()) : null;
+  const auraUids = junkUids || (aura ? new Set(aura.uids) : null);
+  $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true, auraUids })).join('');
+
+  // 1월 오라 잔여 안내 (코치 중이 아닐 때 살짝)
+  let auraHint = $('jan-aura-hint');
+  if (!auraHint) {
+    auraHint = document.createElement('div');
+    auraHint.id = 'jan-aura-hint';
+    $('handarea').parentNode.insertBefore(auraHint, $('handarea'));
+  }
+  if (state.coachStep === 'junk') {
+    auraHint.hidden = false;
+    auraHint.textContent = '🗑️ 빛나는 피(약한 패)를 눌러 고르고 버리세요 (한 번에 최대 5장)';
+  } else if (state.round === 1 && state.screen === 'play' && state.janAuraLeft > 0 && aura) {
+    auraHint.hidden = false;
+    auraHint.textContent = aura.handId === 'none'
+      ? `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 칩 최고 패가 골라져요`
+      : `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 ${aura.name}이 한 번에 골라져요`;
+  } else {
+    auraHint.hidden = true;
+    auraHint.textContent = '';
+  }
 
   const n = state.selected.length;
   const canAct = state.screen === 'play' && !state.juicing && !state.dealing;
@@ -2894,6 +3683,116 @@ function renderTable() {
   } else {
     bg.classList.remove('on');
   }
+}
+
+function renderCoach() {
+  const root = $('coach-root');
+  if (!root) return;
+  const step = state.coachStep;
+  const isShop = step === 'shop' || (step && String(step).startsWith('shop'));
+  const isGoStop = step === 'gostop';
+  const ok =
+    step &&
+    ((isShop && state.screen === 'shop') ||
+      (isGoStop && state.screen === 'gostop') ||
+      (!isShop && !isGoStop && state.screen === 'play' && state.round === 1));
+  if (!ok) {
+    root.classList.remove('on');
+    root.setAttribute('aria-hidden', 'true');
+    root.innerHTML = '';
+    return;
+  }
+
+  const aura = (!isShop && !isGoStop) ? getJanAuraBest() : null;
+  const handText = aura
+    ? (aura.handId === 'none'
+      ? `<b>연두 빛</b>이 도는 패를 눌러 보세요. 조합이 없으면 칩 최고 패가 골라집니다.<br><span style="color:#94a3b8;font-size:12px">1월 한정 · ${JAN_AURA_USES}회</span>`
+      : `<b>연두 빛</b>이 도는 패를 눌러 보세요. <b>${aura.name}</b>이 한 번에 골라집니다.<br><span style="color:#94a3b8;font-size:12px">1월 한정 · ${JAN_AURA_USES}회</span>`)
+    : `연두 빛 패를 눌러 조합을 골라 보세요. <b>1월 한정</b>이에요.`;
+
+  const playRes = state.lastPlay && state.lastPlay.result;
+  const scoredBody = playRes
+    ? `방금 <b>${HAND_BY_ID[playRes.handId].name}</b>으로 <b>+${fmt(playRes.score)}점</b>!<br>
+       점수 = (<b>족보 칩 ${fmt(playRes.chips)}</b> × <b>${fmtMult(playRes.mult)}배</b>)${playRes.flat ? ` + <b>${fmt(playRes.flat)}</b>` : ''}.<br>
+       목표까지 <b>남은 점수 ${fmt(Math.max(0, state.target - state.roundScore))}</b> · 게이지를 확인하세요.`
+    : `점수가 쌓였어요! 점수 = <b>족보 칩</b> × <b>배수</b> + 나머지.`;
+
+  // next: null → 액션으로만 진행 (다음 버튼 없음). 확인이 필요할 때만 라벨.
+  const junkHasSel = state.selected.length > 0;
+  const steps = {
+    hand: {
+      sel: '#handarea', pad: 10, title: '✨ 조합 힌트', body: handText, next: null,
+    },
+    play: {
+      sel: '#btn-play', pad: 8, title: '🎯 내기',
+      body: `골랐으면 <b>내기</b>를 눌러 점수를 쌓아 보세요.`,
+      next: null,
+    },
+    junk: {
+      sel: junkHasSel ? '#btn-discard' : '#handarea',
+      pad: 8,
+      title: '🗑️ 버리기',
+      body: junkHasSel
+        ? `<b>버리기</b>를 눌러 패를 갈아끼우세요 (한 번에 최대 5장). 버린 만큼 덱에서 보충됩니다.`
+        : `조합이 약할 땐 <b>피</b>처럼 약한 패를 버리세요. 빛나는 패를 누르면 추천분이 한 번에 골라져요 (최대 5장).`,
+      next: null,
+    },
+    scored: {
+      sel: '#playedarea', pad: 10, title: '✨ 점수 획득!',
+      body: scoredBody,
+      next: '알겠어요',
+    },
+    gostop: {
+      sel: '#gs-actions', pad: 10, title: '🔥 고 / 스톱',
+      body: `<b>스톱</b>은 지금 정산하고 다음 달로.<br><b>고</b>는 목표를 올리고 더 내지만, 실패하면 <b>고박 = 런 종료</b>!<br><span style="color:#94a3b8;font-size:12px">하나를 골라 보세요.</span>`,
+      next: null,
+    },
+    shop: {
+      sel: '#shop-offers', pad: 10, title: '🏪 상점',
+      body: `특수패를 사고, 마음에 안 들면 <b>리롤</b>하세요. 준비되면 <b>다음 판으로</b>!<br><span style="color:#94a3b8;font-size:12px">춘향 훈수도 여기서 예약할 수 있어요.</span>`,
+      next: '알겠어요',
+    },
+  };
+  const cfg = steps[step];
+  if (!cfg) {
+    root.classList.remove('on');
+    return;
+  }
+  const target = document.querySelector(cfg.sel);
+  if (!target) {
+    root.classList.remove('on');
+    return;
+  }
+
+  const r = target.getBoundingClientRect();
+  const pad = cfg.pad;
+  const x = Math.max(6, r.left - pad);
+  const y = Math.max(6, r.top - pad);
+  const w = Math.min(window.innerWidth - x - 6, r.width + pad * 2);
+  const h = Math.min(window.innerHeight - y - 6, r.height + pad * 2);
+
+  const spaceBelow = window.innerHeight - (y + h);
+  const panelTop = spaceBelow > 140 ? (y + h + 14) : Math.max(12, y - 130);
+  const panelLeft = Math.min(Math.max(12, x), window.innerWidth - 360);
+
+  const actions = cfg.next
+    ? `<button type="button" class="coach-skip" onclick="coachSkip()">건너뛰기</button>
+        <button type="button" class="coach-next" onclick="coachNext()">${cfg.next}</button>`
+    : `<button type="button" class="coach-skip" onclick="coachSkip()">건너뛰기</button>`;
+
+  root.classList.add('on');
+  root.setAttribute('aria-hidden', 'false');
+  root.innerHTML = `
+    <div class="coach-block" style="left:0;top:0;width:100%;height:${y}px"></div>
+    <div class="coach-block" style="left:0;top:${y + h}px;width:100%;height:${Math.max(0, window.innerHeight - y - h)}px"></div>
+    <div class="coach-block" style="left:0;top:${y}px;width:${x}px;height:${h}px"></div>
+    <div class="coach-block" style="left:${x + w}px;top:${y}px;width:${Math.max(0, window.innerWidth - x - w)}px;height:${h}px"></div>
+    <div class="coach-ring" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>
+    <div class="coach-panel" style="left:${panelLeft}px;top:${panelTop}px">
+      <div class="coach-title">${cfg.title}</div>
+      <div>${cfg.body}</div>
+      <div class="coach-actions">${actions}</div>
+    </div>`;
 }
 
 function renderModal() {
@@ -2931,7 +3830,8 @@ function renderModal() {
   }
 
   m.dataset.modalSig = state.screen;
-  m.classList.remove('gostop-modal');
+  m.classList.remove('gostop-modal', 'shop-modal');
+  if (state.screen === 'shop') m.classList.add('shop-modal');
   ov.classList.remove('gostop-open');
   m.innerHTML = fn();
   ov.classList.add('show');
@@ -3021,7 +3921,7 @@ function gostopHTML() {
   return `
     <h2>🎉 목표 달성!</h2>
     <div class="sub">${fmt(state.roundScore)} / ${fmt(state.target)}점 · 내기 ${state.playsLeft} · 패 ${cardsRemaining()}</div>
-    <div class="modal-actions">
+    <div class="modal-actions" id="gs-actions">
       <button class="choicebtn btn-stop gs-simple" onclick="chooseStop()">
         <div class="t">✋ 스톱</div>
         <div class="gs-tip">${stopTip}</div>
@@ -3052,14 +3952,20 @@ function settleHTML() {
 }
 
 function shopHTML() {
+  const rarityKo = { common: '커먼', uncommon: '언커먼', rare: '레어' };
   const offers = state.shopOffers.map((o, i) => {
     const j = o.joker;
     const cant = state.money < j.price || state.jokers.length >= 5;
     return `<div class="offer${o.sold ? ' sold' : ''}">
-      <div class="o-name">${j.icon} ${j.name}</div>
-      <span class="o-rarity r-${j.rarity}">${{ common: '커먼', uncommon: '언커먼', rare: '레어' }[j.rarity]}</span>
+      <div class="o-icon">${j.icon}</div>
+      <div class="o-name">${esc(j.name)}</div>
+      <div class="o-meta">
+        <span class="o-rarity r-${j.rarity}">${rarityKo[j.rarity]}</span>
+        <span class="o-kind">${esc(j.kind || '')}</span>
+      </div>
       <div class="o-desc">${esc(j.desc)}</div>
-      ${o.sold ? '<div style="text-align:center;font-weight:800;color:#94a3b8">판매 완료</div>'
+      ${o.sold
+        ? '<div class="o-sold-tag">판매 완료</div>'
         : `<button class="o-buy" onclick="buyJoker(${i})" ${cant ? 'disabled' : ''}>${j.price}냥에 구매</button>`}
     </div>`;
   }).join('');
@@ -3067,47 +3973,74 @@ function shopHTML() {
   const owned = state.jokers.length
     ? state.jokers.map((j, i) => {
         const def = JOKER_BY_ID[j.id];
-        return `<div class="owned"><b>${def.icon} ${def.name}</b><br><span style="color:#94a3b8">${esc(def.desc)}</span>
+        return `<div class="owned"><b>${def.icon} ${esc(def.name)}</b>
+          <span class="od">${esc(def.desc)}</span>
           <button class="sellbtn" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button></div>`;
       }).join('')
-    : '<span style="color:#64748b;font-size:12px">보유한 특수패가 없습니다</span>';
+    : '<div class="owned-empty">아직 보유한 특수패가 없습니다</div>';
 
   const next = state.round + 1;
-  let bossInfo = '';
+  let bossBlock = '';
   if (isBossRound(next)) {
     if (state.bossCandidates && state.bossCandidates.length > 1) {
-      bossInfo = `<div class="boss-preview">⚠ <b>다음은 ${next}월 — 대박 라운드!</b> 디버프 2종 중 하나를 선택하세요:<br>
+      bossBlock = `<div class="shop-util su-boss">
+        <div class="su-title">⚠ ${next}월 대박 — 디버프 선택</div>
         ${state.bossCandidates.map((id) => {
           const b = BOSS_BY_ID[id];
-          return `<button class="boss-candidate${state.nextBoss === id ? ' selected' : ''}" onclick="pickBossCandidate('${id}')">${b.name} — ${esc(b.desc)}</button>`;
-        }).join('')}</div>`;
+          return `<button class="boss-candidate${state.nextBoss === id ? ' selected' : ''}" onclick="pickBossCandidate('${id}')">${esc(b.name)} — ${esc(b.desc)}</button>`;
+        }).join('')}
+      </div>`;
     } else if (state.nextBoss) {
       const b = BOSS_BY_ID[state.nextBoss];
-      bossInfo = `<div class="boss-preview">⚠ <b>다음 ${next}월은 박 라운드:</b> ${b.name} — ${esc(b.desc)}</div>`;
+      bossBlock = `<div class="shop-util su-boss">
+        <div class="su-title">⚠ 다음 ${next}월 박 라운드</div>
+        <b>${esc(b.name)}</b> — ${esc(b.desc)}
+      </div>`;
     }
   }
 
   const makDisabled = state.chunhyangNext || state.money < 3;
   const nextMonth = state.round + 1;
-  const makInfo = `<div class="boss-preview" style="border-color:rgba(212,175,55,.45);background:rgba(120,85,20,.22);color:#fde68a">
-    🍶 <b>춘향 훈수</b> — 3냥 · ${nextMonth}월 동안 패를 봐주고, 내기/버리기 버튼에 올리면 다음 패를 예측해 줘요.
-    <button class="smallbtn" style="margin-left:8px" onclick="buyChunhyangNext()" ${makDisabled ? 'disabled' : ''}>${state.chunhyangNext ? '✓ 예약됨' : '다음 달 예약'}</button>
+  const makBlock = `<div class="shop-util su-mak">
+    <div class="su-title">🍶 춘향 훈수 · 3냥</div>
+    ${nextMonth}월 동안 패를 봐주고, 내기/버리기에 올리면 다음 패를 예측해요.
+    <div style="margin-top:8px">
+      <button class="smallbtn" onclick="buyChunhyangNext()" ${makDisabled ? 'disabled' : ''}>${state.chunhyangNext ? '✓ 예약됨' : '다음 달 예약'}</button>
+    </div>
   </div>`;
 
   const needPick = isBossRound(next) && !state.nextBoss;
   const nm = MONTHS[next - 1];
   return `
-    <h2>🏪 상점 <span style="font-size:13px;color:#fbbf24">보유 ${state.money}냥</span></h2>
-    <div style="font-size:11.5px;color:#94a3b8;margin-bottom:2px">내 특수패 (${state.jokers.length}/5)</div>
-    <div class="owned-row">${owned}</div>
-    <div class="shop-offers">${offers}</div>
-    ${makInfo}
-    ${bossInfo}
-    <div class="shop-bottom">
-      <button class="smallbtn" onclick="reroll()" ${state.money < state.rerollCost ? 'disabled' : ''}>🔄 리롤 ${state.rerollCost}냥</button>
-      <div style="font-size:12px;color:#cbd5e1">다음: ${nm.flower} ${next}월 · ${nm.name} · 목표 ${fmt(TARGETS[next - 1])}점</div>
+    <div class="shop-head">
+      <div>
+        <h2>🏪 상점</h2>
+        <div class="shop-sub">${state.round}월 클리어 · 특수패를 사고 다음 달로 넘어가세요</div>
+      </div>
+      <div class="shop-wallet"><span class="lbl">보유</span><b>${state.money}냥</b></div>
+    </div>
+    <section class="shop-sec" id="shop-owned">
+      <div class="shop-sec-h">내 특수패 <span>${state.jokers.length}/5</span></div>
+      <div class="owned-row">${owned}</div>
+    </section>
+    <section class="shop-sec" id="shop-offers">
+      <div class="shop-sec-h">
+        <span>오늘의 특수패</span>
+        <button type="button" class="shop-reroll" onclick="reroll()" ${state.money < state.rerollCost ? 'disabled' : ''}>🔄 리롤 ${state.rerollCost}냥</button>
+      </div>
+      <div class="shop-offers">${offers}</div>
+    </section>
+    <section class="shop-sec" id="shop-extras">
+      <div class="shop-sec-h">다음 달 준비</div>
+      <div class="shop-utils" style="${bossBlock ? '' : 'grid-template-columns:1fr'}">
+        ${makBlock}
+        ${bossBlock}
+      </div>
+    </section>
+    <footer class="shop-footer" id="shop-footer">
+      <div class="sf-next">다음: <b>${nm.flower} ${next}월 · ${nm.name}</b><br>목표 ${fmt(TARGETS[next - 1])}점</div>
       <button id="btn-nextround" onclick="nextRound()" ${needPick ? 'disabled title="디버프를 먼저 선택하세요"' : ''}>다음 판으로 →</button>
-    </div>`;
+    </footer>`;
 }
 
 function gameoverHTML() {
@@ -3141,10 +4074,16 @@ function helpHTML() {
     tti3: '띠 3장 이상 (비단 제외, 배수 타는 건 칩 높은 3장)',
     pi5: '피·쌍피만, 쌍피=2로 환산해 합 5 이상', month2: '같은 달 2장', none: '해당 없음',
   };
+  const HAND_VIS = {
+    ogwang: '🕊️', sagwang: '🏯', chongtong: '🎴', godori: '🐦',
+    samgwang: '🌕', bisamgwang: '☔', dan: '🎀', month3: '3️⃣',
+    yeol3: '🂠', tti3: '🎗️', pi5: '🍂', month2: '2️⃣', none: '·',
+  };
   const rows = HANDS.map((h, i) => {
     const tier = i <= 1 ? 's' : i <= 5 ? 'a' : i <= 8 ? 'b' : i <= 11 ? 'c' : 'd';
     return `<div class="hb-row t-${tier}">
       <div class="hb-rank">${i + 1}</div>
+      <div class="hb-vis" aria-hidden="true">${HAND_VIS[h.id] || '🎴'}</div>
       <div>
         <div class="hb-name">${h.name}</div>
         <div class="hb-cond">${conds[h.id]}</div>
@@ -4131,7 +5070,9 @@ async function flyCardsFromHand(wraps, steps, fromRects) {
     const w = wraps[i];
     const card = steps[i].card;
     const from = fromRects[card.uid];
-    const to = w.getBoundingClientRect();
+    // 래퍼가 아니라 실제 카드 박스으로 — 뱃지/칩 플로트와 무관하게 맞춤
+    const toEl = w.querySelector('.card') || w;
+    const to = toEl.getBoundingClientRect();
     if (!from || to.width < 1) {
       w.classList.add('landed');
       continue;
@@ -4143,22 +5084,31 @@ async function flyCardsFromHand(wraps, steps, fromRects) {
     ghost.style.top = from.top + 'px';
     ghost.style.width = from.width + 'px';
     ghost.style.height = from.height + 'px';
+    ghost.style.transformOrigin = 'center center';
     document.body.appendChild(ghost);
 
-    const dx = to.left - from.left;
-    const dy = to.top - from.top;
+    // 중심점 기준 FLIP + 도착 시 슬롯 크기로 scale (선택 scale·손/슬롯 크기 차이 보정)
+    const dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+    const dy = (to.top + to.height / 2) - (from.top + from.height / 2);
+    const sEnd = to.width / from.width;
     const delay = i * 50;
     pending.push(new Promise((resolve) => {
+      let done = false;
       const finish = () => {
+        if (done) return;
+        done = true;
         w.classList.add('landed');
-        if (ghost.parentNode) ghost.remove();
-        resolve();
+        // 한 프레임 겹쳐 두고 제거 → 착지 깜빡임 완화
+        requestAnimationFrame(() => {
+          if (ghost.parentNode) ghost.remove();
+          resolve();
+        });
       };
       try {
         const anim = ghost.animate([
           { transform: 'translate(0, 0) scale(1) rotate(0deg)', offset: 0 },
-          { transform: `translate(${dx * 0.45}px, ${dy * 0.3 - 36}px) scale(1.1) rotate(-5deg)`, offset: 0.4 },
-          { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(0deg)`, offset: 1 },
+          { transform: `translate(${dx * 0.45}px, ${dy * 0.3 - 36}px) scale(${Math.max(sEnd, 1) * 1.06}) rotate(-5deg)`, offset: 0.4 },
+          { transform: `translate(${dx}px, ${dy}px) scale(${sEnd}) rotate(0deg)`, offset: 1 },
         ], {
           duration: 520,
           delay,
@@ -4365,18 +5315,21 @@ async function playJuiceSequence(snap, fromRects = null) {
           const tick = (now) => {
             if (JUICE.skip) {
               gauge.style.width = Math.min(100, (sideTo / state.target) * 100) + '%';
+              setNeedVal(sideTo);
               resolve(); return;
             }
             const p = Math.min(1, (now - t0) / landMs);
             const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
             const v = sideFrom + (sideTo - sideFrom) * eased;
             gauge.style.width = Math.min(100, (v / state.target) * 100) + '%';
+            setNeedVal(Math.floor(v));
             if (p < 1) requestAnimationFrame(tick); else resolve();
           };
           requestAnimationFrame(tick);
         });
       })(),
     ]);
+    setNeedVal(sideTo);
     await juiceWait(120);
 
     // 5) 목표 돌파
@@ -4385,7 +5338,6 @@ async function playJuiceSequence(snap, fromRects = null) {
       gauge.classList.add('overflow');
       gauge.style.width = '100%';
       sfxOverflow();
-      maybeShake(bd.score, true);
       await juiceWait(480);
     } else {
       await juiceWait(220);
@@ -4403,6 +5355,9 @@ async function playJuiceSequence(snap, fromRects = null) {
 }
 
 // ── 시작 ───────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  if (state.coachStep) renderCoach();
+});
 boot(); // 첫 방문이면 룰 안내 → 이후 prep (1월 시작 전 훈수 예약)
 </script>
 </body>
