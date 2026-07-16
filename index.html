@@ -212,8 +212,9 @@
     text-align: center; font-size: 12px; font-weight: 700; color: #bef264;
     margin: 0 0 8px; text-shadow: 0 1px 0 rgba(0,0,0,.35);
   }
+  #jan-aura-hint.junk { color: #fca5a5; }
   #jan-aura-hint[hidden] { display: none !important; }
-  /* 추천 — 연두 글로우 + 우상단 ✦ (선택되면 둘 다 끔, 링 안 쌓음) */
+  /* 내기 추천 — 연두 글로우 + 우상단 ✦ */
   #handarea .card.coach-aura:not(.sel) {
     box-shadow:
       0 3px 8px rgba(0,0,0,.45),
@@ -243,6 +244,39 @@
     background: radial-gradient(circle at 40% 35%, #ecfccb, #a3e635);
     border: 1.5px solid #65a30d;
     box-shadow: 0 0 8px rgba(163, 230, 53, .85);
+    pointer-events: none;
+    animation: coachSpark 1.5s ease-in-out infinite;
+  }
+  /* 버리기 추천 — 빨간 글로우 + 우상단 ↓ */
+  #handarea .card.coach-aura-junk:not(.sel) {
+    box-shadow:
+      0 3px 8px rgba(0,0,0,.45),
+      0 0 12px rgba(248, 113, 113, .75),
+      inset 0 0 0 2.5px rgba(185, 28, 28, .9),
+      inset 0 0 0 4px rgba(255,255,255,.55);
+    animation: coachAuraPulse 1.5s ease-in-out infinite;
+    z-index: 2;
+  }
+  #handarea .card.kwang.coach-aura-junk:not(.sel) {
+    box-shadow:
+      0 3px 8px rgba(0,0,0,.45),
+      0 0 12px rgba(248, 113, 113, .75),
+      inset 0 0 0 2.5px #dc2626,
+      inset 0 0 0 4px rgba(255,255,255,.55);
+  }
+  #handarea .card.coach-aura-junk:not(.sel)::before {
+    content: '↓';
+    position: absolute;
+    top: -7px; right: -7px;
+    z-index: 4;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; line-height: 1;
+    color: #fff;
+    background: radial-gradient(circle at 40% 35%, #fecaca, #ef4444);
+    border: 1.5px solid #b91c1c;
+    box-shadow: 0 0 8px rgba(248, 113, 113, .9);
     pointer-events: none;
     animation: coachSpark 1.5s ease-in-out infinite;
   }
@@ -482,7 +516,7 @@
     background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(0,0,0,.28));
     border: 1px solid rgba(255,255,255,.14);
     display: flex; flex-direction: column; gap: 6px;
-    min-width: 0;
+    min-width: 0; min-height: 210px;
     transition: border-color .15s, transform .15s;
   }
   .offer:not(.sold):hover { border-color: rgba(253,230,138,.45); transform: translateY(-1px); }
@@ -493,14 +527,16 @@
   }
   .offer .o-name { font-weight: 900; font-size: 14px; color: #f8fafc; text-align: center; }
   .offer .o-meta {
-    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 6px; flex-wrap: nowrap;
   }
   .offer .o-rarity {
     font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px;
+    white-space: nowrap; flex-shrink: 0;
   }
   .offer .o-kind {
     font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
     background: rgba(255,255,255,.08); color: #94a3b8;
+    white-space: nowrap; flex-shrink: 0;
   }
   .r-common { background: #334155; color: #cbd5e1; }
   .r-uncommon { background: #14532d; color: #86efac; }
@@ -508,50 +544,28 @@
   .offer .o-desc {
     font-size: 11.5px; color: #cbd5e1; line-height: 1.45; flex: 1;
     text-align: center; min-height: 2.9em;
+    display: flex; align-items: center; justify-content: center;
   }
   .offer .o-buy {
     background: linear-gradient(180deg, #eab308, #b45309);
     color: #fff; padding: 9px; font-weight: 900; font-size: 13px;
-    border-radius: 9px; border: none; width: 100%;
+    border-radius: 9px; border: none; width: 100%; margin-top: auto;
   }
   .offer .o-buy:disabled { opacity: .45; cursor: not-allowed; }
-  .offer .o-sold-tag {
-    text-align: center; font-weight: 800; color: #94a3b8; font-size: 12px; padding: 8px 0 2px;
-  }
-  .owned-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-    gap: 10px;
-  }
-  .owned-card {
-    position: relative;
-    border-radius: 14px; padding: 14px 12px 12px;
-    background: linear-gradient(180deg, rgba(212,175,55,.14), rgba(0,0,0,.3));
-    border: 1px solid rgba(212,175,55,.38);
-    display: flex; flex-direction: column; gap: 6px;
-    min-width: 0; min-height: 210px;
-  }
-  .owned-card .o-icon {
-    font-size: 28px; line-height: 1; text-align: center;
-    filter: drop-shadow(0 2px 0 rgba(0,0,0,.35));
-  }
-  .owned-card .o-name { font-weight: 900; font-size: 14px; color: #fde68a; text-align: center; }
-  .owned-card .o-meta {
-    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
-  }
-  .owned-card .o-desc {
-    font-size: 11.5px; color: #cbd5e1; line-height: 1.45; flex: 1;
-    text-align: center; min-height: 2.9em;
-  }
-  .owned-card .owned-sell {
+  .offer .o-sell {
     margin-top: auto; width: 100%;
     background: rgba(255,255,255,.1); color: #fca5a5;
-    font-size: 11px; padding: 8px; font-weight: 800; border-radius: 9px;
+    font-size: 13px; padding: 9px; font-weight: 800; border-radius: 9px;
     border: 1px solid rgba(252,165,165,.28);
+  }
+  .offer .o-sold-tag {
+    text-align: center; font-weight: 800; color: #94a3b8; font-size: 12px; padding: 8px 0 2px;
+    margin-top: auto;
   }
   .owned-empty {
     color: #64748b; font-size: 12px; padding: 10px 12px;
-    border-radius: 10px; border: 1px dashed rgba(255,255,255,.12); width: 100%;
+    border-radius: 10px; border: 1px dashed rgba(255,255,255,.12);
+    grid-column: 1 / -1;
   }
   .shop-utils {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
@@ -2308,6 +2322,33 @@ function ensureJanOpeningCombo(drawn) {
   state.deck = rest.slice(6);
 }
 
+/** 1월 버리기 튜토용 — 무조합 + 버릴 피(쌍피) 최소 2장 */
+function janHandIsNone(cards) {
+  const env = scoreEnv();
+  const r = evaluateHand(cards.filter((c) => !c.faceDown), env);
+  return !r || !r.handId || r.handId === 'none';
+}
+function countJunkPi(cards) {
+  return cards.filter((c) => !c.faceDown && (effType(c) === 'pi' || effType(c) === 'ssangpi')).length;
+}
+function ensureJanJunkTutorialHand(drawn) {
+  const ok = (trial) => janHandIsNone(trial) && countJunkPi(trial) >= 2;
+  if (ok(drawn)) return;
+
+  for (let n = 0; n < 128; n++) {
+    const pool = [...drawn, ...state.deck];
+    shuffle(pool, rng);
+    const trial = pool.slice(0, 8);
+    if (ok(trial)) {
+      drawn.length = 0;
+      drawn.push(...trial);
+      state.deck = pool.slice(8);
+      return;
+    }
+  }
+  ensureJanNoCombo(drawn);
+}
+
 /** 1월 버리기 튜토용 — drawn(8장)에 족보가 없도록 재구성 */
 function ensureJanNoCombo(drawn) {
   const env = scoreEnv();
@@ -2360,9 +2401,11 @@ function ensureJanNoCombo(drawn) {
   state.deck = pool.filter((c) => !set.has(c));
 }
 
-async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
-  // 고/스톱 대기 중에는 절대 보충하지 않음
-  if (state.pendingGoStop && !isRoundStart) return;
+async function dealToHand({ playGen = null, isRoundStart = false, forceJunkTutor = false } = {}) {
+  // 고/스톱 대기 중에는 절대 보충하지 않음 (단, 1월 버리기 튜토 보충은 예외)
+  const junkTutorDeal = forceJunkTutor
+    || (!isRoundStart && state.round === 1 && state.janTutorJunkPending);
+  if (state.pendingGoStop && !isRoundStart && !junkTutorDeal) return;
   if (state.screen === 'gostop') return;
 
   const dealGen = (state.dealGen = (state.dealGen || 0) + 1);
@@ -2377,7 +2420,6 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
   }
 
   // 1월 튜토 2단계: 조합 직후 보충 → 손패 리셋 후 무조합으로 버리기 유도
-  const junkTutorDeal = !isRoundStart && state.round === 1 && state.janTutorJunkPending;
   if (junkTutorDeal) {
     for (let i = drawn.length - 1; i >= 0; i--) state.deck.push(drawn[i]);
     drawn = [];
@@ -2386,7 +2428,7 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
     state.selected = [];
     while (drawn.length < 8 && state.deck.length > 0) drawn.push(state.deck.pop());
     applyAngaeFaceDown(drawn, false);
-    ensureJanNoCombo(drawn);
+    ensureJanJunkTutorialHand(drawn);
   } else if (!drawn.length) {
     if (!state.pendingGoStop) {
       sortHand();
@@ -2465,7 +2507,10 @@ async function dealToHand({ playGen = null, isRoundStart = false } = {}) {
   state.dealing = false;
   if (junkTutorDeal) {
     state.janTutorJunkPending = false;
-    if (!hasSeenJanCoach()) state.coachStep = 'junk';
+    if (!hasSeenJanCoach()) {
+      if (state.discardsLeft < 1) state.discardsLeft = 1;
+      state.coachStep = 'junk';
+    }
   }
   render();
   maybeStartJanCoach(isRoundStart);
@@ -2560,7 +2605,7 @@ function selectedCards() {
 
 function toggleSelect(uid) {
   if (state.screen !== 'play' || state.juicing || state.dealing) return;
-  // 1월 버리기 튜토: 빛나는 약한 패 하나 누르면 추천분(최대 5장) 일괄 선택
+  // 1월 버리기 튜토: 빨간 빛 약한 패 하나 누르면 추천분(최대 5장) 일괄 선택
   if (state.coachStep === 'junk') {
     const junk = getJanJunkSuggest();
     if (junk.includes(uid)) {
@@ -2572,8 +2617,8 @@ function toggleSelect(uid) {
       return;
     }
   }
-  // 1월 조합 오라: 빛나는 패 하나 누르면 조합 전체 선택 (토글 취소 시 횟수 환불)
-  const aura = getJanAuraBest();
+  // 1월 조합 오라: 빛나는 패 하나 누르면 조합 전체 선택 (버리기 튜토 중엔 비활성)
+  const aura = state.coachStep === 'junk' ? null : getJanAuraBest();
   if (aura && aura.uids.includes(uid)) {
     const allOn = aura.uids.every((u) => state.selected.includes(u));
     if (allOn) {
@@ -2622,14 +2667,14 @@ function playSelected() {
     state.coachPendingScored = true;
     state.coachStep = null;
   } else if (state.coachStep === 'junk') {
-    state.coachStep = null;
-    state.janTutorJunkPending = false;
-    markJanCoachSeen();
+    flashActions();
+    return;
   } else if (state.coachStep === 'scored') {
     state.coachStep = null;
-    state.janTutorJunkPending = false;
-    markJanCoachSeen();
+    // 버리기 튜토가 남았으면 완료 처리 보류
+    if (!state.janTutorJunkPending) markJanCoachSeen();
   }
+  if (state.round === 1 && !hasSeenJanCoach()) state.janTutorJunkPending = true;
   // 내기로 확정 → 추천 횟수는 소모된 채, 다음 손에서 새로 과금
   state.janAuraCharged = false;
 
@@ -2706,6 +2751,29 @@ function playSelected() {
     // 목표 달성: 드로우 없이 고/스톱(또는 패 없으면 정산)
     if (state.roundScore >= state.target && state.round !== ROUNDS) {
       if (await pauseForCoachScored(playGen)) return;
+      // 1월: 첫 내기 후 버리기 튜토가 남았으면 목표 달성해도 보충부터
+      if (state.janTutorJunkPending && state.round === 1 && !hasSeenJanCoach()) {
+        state.pendingGoStop = false;
+        state.dealing = true;
+        render();
+        await new Promise((r) => setTimeout(r, 420));
+        if (playGen !== state.playFadeGen) { state.dealing = false; return; }
+        const pa = $('playedarea');
+        if (pa && state.lastPlay) {
+          pa.classList.add('play-fade-out');
+          await new Promise((r) => setTimeout(r, 420));
+        }
+        if (playGen !== state.playFadeGen) { state.dealing = false; return; }
+        state.lastPlay = null;
+        if (pa) pa.classList.remove('play-fade-out');
+        render();
+        await dealToHand({ playGen, forceJunkTutor: true });
+        if (playGen !== state.playFadeGen) { state.dealing = false; return; }
+        if (state.roundScore >= state.target) state.pendingGoStop = true;
+        checkAfterPlay();
+        render();
+        return;
+      }
       state.coachAfterDeal = null;
       // 버리기 튜토 대기 중이면 seen은 고 드로우/스톱에서 처리
       checkAfterPlay();
@@ -2824,6 +2892,7 @@ function discardSelected() {
   if (cards.length < 1 || cards.length > 5 || state.discardsLeft <= 0) return;
   if (state.coachStep === 'junk') {
     state.coachStep = null;
+    state.janTutorJunkPending = false;
     markJanCoachSeen();
   } else if (state.coachStep) {
     state.coachStep = null;
@@ -2849,6 +2918,11 @@ function discardSelected() {
     state.dealing = true; // 드로우·정렬 끝날 때까지 조합 힌트 숨김
     render(); // 버린 뒤 빈 자리
     await dealToHand();
+    if (state.roundScore >= state.target && state.round !== ROUNDS && cardsRemaining() > 0) {
+      state.pendingGoStop = true;
+      state.screen = 'gostop';
+      maybeStartGoStopCoach();
+    }
   };
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
@@ -3088,6 +3162,7 @@ function replayTutorials() {
 
 /** 1월 조합 오라 — 족보 등급 우선, 동급이면 점수. 코어만 하이라이트 */
 function getJanAuraBest() {
+  if (state.coachStep === 'junk') return null;
   if (state.round !== 1 || state.janAuraLeft <= 0) return null;
   if (state.screen !== 'play' || state.juicing || state.dealing) return null;
   if (state.hand.length < 1) return null;
@@ -3234,7 +3309,13 @@ function coachSkip() {
   state.coachAfterDeal = null;
   if (step === 'shop' || (step && String(step).startsWith('shop'))) markShopCoachSeen();
   else if (step === 'gostop') markGoStopCoachSeen();
-  else {
+  else if (step === 'junk') {
+    state.janTutorJunkPending = false;
+    markJanCoachSeen();
+  } else if (step === 'scored' || step === 'hand' || step === 'play') {
+    // 조합·점수 코치만 건너뛰고 버리기 튜토는 첫 보충에서 이어감
+    if (!state.janTutorJunkPending) markJanCoachSeen();
+  } else {
     state.janTutorJunkPending = false;
     markJanCoachSeen();
   }
@@ -3431,6 +3512,11 @@ const fmtMult = (m) => (Number.isInteger(m) ? m : m.toFixed(2).replace(/0+$/, ''
 
 const TTI_LABEL = { hongdan: '홍단', cheongdan: '청단', chodan: '초단', bi_tti: '비단' };
 
+function auraCardCls(opts, uid) {
+  if (!opts.selectable || !opts.auraUids || !opts.auraUids.has(uid)) return '';
+  return opts.auraKind === 'junk' ? ' coach-aura-junk' : ' coach-aura';
+}
+
 function cardHTML(card, opts = {}) {
   const M = MONTHS[card.month - 1];
   const discarding = state.discardAnimUids && state.discardAnimUids.includes(card.uid);
@@ -3443,7 +3529,7 @@ function cardHTML(card, opts = {}) {
     if (dealCls) styleBits.push(`--di:${state.dealInUids.indexOf(card.uid)}`);
     if (discarding) styleBits.push(`--dd:${dd}`);
     const styleAttr = styleBits.length ? ` style="${styleBits.join(';')}"` : '';
-    const auraCls = opts.selectable && opts.auraUids && opts.auraUids.has(card.uid) ? ' coach-aura' : '';
+    const auraCls = auraCardCls(opts, card.uid);
     const click = opts.selectable && !discarding ? ` onclick="toggleSelect(${card.uid})"` : '';
     return `<div class="card facedown${selCls}${dealCls}${discCls}${auraCls}${opts.selectable && !discarding ? '' : ' static'}" data-uid="${card.uid}"${styleAttr}${click}><div class="back-q">?</div></div>`;
   }
@@ -3477,7 +3563,7 @@ function cardHTML(card, opts = {}) {
   const selCls = opts.selectable && state.selected.includes(card.uid) && !discarding ? ' sel' : '';
   const dealCls = state.dealInUids && state.dealInUids.includes(card.uid) ? ' deal-in' : '';
   const discCls = discarding ? ' discarding' : '';
-  const auraCls = opts.selectable && opts.auraUids && opts.auraUids.has(card.uid) ? ' coach-aura' : '';
+  const auraCls = auraCardCls(opts, card.uid);
   const styleBits = [];
   if (dealCls) styleBits.push(`--di:${state.dealInUids.indexOf(card.uid)}`);
   if (discarding) styleBits.push(`--dd:${dd}`);
@@ -3730,10 +3816,12 @@ function renderTable() {
     pa.innerHTML = `<div class="hint">카드를 고르고 <b>내기</b>를 누르세요</div>`;
   }
 
-  const aura = getJanAuraBest();
-  const junkUids = state.coachStep === 'junk' ? new Set(getJanJunkSuggest()) : null;
+  const isJunkAura = state.coachStep === 'junk';
+  const junkUids = isJunkAura ? new Set(getJanJunkSuggest()) : null;
+  const aura = isJunkAura ? null : getJanAuraBest();
   const auraUids = junkUids || (aura ? new Set(aura.uids) : null);
-  $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true, auraUids })).join('');
+  const auraKind = isJunkAura ? 'junk' : 'play';
+  $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true, auraUids, auraKind })).join('');
 
   // 1월 오라 잔여 안내 (코치 중이 아닐 때 살짝)
   let auraHint = $('jan-aura-hint');
@@ -3744,14 +3832,17 @@ function renderTable() {
   }
   if (state.coachStep === 'junk') {
     auraHint.hidden = false;
-    auraHint.textContent = '🗑️ 빛나는 피(약한 패)를 눌러 고르고 버리세요 (한 번에 최대 5장)';
+    auraHint.classList.add('junk');
+    auraHint.textContent = '🗑️ 빨간 빛 — 버릴 약한 패 (눌러 고르고 버리기, 최대 5장)';
   } else if (state.round === 1 && state.screen === 'play' && state.janAuraLeft > 0 && aura) {
     auraHint.hidden = false;
+    auraHint.classList.remove('junk');
     auraHint.textContent = aura.handId === 'none'
       ? `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 칩 최고 패가 골라져요`
       : `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 ${aura.name}이 한 번에 골라져요`;
   } else {
     auraHint.hidden = true;
+    auraHint.classList.remove('junk');
     auraHint.textContent = '';
   }
 
@@ -3759,7 +3850,7 @@ function renderTable() {
   const canAct = state.screen === 'play' && !state.juicing && !state.dealing;
   const shortAct = window.matchMedia('(max-width: 720px)').matches;
   $('btn-play').textContent = shortAct ? `내기 (${state.playsLeft})` : `내기 (${state.playsLeft}회 남음)`;
-  $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0;
+  $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0 || state.coachStep === 'junk';
   $('btn-discard').textContent = shortAct ? `버리기 (${state.discardsLeft})` : `버리기 (${state.discardsLeft}회 남음)`;
   $('btn-discard').disabled = !canAct || n < 1 || n > 5 || state.discardsLeft <= 0;
   if (CHUNHYANG_ENABLED) {
@@ -3835,7 +3926,7 @@ function renderCoach() {
       title: '🗑️ 버리기',
       body: junkHasSel
         ? `<b>버리기</b>를 눌러 패를 갈아끼우세요 (한 번에 최대 5장). 버린 만큼 덱에서 보충됩니다.`
-        : `조합이 약할 땐 <b>피</b>처럼 약한 패를 버리세요. 빛나는 패를 누르면 추천분이 한 번에 골라져요 (최대 5장).`,
+        : `조합이 약할 땐 <b>피</b>처럼 약한 패를 버리세요. <b style="color:#fca5a5">빨간 빛</b> 패를 누르면 추천분이 한 번에 골라져요 (최대 5장).`,
       next: null,
     },
     scored: {
@@ -4082,7 +4173,7 @@ function shopHTML() {
     ? state.jokers.map((j, i) => {
         const def = JOKER_BY_ID[j.id];
         const extra = def.id === 'mitjang' ? ` (누적 +${state.mitjangChips}점)` : '';
-        return `<div class="owned-card">
+        return `<div class="offer owned">
           <div class="o-icon">${def.icon}</div>
           <div class="o-name">${esc(def.name)}</div>
           <div class="o-meta">
@@ -4090,7 +4181,7 @@ function shopHTML() {
             <span class="o-kind">${esc(def.kind || '')}</span>
           </div>
           <div class="o-desc">${esc(def.desc)}${esc(extra)}</div>
-          <button class="owned-sell" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button>
+          <button class="o-sell" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button>
         </div>`;
       }).join('')
     : '<div class="owned-empty">아직 보유한 특수패가 없습니다</div>';
@@ -4137,7 +4228,7 @@ function shopHTML() {
     </div>
     <section class="shop-sec" id="shop-owned">
       <div class="shop-sec-h">내 특수패 <span>${state.jokers.length}/5</span></div>
-      <div class="owned-row">${owned}</div>
+      <div class="shop-offers shop-owned">${owned}</div>
     </section>
     <section class="shop-sec" id="shop-offers">
       <div class="shop-sec-h">
