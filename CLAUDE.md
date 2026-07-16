@@ -17,7 +17,7 @@
 ## 구현 원칙 (기존 버그 예방 체크리스트)
 
 - 카드 선택 상태는 배열 인덱스가 아닌 **uid**로 저장 (보충 시 인덱스 밀림).
-- 고 목표는 항상 `goTarget(baseTarget, goLevel, roundScore)` = max(ceil(base×goMult), score + ceil(base×0.25)) — 현재 target에 거듭 곱하지 말 것. 항상 현재 점수보다 커야 함 (연쇄 고 금지).
+- 고는 밀치기: 선언 시 `goLevel = goLevelReached(base, score, goLevel) + 1`, 목표 = `goThreshold(base, goLevel)` — 이미 넘은 문턱은 전부 소급, 선언 목표는 정의상 항상 현재 점수보다 큼 (공짜 연쇄 고 불가). 내기 +1은 밀친 단계 수와 무관하게 선언 1회당 1개.
 - `Math.floor`는 최종 점수에서 1회만 (흔들기 ×1.5로 배수가 소수가 됨).
 - 프리뷰는 `computeScore` 드라이런 — 경제 트리거(광팔이 지급, 통계)는 `playSelected()`에서만.
 - 연쇄 고는 `checkAfterPlay()` 재진입으로 처리 (재귀·모달 중첩 금지).

@@ -635,7 +635,7 @@
     pointer-events: none;
   }
   #hand-banner {
-    position: fixed; left: 50%; top: 120px; transform: translate(-50%, -50%) scale(.3);
+    position: fixed; left: 50%; top: 28vh; transform: translate(-50%, -50%) scale(.3);
     z-index: 60; font-size: clamp(26px, 5.5vw, 48px); font-weight: 900;
     letter-spacing: 2px; opacity: 0; pointer-events: none; white-space: nowrap;
     text-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 40px rgba(0,0,0,.5);
@@ -659,6 +659,454 @@
   #hand-banner.tier-B { color: #fdba74; text-shadow: 0 0 20px rgba(251,146,60,.45), 0 3px 0 #9a3412; }
   #hand-banner.tier-C { color: #93c5fd; text-shadow: 0 0 16px rgba(96,165,250,.4), 0 3px 0 #1e3a8a; }
   #hand-banner.tier-D { color: #cbd5e1; text-shadow: 0 2px 0 #334155; }
+
+  /* ── 밀치기 고 하이퍼버닝 연출 ─────────── */
+  #go-cascade {
+    position: fixed; inset: 0; z-index: 72; display: none;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, rgba(120,40,10,.45), transparent 62%);
+  }
+  #go-cascade.on { display: flex; }
+  #go-cascade .go-stage {
+    position: relative; width: min(92vw, 420px); height: 160px;
+  }
+  #go-cascade .go-num {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 900; font-variant-numeric: tabular-nums;
+    color: #fff7ed; letter-spacing: -0.04em; white-space: nowrap;
+    text-shadow:
+      0 0 24px rgba(251,191,36,.85),
+      0 0 48px rgba(239,68,68,.55),
+      0 6px 0 #7c2d12,
+      0 10px 24px rgba(0,0,0,.55);
+    will-change: transform, opacity, filter;
+  }
+  #go-cascade .go-num.slam { animation: goSlamIn .42s cubic-bezier(.15,1.55,.35,1) forwards; }
+  #go-cascade .go-num.push-out { animation: goPushOut .32s ease-in forwards; }
+  #go-cascade .go-shard {
+    position: absolute; left: 50%; top: 50%;
+    font-weight: 900; color: #fde68a; pointer-events: none;
+    text-shadow: 0 0 12px rgba(251,191,36,.8);
+    animation: goShardFly .55s cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  @keyframes goSlamIn {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(2.6) rotate(8deg); filter: blur(8px) brightness(2); }
+    55% { opacity: 1; transform: translate(-50%, -50%) scale(.9) rotate(-2deg); filter: blur(0) brightness(1.3); }
+    78% { transform: translate(-50%, -50%) scale(1.14) rotate(1deg); filter: brightness(1.1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); filter: brightness(1); }
+  }
+  @keyframes goPushOut {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); filter: brightness(1.4); }
+    100% { opacity: 0; transform: translate(-130%, -60%) scale(.35) rotate(-18deg); filter: brightness(2.2) blur(1px); }
+  }
+  @keyframes goShardFly {
+    0% { opacity: 1; transform: translate(-50%, -50%) rotate(0) scale(1); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) rotate(var(--rot)) scale(.25); }
+  }
+  /* 고 버튼 안 숫자 — 공통 + 프리뷰 연출들 (전체 ease-out) */
+  .choicebtn.btn-go.gs-simple { overflow: visible; position: relative; }
+  .choicebtn.btn-go.go-btn-juice {
+    animation: goBtnJuicePulse .34s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes goBtnJuicePulse {
+    0% { filter: brightness(1.35); transform: scale(1.03); }
+    100% { filter: brightness(1); transform: scale(1); }
+  }
+  .choicebtn.btn-go .go-btn-stage {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1.7em;
+    margin: 0 auto;
+    overflow: visible;
+    text-align: center;
+  }
+  .choicebtn.btn-go .go-btn-stage .go-num {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    font-weight: 900; font-size: 1.65em; letter-spacing: -0.03em;
+    color: #fffef5; white-space: nowrap; line-height: 1;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(127,29,29,.65), 0 0 12px rgba(254,240,138,.5);
+    will-change: transform, opacity, filter;
+    pointer-events: none;
+  }
+  .choicebtn.btn-go .go-impact {
+    position: absolute; left: 50%; top: 50%;
+    width: 18px; height: 18px; margin: -9px 0 0 -9px;
+    border: 2px solid rgba(254,240,138,.85);
+    border-radius: 50%; pointer-events: none; z-index: 2;
+    animation: goImpactRing .42s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goImpactRing {
+    0% { transform: scale(.4); opacity: .95; }
+    100% { transform: scale(4.2); opacity: 0; }
+  }
+  .choicebtn.btn-go .go-spark {
+    position: absolute; left: 50%; top: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #fef08a; pointer-events: none; z-index: 3;
+    box-shadow: 0 0 6px #fbbf24;
+    animation: goSparkFly .48s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goSparkFly {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0); opacity: 0; }
+  }
+
+  /* A 룰렛+ */
+  .choicebtn.btn-go .go-roulette {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.02em; position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    font-weight: 900; font-size: 1.65em; letter-spacing: -0.04em;
+    color: #fffef5; line-height: 1;
+    text-shadow: 0 1px 0 rgba(127,29,29,.65), 0 0 12px rgba(254,240,138,.5);
+    pointer-events: none;
+  }
+  .choicebtn.btn-go .go-roulette.spinning .gr-slot {
+    filter: blur(1.2px) brightness(1.3);
+  }
+  .choicebtn.btn-go .go-roulette.settle {
+    animation: goRouletteSettle .4s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes goRouletteSettle {
+    0% { transform: translate(-50%, -50%) scale(1.14); filter: brightness(1.45); }
+    100% { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+  }
+  .choicebtn.btn-go .go-roulette .gr-slot {
+    display: inline-block; height: 1.1em; width: 0.78em;
+    overflow: hidden; position: relative; vertical-align: middle;
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+  }
+  .choicebtn.btn-go .go-roulette .gr-strip {
+    display: flex; flex-direction: column; align-items: center;
+    will-change: transform;
+  }
+  .choicebtn.btn-go .go-roulette .gr-strip span {
+    height: 1.1em; line-height: 1.1em; font-variant-numeric: tabular-nums;
+  }
+
+  /* B 펀치+ */
+  .choicebtn.btn-go .go-num.punch {
+    animation: goBtnPunch .32s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.punch-final {
+    animation: goBtnPunchFinal .45s cubic-bezier(.16,1,.3,1) forwards;
+    color: #fef08a;
+  }
+  @keyframes goBtnPunch {
+    0% { transform: translate(-50%, -50%) scale(.4); opacity: .25; filter: brightness(2); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: brightness(1); }
+  }
+  @keyframes goBtnPunchFinal {
+    0% { transform: translate(-50%, -50%) scale(.25); opacity: 0; filter: brightness(2.2); }
+    100% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; filter: brightness(1.12); }
+  }
+
+  /* C 옆 밀치기+ — 빌드업은 부드러운 플로우, 최종만 임팩트 */
+  .choicebtn.btn-go .go-num.slide-in {
+    animation: goBtnSlideIn .48s cubic-bezier(.65,0,.35,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-flow-in {
+    animation: goBtnSlideFlowIn .36s cubic-bezier(.4,.02,.2,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-flow-in-sticky {
+    animation: goBtnSlideFlowInSticky .58s cubic-bezier(.34,.08,.18,1.12) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-out {
+    animation: goBtnSlideOut .39s cubic-bezier(.65,0,.35,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-flow-out {
+    animation: goBtnSlideFlowOut .36s cubic-bezier(.4,.02,.2,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-flow-out-sticky {
+    animation: goBtnSlideFlowOutSticky .58s cubic-bezier(.34,.08,.18,1.05) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-out-blast {
+    animation: goBtnSlideOutBlast .45s cubic-bezier(.65,0,.35,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slide-in-epic {
+    animation: goBtnSlideInEpic .72s cubic-bezier(.65,0,.35,1) forwards;
+    color: #fef08a;
+  }
+  .choicebtn.btn-go .go-num.slide-fake {
+    animation: goBtnSlideFake .55s cubic-bezier(.65,0,.35,1) forwards;
+    color: #fef08a;
+  }
+  .choicebtn.btn-go .go-num.slide-doubt {
+    animation: goBtnSlideDoubt .5s cubic-bezier(.65,0,.35,1) forwards;
+  }
+  @keyframes goBtnSlideIn {
+    0% { opacity: 0; transform: translate(55%, -50%) scale(1.04); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes goBtnSlideOut {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-145%, -50%) scale(.92); }
+  }
+  /* 빌드업: 짧게 겹치며 흐르듯 (스큐·블러·회전 없음) */
+  @keyframes goBtnSlideFlowIn {
+    0% { opacity: 0; transform: translate(28%, -50%); }
+    100% { opacity: 1; transform: translate(-50%, -50%); }
+  }
+  @keyframes goBtnSlideFlowOut {
+    0% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-128%, -50%); }
+  }
+  @keyframes goBtnSlideFlowInSticky {
+    0% { opacity: 0; transform: translate(42%, -50%) scale(1.04); }
+    70% { opacity: 1; transform: translate(-52%, -50%) scale(1.06); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes goBtnSlideFlowOutSticky {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-118%, -50%) scale(.94); }
+  }
+  @keyframes goBtnSlideOutBlast {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); filter: brightness(1.4); }
+    35% { opacity: 1; transform: translate(-35%, -50%) scale(1.12) skewX(4deg); }
+    100% { opacity: 0; transform: translate(-210%, -50%) scale(.55) rotate(-14deg); filter: blur(2px) brightness(2); }
+  }
+  @keyframes goBtnSlideInEpic {
+    0% {
+      opacity: 0;
+      transform: translate(100%, -50%) scale(1.35);
+      filter: blur(2px) brightness(2);
+    }
+    60% {
+      opacity: 1;
+      transform: translate(-52%, -50%) scale(1.12);
+      filter: blur(0) brightness(1.35);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.06);
+      filter: brightness(1.12);
+    }
+  }
+  @keyframes goBtnSlideFake {
+    0% { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+    40% { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.35); }
+    100% { transform: translate(-50%, -50%) scale(1.04); filter: brightness(1.1); }
+  }
+  @keyframes goBtnSlideDoubt {
+    0%,100% { transform: translate(-50%, -50%) scale(1.04); }
+    25% { transform: translate(-54%, -50%) scale(1.02) rotate(-2deg); filter: brightness(.85); }
+    50% { transform: translate(-46%, -50%) scale(1.08) rotate(2deg); filter: brightness(1.3); }
+    75% { transform: translate(-52%, -50%) scale(.98) rotate(-1deg); }
+  }
+
+  /* D 하이퍼번 */
+  .choicebtn.btn-go .go-num.hyper {
+    animation: goBtnHyper .18s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.hyper-final {
+    animation: goBtnHyperFinal .48s cubic-bezier(.16,1,.3,1) forwards;
+    color: #fef08a;
+  }
+  @keyframes goBtnHyper {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(1.65); filter: brightness(2) contrast(1.3); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: brightness(1.15); }
+  }
+  @keyframes goBtnHyperFinal {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(2.1); filter: brightness(2.6); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); filter: brightness(1.15); }
+  }
+
+  /* E 임팩트 슬램 */
+  .choicebtn.btn-go .go-num.slam-drop {
+    animation: goBtnSlamDrop .38s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.slam-crush {
+    animation: goBtnSlamCrush .22s cubic-bezier(.4,0,.7,.2) forwards;
+  }
+  @keyframes goBtnSlamDrop {
+    0% { opacity: 0; transform: translate(-50%, -160%) scale(1.45); filter: blur(2px); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+  }
+  @keyframes goBtnSlamCrush {
+    0% { transform: translate(-50%, -50%) scale(1,1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.25,.3); opacity: 0; filter: blur(1.5px); }
+  }
+
+  /* F 파편 재조립 — letter-spacing 애니 금지(중앙 틀어짐), scale만 */
+  .choicebtn.btn-go .go-num.assemble {
+    animation: goBtnAssemble .4s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goBtnAssemble {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.85);
+      filter: blur(5px) brightness(1.8);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      filter: blur(0) brightness(1);
+    }
+  }
+  .choicebtn.btn-go .go-mini-shard {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    font-weight: 900; font-size: 1.05em; color: #fde68a;
+    letter-spacing: -0.03em; white-space: nowrap; line-height: 1;
+    text-align: center;
+    text-shadow: 0 0 8px rgba(251,191,36,.8);
+    pointer-events: none;
+    animation: goMiniShard .42s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goMiniShard {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(.35) rotate(var(--rot)); }
+  }
+
+  /* G 열기 상승 */
+  .choicebtn.btn-go .go-num.heat {
+    animation: goBtnHeatIn .32s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goBtnHeatIn {
+    0% { opacity: .35; transform: translate(-50%, 35%) scale(.92); filter: hue-rotate(-16deg) brightness(.85); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: hue-rotate(0) brightness(1.12); }
+  }
+  .choicebtn.btn-go .go-heat-flame {
+    position: absolute; left: 50%; bottom: -4px;
+    font-size: 14px; pointer-events: none; opacity: 0;
+    animation: goHeatFlame .55s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes goHeatFlame {
+    0% { opacity: 0; transform: translate(-50%, 8px) scale(.6); }
+    35% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--fx)), -28px) scale(1.15); }
+  }
+
+  /* H 글리치 락 */
+  .choicebtn.btn-go .go-num.glitch {
+    animation: goBtnGlitch .12s steps(2) infinite;
+  }
+  .choicebtn.btn-go .go-num.glitch-lock {
+    animation: goBtnGlitchLock .42s cubic-bezier(.16,1,.3,1) forwards;
+    color: #fef08a;
+  }
+  @keyframes goBtnGlitch {
+    0% { transform: translate(-52%, -48%); text-shadow: 2px 0 #f43f5e, -2px 0 #38bdf8; }
+    50% { transform: translate(-48%, -52%); text-shadow: -2px 0 #f43f5e, 2px 0 #38bdf8; }
+    100% { transform: translate(-50%, -50%); text-shadow: 0 0 12px rgba(254,240,138,.5); }
+  }
+  @keyframes goBtnGlitchLock {
+    0% { transform: translate(-50%, -50%) scale(1.22); filter: contrast(1.5) brightness(1.35); }
+    100% { transform: translate(-50%, -50%) scale(1.04); filter: contrast(1) brightness(1.08); }
+  }
+
+  /* stack (본게임 임시) */
+  .choicebtn.btn-go .go-num.stack-in {
+    animation: goBtnStackIn .34s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .choicebtn.btn-go .go-num.stack-out {
+    animation: goBtnStackOut .26s cubic-bezier(.4,0,.7,.2) forwards;
+  }
+  @keyframes goBtnStackIn {
+    0% { opacity: 0; transform: translate(-50%, -90%) scale(.96); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes goBtnStackOut {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, 85%) scale(.82); }
+  }
+
+  /* ── 고 연출 프리뷰 (?goPreview=1) ── */
+  #go-anim-preview {
+    display: none; position: fixed; inset: 0; z-index: 90;
+    background: radial-gradient(ellipse at 50% 10%, #1f4630, #0a1610 65%);
+    padding: 22px 14px 40px; overflow-y: auto;
+    align-items: flex-start; justify-content: center;
+  }
+  #go-anim-preview.on { display: flex; }
+  #go-anim-preview .gap-inner { width: min(1100px, 100%); margin: 0 auto; }
+  #go-anim-preview h1 {
+    margin: 0 0 6px; color: #fde68a; font-size: 22px; font-weight: 900;
+  }
+  #go-anim-preview .gap-sub {
+    color: #94a3b8; font-size: 13px; margin-bottom: 14px; line-height: 1.5;
+  }
+  #go-anim-preview .gap-sub code {
+    background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 4px; color: #cbd5e1;
+  }
+  #go-anim-preview .gap-section-title {
+    margin: 18px 0 10px; color: #fde68a; font-size: 15px; font-weight: 900;
+  }
+  #go-anim-preview .gap-section-title:first-of-type { margin-top: 4px; }
+  #go-anim-preview .gap-toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  #go-anim-preview .gap-toolbar button {
+    background: rgba(255,255,255,.1); color: #f1f5f9;
+    border: 1px solid rgba(255,255,255,.18); border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; font-weight: 800; cursor: pointer;
+  }
+  #go-anim-preview .gap-toolbar button:hover { background: rgba(255,255,255,.18); }
+  #go-anim-preview .gap-live-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 900px) {
+    #go-anim-preview .gap-live-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  #go-anim-preview .gap-live-card {
+    background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; padding: 12px 10px 12px;
+  }
+  #go-anim-preview .gap-live-card h3 {
+    margin: 0 0 2px; color: #fef3c7; font-size: 13px; font-weight: 900;
+  }
+  #go-anim-preview .gap-live-card .gap-tag {
+    display: inline-block; margin-bottom: 8px;
+    font-size: 10px; font-weight: 800; color: #94a3b8;
+  }
+  #go-anim-preview .gap-live-card .gap-tag.d { color: #fca5a5; }
+  #go-anim-preview .gap-live-card .gap-tag.c { color: #93c5fd; }
+  #go-anim-preview .gap-live-card .choicebtn {
+    width: 100%; min-width: 0; cursor: pointer; min-height: 64px;
+  }
+  #go-anim-preview .gap-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  @media (max-width: 980px) {
+    #go-anim-preview .gap-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) {
+    #go-anim-preview .gap-grid { grid-template-columns: 1fr; }
+  }
+  #go-anim-preview .gap-card {
+    background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px; padding: 14px 12px 14px;
+  }
+  #go-anim-preview .gap-card h3 {
+    margin: 0 0 4px; color: #fef3c7; font-size: 14px; font-weight: 900;
+  }
+  #go-anim-preview .gap-card p {
+    margin: 0 0 12px; color: #94a3b8; font-size: 11.5px; line-height: 1.4; min-height: 2.6em;
+  }
+  #go-anim-preview .gap-card .choicebtn {
+    width: 100%; min-width: 0; cursor: pointer; min-height: 72px;
+  }
+  #go-anim-preview .gap-replay {
+    margin-top: 8px; width: 100%;
+    background: rgba(255,255,255,.08); color: #e2e8f0;
+    border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+    padding: 7px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  #go-anim-preview .gap-replay:hover { background: rgba(255,255,255,.14); }
+  #go-anim-preview .gap-close {
+    margin-top: 18px; display: inline-block;
+    color: #86efac; font-size: 13px; font-weight: 700;
+  }
   #gauge.overflow { box-shadow: 0 0 0 2px #fde68a, 0 0 18px rgba(250,204,21,.75); }
   #gauge-fill.overflow {
     background: linear-gradient(90deg, #fbbf24, #f472b6, #a3e635) !important;
@@ -950,6 +1398,15 @@
     #juice-tally .jt-score { font-size: 24px; }
     #juice-cards { gap: 6px; min-height: 100px; align-items: flex-end; }
     #juice-skip-hint { font-size: 12px; bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+    #hand-banner {
+      top: 26vh; font-size: clamp(28px, 8vw, 44px); max-width: 92vw;
+      white-space: normal; text-align: center; line-height: 1.15;
+    }
+    #go-cascade .go-stage { height: 140px; }
+    #go-cascade .go-num { font-size: clamp(56px, 16vw, 96px) !important; }
+    .choicebtn.btn-go .go-btn-stage { height: 1.85em; }
+    .choicebtn.btn-go .go-btn-stage .go-num,
+    .choicebtn.btn-go .go-roulette { font-size: 1.85em; }
   }
 
   @media (max-width: 720px) and (max-height: 700px) {
@@ -1044,6 +1501,30 @@
   <div id="hand-banner"></div>
   <div id="juice-skip-hint">클릭하면 연출 스킵</div>
 </div>
+<div id="go-cascade" aria-hidden="true"><div class="go-stage" id="go-cascade-stage"></div></div>
+
+<div id="go-anim-preview" aria-hidden="true">
+  <div class="gap-inner">
+    <h1>고 버튼 연출 프리뷰</h1>
+    <div class="gap-sub">
+      <code>?goPreview=1</code> · 본게임 룰: <b style="color:#e2e8f0">1고 = 기본</b> /
+      <b style="color:#fca5a5">2~3고 = D</b> /
+      <b style="color:#93c5fd">4고+ = C</b> (0 → N 밀치기)<br>
+      아래는 스타일별 비교용(0→6). 확정 후 풀스크린 두두둥은 별도.
+    </div>
+    <div class="gap-section-title">본게임 · 1고 ~ 10고</div>
+    <div class="gap-toolbar">
+      <button type="button" onclick="previewGoLevelAll()">▶ 1→10 순차 재생</button>
+    </div>
+    <div class="gap-live-grid" id="gap-live-grid"></div>
+    <div class="gap-section-title">스타일 비교 (A~H)</div>
+    <div class="gap-toolbar">
+      <button type="button" onclick="previewGoAnimAll()">▶ 스타일 전부 재생</button>
+    </div>
+    <div class="gap-grid" id="gap-grid"></div>
+    <a class="gap-close" href="./index.html">← 게임으로 돌아가기</a>
+  </div>
+</div>
 
 <script>
 /* ================================================================
@@ -1137,9 +1618,15 @@ const MILD_BOSSES = ['pibak', 'gwangbak', 'meongbak'];
 // 고 무제한: n고 = 목표 ×(1+0.5n), 성공 보너스 n(n+3)냥 (4, 10, 18, 28, 40…)
 const goMult = (n) => 1 + 0.5 * n;
 const goBonus = (n) => n * (n + 3);
-// n고 목표: 기본 공식과 "현재 점수 + 기본 목표의 25%" 중 큰 쪽.
-// 항상 현재 점수보다 크므로 고 선언 즉시 다음 단계가 충족되는 연쇄 고는 발생 불가.
-const goTarget = (base, n, score) => Math.max(Math.ceil(base * goMult(n)), score + Math.ceil(base * 0.25));
+// n고 문턱 점수. 고 선언 시 이미 넘어 있는 문턱은 전부 소급 인정("밀치기 고") —
+// 선언 단계는 항상 "아직 못 넘은 첫 문턱"이라 목표 > 현재 점수가 보장되고, 즉시 재충족 연쇄는 불가.
+const goThreshold = (base, n) => Math.ceil(base * goMult(n));
+// 현재 점수가 이미 넘은 최대 고 단계 (cur 미만으로는 내려가지 않음)
+const goLevelReached = (base, score, cur = 0) => {
+  let k = cur;
+  while (score >= goThreshold(base, k + 1)) k++;
+  return k;
+};
 
 // ── 족보 판정 (고정 우선순위, 첫 매치) ─────────────────────
 // core = 족보를 구성한 카드들 — 이 카드들의 칩만 배수를 타고, 나머지는 배수 없이 가산.
@@ -1754,12 +2241,15 @@ function checkAfterPlay() {
 
 async function chooseGo() {
   if (state.screen !== 'gostop' || state.dealing) return;
-  state.goLevel++;
-  state.target = goTarget(state.baseTarget, state.goLevel, state.roundScore);
-  state.playsLeft++; // 고 보상: 내기 +1 (버리기는 추가하지 않음)
+  const fromLevel = state.goLevel;
+  // 밀치기 고: 이미 넘어 있는 문턱 전부 소급 인정, 선언 단계 = 아직 못 넘은 첫 문턱
+  state.goLevel = goLevelReached(state.baseTarget, state.roundScore, state.goLevel) + 1;
+  state.target = goThreshold(state.baseTarget, state.goLevel);
+  state.playsLeft++; // 고 보상: 내기 +1 (밀친 단계 수와 무관하게 선언 1회당 1개)
   state.pendingGoStop = false;
   state.screen = 'play';
   render(); // 모달 닫고 모자란 손패 노출
+  await playGoCascade(fromLevel, state.goLevel);
   await dealToHand();
   checkAfterPlay();
   render();
@@ -1944,6 +2434,10 @@ function restart() {
 
 function boot() {
   resetRun();
+  if (new URLSearchParams(location.search).get('goPreview') === '1') {
+    openGoAnimPreview();
+    return;
+  }
   state.screen = hasSeenHowto() ? 'prep' : 'welcome';
   render();
 }
@@ -2411,13 +2905,35 @@ function renderModal() {
   const fn = screens[state.screen];
   if (!fn) {
     m.classList.remove('gostop-modal');
+    m.dataset.modalSig = '';
     ov.classList.remove('show', 'gostop-open');
     return;
   }
-  m.innerHTML = fn();
+
   const isGoStop = state.screen === 'gostop';
-  m.classList.toggle('gostop-modal', isGoStop);
-  ov.classList.toggle('gostop-open', isGoStop);
+  // 고/스톱은 render가 연달아 두 번 와도 DOM을 다시 안 그림 → 버튼 연출 중복 방지
+  if (isGoStop) {
+    const n = goLevelReached(state.baseTarget, state.roundScore, state.goLevel) + 1;
+    const sig = `gostop:${state.goLevel}:${n}:${state.roundScore}:${state.playsLeft}:${cardsRemaining()}`;
+    m.classList.add('gostop-modal');
+    ov.classList.add('show', 'gostop-open');
+    if (m.dataset.modalSig === sig) return;
+    m.dataset.modalSig = sig;
+    m.innerHTML = gostopHTML();
+    const stage = $('go-btn-stage');
+    if (stage) {
+      const from = +stage.dataset.from || 0;
+      const to = +stage.dataset.to || 0;
+      // 첫 숫자 즉시 심어 빈 버튼 깜빡임 방지 후 쌓기 연출
+      playGoBtnCascade(from, to);
+    }
+    return;
+  }
+
+  m.dataset.modalSig = state.screen;
+  m.classList.remove('gostop-modal');
+  ov.classList.remove('gostop-open');
+  m.innerHTML = fn();
   ov.classList.add('show');
 }
 
@@ -2446,6 +2962,7 @@ function welcomeHTML() {
         <div class="hc-title"><span class="ico">🔥</span>고 / 스톱</div>
         <div class="hc-body">
           목표를 넘기면 <b>스톱</b>(정산) 또는 <b>고</b>(목표↑ · 내기 +1 · 보너스).
+          한 방이 크면 이미 넘은 고 문턱을 <b>한 번에 밀치며</b> 여러 단계 점프!
           고는 무제한이지만, 실패하면 <b>고박 = 런 종료</b>.
           <b>3·6·9·12월</b>은 박 라운드(디버프)가 붙습니다.
         </div>
@@ -2487,15 +3004,20 @@ function prepHTML() {
 }
 
 function gostopHTML() {
-  const n = state.goLevel + 1; // 다음 고 단계 (무제한)
-  const newTarget = goTarget(state.baseTarget, n, state.roundScore);
-  const floored = newTarget > Math.ceil(state.baseTarget * goMult(n));
+  // 밀치기 고: 이미 넘은 문턱은 소급 인정 → 선언 단계 = 아직 못 넘은 첫 문턱
+  const n = goLevelReached(state.baseTarget, state.roundScore, state.goLevel) + 1;
+  const jump = n - state.goLevel; // 1이면 일반 고, 2 이상이면 밀치기
+  const newTarget = goThreshold(state.baseTarget, n);
   const stopTip = state.goLevel > 0
     ? `지금 정산하고 다음 판으로<br>(${state.goLevel}고 보너스 <b>+${goBonus(state.goLevel)}냥</b> 확보)`
     : '지금 정산하고 안전하게 다음 판으로';
-  const goTip = `새 목표 <b>${fmt(newTarget)}점</b>${floored ? ' (상향)' : ` (×${goMult(n)})`}<br>`
+  const goTip = (jump > 1 ? `한 방으로 <b style="color:#fde68a">${jump}단계 밀치기</b><br>` : '')
+    + `새 목표 <b>${fmt(newTarget)}점</b> (×${goMult(n)})<br>`
     + `내기 <b>+1</b> · 손패 보충 · 성공 시 <b>+${goBonus(n)}냥</b><br>`
     + `실패 시 <b>고박 = 런 종료</b>`;
+  const goTitle = n <= 1
+    ? `<div class="t">1고</div>`
+    : `<div class="t go-btn-stage" id="go-btn-stage" data-from="${state.goLevel}" data-to="${n}"></div>`;
   return `
     <h2>🎉 목표 달성!</h2>
     <div class="sub">${fmt(state.roundScore)} / ${fmt(state.target)}점 · 내기 ${state.playsLeft} · 패 ${cardsRemaining()}</div>
@@ -2505,7 +3027,7 @@ function gostopHTML() {
         <div class="gs-tip">${stopTip}</div>
       </button>
       <button class="choicebtn btn-go gs-simple" onclick="chooseGo()">
-        <div class="t">🔥 ${n}고</div>
+        ${goTitle}
         <div class="gs-tip">${goTip}</div>
       </button>
     </div>`;
@@ -2661,7 +3183,8 @@ function helpHTML() {
         <div class="hc-title"><span class="ico">🎯</span>한 판 · 고/스톱</div>
         <div class="hc-body">
           내기 <b>4회</b> · 버리기 <b>4회</b> · 손패 <b>8장</b>. 목표를 넘기면 <b>고</b> 또는 <b>스톱</b>.
-          고는 무제한 — 목표 ×(1+0.5n)과 현재 점수+25% 중 큰 쪽, 내기 +1 · 손패 보충, 보너스 n(n+3)냥.
+          고는 무제한 — n고 문턱 = 목표 ×(1+0.5n), 내기 +1 · 손패 보충, 보너스 n(n+3)냥.
+          점수가 이미 넘은 문턱은 고 선언 시 <b>전부 소급 인정(밀치기)</b> — 큰 한 방이면 여러 단계를 한 번에 점프.
           실패하면 <b>고박 = 런 종료</b>.
         </div>
       </div>
@@ -2781,6 +3304,652 @@ function sfxDiscard() {
 function sfxPlayLift() {
   beep(380, 0.07, 'triangle', 0.03);
   setTimeout(() => beep(520, 0.09, 'sine', 0.035), 60);
+}
+function sfxGoStep(step, final) {
+  const f = 392 * Math.pow(1.122, step); // 밀칠 때마다 반음씩 상승
+  beep(f, 0.12, 'sawtooth', 0.045);
+  setTimeout(() => beep(f * 1.5, final ? 0.22 : 0.12, 'triangle', 0.05), 60);
+  if (final) setTimeout(() => beep(f * 2, 0.3, 'triangle', 0.045), 150);
+}
+
+function handBannerAnchor() {
+  const mobile = window.matchMedia('(max-width: 720px)').matches;
+  if (mobile) {
+    const hand = $('handarea');
+    const hr = hand && hand.getBoundingClientRect();
+    const cy = (hr && hr.top > 70) ? Math.max(72, hr.top - 36) : window.innerHeight * 0.26;
+    return { cx: window.innerWidth / 2, cy };
+  }
+  const pa = $('playedarea');
+  const visible = pa && getComputedStyle(pa).display !== 'none' && pa.getBoundingClientRect().height > 8;
+  const r = (visible ? pa : ($('table') || document.body)).getBoundingClientRect();
+  return { cx: r.left + r.width / 2, cy: r.top + Math.min(48, Math.max(28, r.height * 0.28)) };
+}
+
+function spawnGoShards(stage, text, fontSize) {
+  const count = Math.min(10, Math.max(4, [...text].length * 2));
+  for (let i = 0; i < count; i++) {
+    const shard = document.createElement('span');
+    shard.className = 'go-shard';
+    shard.textContent = text[i % text.length] || '!';
+    const ang = (-70 + Math.random() * 140) * Math.PI / 180;
+    const dist = 70 + Math.random() * 140;
+    shard.style.fontSize = Math.max(14, (fontSize || 48) * (0.35 + Math.random() * 0.45)) + 'px';
+    shard.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
+    shard.style.setProperty('--sy', Math.sin(ang) * dist - 30 + 'px');
+    shard.style.setProperty('--rot', (-200 + Math.random() * 400) + 'deg');
+    shard.style.animationDelay = (i * 18) + 'ms';
+    stage.appendChild(shard);
+    setTimeout(() => shard.remove(), 620);
+  }
+}
+
+// 하이퍼버닝식: 풀스크린=깨지며 밀치기 / 버튼=위에서 쌓이며 교체
+async function runGoShatterCascade(fromLevel, toLevel, opts = {}) {
+  const fullscreen = !!opts.fullscreen;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (toLevel <= fromLevel) return;
+  if (reduce) {
+    if (opts.stageEl && !fullscreen) {
+      opts.stageEl.innerHTML = '';
+      const num = document.createElement('div');
+      num.className = 'go-num';
+      num.textContent = `${toLevel}고`;
+      opts.stageEl.appendChild(num);
+    }
+    return;
+  }
+
+  const overlay = fullscreen ? $('go-cascade') : null;
+  const stage = fullscreen
+    ? $('go-cascade-stage')
+    : (opts.stageEl || $('go-btn-stage'));
+  if (!stage) return;
+
+  const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+  let cur = null;
+  const inBtn = !fullscreen;
+
+  if (fullscreen && overlay) {
+    overlay.classList.add('on');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  stage.querySelectorAll('.go-num, .go-shard').forEach((el) => el.remove());
+  if (inBtn) stage.textContent = '';
+
+  try {
+    for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+      const final = lv === toLevel;
+      const label = inBtn
+        ? `${lv}고`
+        : `${lv}고${'!'.repeat(Math.min(3, i + 1))}`;
+      const size = fullscreen
+        ? Math.min(132, 64 + i * 14)
+        : null;
+
+      if (cur) {
+        if (fullscreen) {
+          spawnGoShards(stage, cur.textContent.replace(/[!고]/g, ''), size || 28);
+          cur.classList.remove('slam');
+          cur.classList.add('push-out');
+        } else {
+          // 버튼: 위에서 쌓이며 아래로 밀림 (파편 없이 깔끔하게)
+          cur.classList.remove('stack-in');
+          cur.classList.add('stack-out');
+        }
+        const dying = cur;
+        setTimeout(() => dying.remove(), inBtn ? 300 : 340);
+        cur = null;
+      }
+
+      const num = document.createElement('div');
+      num.className = inBtn ? 'go-num stack-in' : 'go-num slam';
+      num.textContent = label;
+      if (size) num.style.fontSize = size + 'px';
+      if (final && fullscreen) {
+        num.style.color = '#fef08a';
+        num.style.textShadow =
+          '0 0 28px rgba(250,204,21,.95), 0 0 56px rgba(239,68,68,.65), 0 8px 0 #9a3412, 0 12px 28px rgba(0,0,0,.55)';
+      }
+      stage.appendChild(num);
+      cur = num;
+      sfxGoStep(i, final);
+      if (fullscreen && i >= 1) screenShake(final);
+      if (opts.onStep) opts.onStep(lv, final);
+      await wait(final
+        ? (fullscreen ? 720 : 340)
+        : Math.max(120, Math.round((fullscreen ? 360 : 200) * Math.pow(0.88, i))));
+    }
+    if (opts.holdFinal) await wait(opts.holdFinal);
+  } finally {
+    if (fullscreen && overlay) {
+      overlay.classList.remove('on');
+      overlay.setAttribute('aria-hidden', 'true');
+      stage.innerHTML = '';
+    }
+  }
+}
+
+// 확정 시 풀스크린 두두둥
+async function playGoCascade(fromLevel, toLevel) {
+  if (toLevel <= fromLevel) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  state.juicing = true;
+  document.body.classList.add('juicing');
+  try {
+    await runGoShatterCascade(fromLevel, toLevel, { fullscreen: true });
+  } finally {
+    state.juicing = false;
+    document.body.classList.remove('juicing');
+  }
+}
+
+// 선택 UI: 1고 = 기본 표기 / 2~3고 = D / 4고+ = C
+async function playGoBtnCascade(fromLevel, toLevel) {
+  const stage = $('go-btn-stage');
+  if (!stage || toLevel <= fromLevel) return;
+  if (toLevel <= 1) {
+    clearGoBtnStage(stage);
+    const num = document.createElement('div');
+    num.className = 'go-num';
+    num.textContent = goBtnLabel(toLevel);
+    stage.appendChild(num);
+    return;
+  }
+  const style = toLevel <= 3 ? 'hyper' : 'slide';
+  await playGoBtnStyle(stage, fromLevel, toLevel, style);
+}
+
+function goBtnLabel(lv) {
+  return `${lv}고`;
+}
+
+function clearGoBtnStage(stage) {
+  if (!stage) return;
+  stage.querySelectorAll('.go-num, .go-roulette, .go-impact, .go-spark, .go-mini-shard, .go-heat-flame')
+    .forEach((el) => el.remove());
+  stage.textContent = '';
+}
+
+function juiceGoBtn(stage, heavy = false) {
+  const btn = stage && stage.closest('.choicebtn');
+  if (!btn) return;
+  btn.classList.remove('go-btn-juice');
+  void btn.offsetWidth;
+  btn.classList.add('go-btn-juice');
+  setTimeout(() => btn.classList.remove('go-btn-juice'), 360);
+  if (heavy) screenShake(false);
+}
+
+function spawnGoImpact(stage) {
+  const ring = document.createElement('div');
+  ring.className = 'go-impact';
+  stage.appendChild(ring);
+  setTimeout(() => ring.remove(), 420);
+}
+
+function spawnGoSparks(stage, n = 6) {
+  for (let i = 0; i < n; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'go-spark';
+    const ang = (Math.PI * 2 * i) / n + Math.random() * 0.4;
+    const dist = 28 + Math.random() * 36;
+    sp.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
+    sp.style.setProperty('--sy', Math.sin(ang) * dist + 'px');
+    stage.appendChild(sp);
+    setTimeout(() => sp.remove(), 480);
+  }
+}
+
+function spawnGoMiniShards(stage, label) {
+  for (let i = 0; i < 5; i++) {
+    const sh = document.createElement('div');
+    sh.className = 'go-mini-shard';
+    sh.textContent = label;
+    const ang = (Math.PI * 2 * i) / 5 + Math.random() * 0.25;
+    const dist = 32 + Math.random() * 36;
+    sh.style.setProperty('--sx', Math.cos(ang) * dist + 'px');
+    sh.style.setProperty('--sy', Math.sin(ang) * dist + 'px');
+    sh.style.setProperty('--rot', (-90 + Math.random() * 180) + 'deg');
+    stage.appendChild(sh);
+    setTimeout(() => sh.remove(), 450);
+  }
+}
+
+async function playGoBtnStyle(stage, fromLevel, toLevel, style) {
+  if (!stage || toLevel <= fromLevel) return;
+  if (stage.dataset.playing === '1') return;
+  stage.dataset.playing = '1';
+  const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+  const fn = GO_BTN_ANIMS[style];
+  try {
+    if (fn) await fn(stage, fromLevel, toLevel, wait);
+    else await animGoStack(stage, fromLevel, toLevel, wait);
+  } finally {
+    if (document.body.contains(stage)) stage.dataset.playing = '0';
+  }
+}
+
+async function animGoRoulette(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  const levels = [];
+  for (let lv = fromLevel + 1; lv <= toLevel; lv++) levels.push(lv);
+  if (!levels.length) return;
+
+  const row = document.createElement('div');
+  row.className = 'go-roulette spinning';
+  const slot = document.createElement('span');
+  slot.className = 'gr-slot';
+  const strip = document.createElement('span');
+  strip.className = 'gr-strip';
+  // 3바퀴 분량으로 더 도파민
+  const spins = [...levels, ...levels, ...levels];
+  spins.forEach((n) => {
+    const s = document.createElement('span');
+    s.textContent = String(n);
+    strip.appendChild(s);
+  });
+  slot.appendChild(strip);
+  row.appendChild(slot);
+  row.appendChild(Object.assign(document.createElement('span'), { className: 'gr-tail', textContent: '고' }));
+  stage.appendChild(row);
+
+  const cell = 1.1;
+  strip.style.transition = 'none';
+  strip.style.transform = 'translateY(0)';
+  void strip.offsetWidth;
+
+  const finalIdx = spins.length - 1;
+  // 가속 스핀
+  strip.style.transition = 'transform .55s cubic-bezier(.4,0,.7,.2)';
+  strip.style.transform = `translateY(${-Math.floor(levels.length * 1.2) * cell}em)`;
+  sfxGoStep(0, false);
+  juiceGoBtn(stage);
+  await wait(520);
+
+  // 감속 정착 (ease-out)
+  strip.style.transition = `transform ${0.8 + levels.length * 0.04}s cubic-bezier(.16,1,.3,1)`;
+  strip.style.transform = `translateY(${-finalIdx * cell}em)`;
+  for (let i = 1; i < levels.length; i++) {
+    await wait(70 + i * 8);
+    sfxGoStep(i, false);
+  }
+  await wait(580);
+  row.classList.remove('spinning');
+  row.classList.add('settle');
+  spawnGoImpact(stage);
+  spawnGoSparks(stage, 8);
+  juiceGoBtn(stage, true);
+  sfxGoStep(levels.length, true);
+  await wait(280);
+}
+
+async function animGoPunch(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  let cur = null;
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    const final = lv === toLevel;
+    if (cur) cur.remove();
+    const num = document.createElement('div');
+    num.className = final ? 'go-num punch-final' : 'go-num punch';
+    num.textContent = goBtnLabel(lv);
+    stage.appendChild(num);
+    cur = num;
+    spawnGoImpact(stage);
+    if (final || i % 2 === 1) spawnGoSparks(stage, final ? 10 : 5);
+    juiceGoBtn(stage, final);
+    sfxGoStep(i, final);
+    await wait(final ? 420 : Math.max(110, 200 - i * 14));
+  }
+}
+
+async function animGoSlide(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  const fakeLv = toLevel - 1;
+  let cur = null;
+
+  const pushSlide = async (lv, { clsIn, clsOut, asFinal, epic, flow, sticky }) => {
+    if (cur) {
+      cur.classList.remove(
+        'slide-in', 'slide-flow-in', 'slide-flow-in-sticky',
+        'slide-fake', 'slide-doubt', 'slide-in-epic'
+      );
+      cur.classList.add(clsOut || (sticky ? 'slide-flow-out-sticky' : flow ? 'slide-flow-out' : 'slide-out'));
+      const dying = cur;
+      setTimeout(() => dying.remove(), epic ? 480 : sticky ? 600 : flow ? 400 : 400);
+      cur = null;
+      if (!flow && !sticky) await wait(epic ? 140 : 70);
+    }
+    const num = document.createElement('div');
+    num.className = `go-num ${clsIn}`;
+    num.textContent = goBtnLabel(lv);
+    if (asFinal || epic) num.style.color = '#fef08a';
+    stage.appendChild(num);
+    cur = num;
+    if (!flow && !sticky) juiceGoBtn(stage, !!(asFinal || epic));
+    if (asFinal || epic) {
+      spawnGoImpact(stage);
+      spawnGoSparks(stage, epic ? 14 : 8);
+    }
+  };
+
+  if (toLevel <= fromLevel + 1) {
+    await pushSlide(toLevel, { clsIn: 'slide-in-epic', clsOut: 'slide-out', asFinal: true, epic: true });
+    sfxGoStep(0, true);
+    await wait(720);
+    return;
+  }
+
+  // 1) 최종 직전까지 — 앞은 빠르게, 뒤로 갈수록 쫀득하게 감속
+  //    단 4~6고대(짧은 span)는 초반을 덜 날려서 주루룩 방지
+  const span = Math.max(1, fakeLv - fromLevel);
+  const shortish = span <= 5; // 예: 0→4/5/6 (fake 3/4/5)
+  let step = 0;
+  for (let lv = fromLevel + 1; lv <= fakeLv; lv++, step++) {
+    const isFakeFinal = lv === fakeLv;
+    const remain = fakeLv - lv;
+    const sticky = !isFakeFinal && remain <= 2;
+    await pushSlide(lv, {
+      clsIn: isFakeFinal ? 'slide-in' : (sticky ? 'slide-flow-in-sticky' : 'slide-flow-in'),
+      clsOut: isFakeFinal ? 'slide-out' : (sticky ? 'slide-flow-out-sticky' : 'slide-flow-out'),
+      asFinal: isFakeFinal,
+      epic: false,
+      flow: !isFakeFinal && !sticky,
+      sticky: sticky,
+    });
+    sfxGoStep(step, isFakeFinal);
+    if (!isFakeFinal) {
+      const t = (lv - fromLevel) / span;
+      const chew = Math.pow(t, shortish ? 1.65 : 2.35);
+      const base = shortish
+        ? 145 + span * 6
+        : 72 + Math.min(40, span * 2);
+      const rise = shortish
+        ? 200 + span * 8
+        : 280 + Math.min(160, span * 10);
+      await wait(Math.round(base + chew * rise));
+    }
+  }
+
+  // 2) "이게 끝?" — 잠금처럼 보이다가 흔들림(의심)
+  if (cur) {
+    cur.classList.remove('slide-in', 'slide-flow-in');
+    cur.classList.add('slide-fake');
+    cur.style.color = '#fef08a';
+  }
+  spawnGoImpact(stage);
+  juiceGoBtn(stage, true);
+  await wait(760); // 흔들리기 전 — 가짜 피날레로 잠깐 더 머무름
+
+  if (cur) {
+    cur.classList.remove('slide-fake');
+    cur.classList.add('slide-doubt');
+  }
+  await wait(480);
+
+  // 3) 반전: 가짜를 날리고 진짜가 같은 방향에서 더 멋지게
+  await pushSlide(toLevel, {
+    clsIn: 'slide-in-epic',
+    clsOut: 'slide-out-blast',
+    asFinal: true,
+    epic: true,
+  });
+  sfxGoStep(step + 1, true);
+  spawnGoImpact(stage);
+  spawnGoSparks(stage, 10);
+  juiceGoBtn(stage, true);
+  await wait(780);
+}
+
+async function animGoHyper(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  let cur = null;
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    const final = lv === toLevel;
+    if (cur) cur.remove();
+    const num = document.createElement('div');
+    num.className = final ? 'go-num hyper-final' : 'go-num hyper';
+    num.textContent = goBtnLabel(lv);
+    stage.appendChild(num);
+    cur = num;
+    sfxGoStep(i, final);
+    if (!final) juiceGoBtn(stage);
+    await wait(final ? 0 : Math.max(55, 130 - i * 12));
+  }
+  spawnGoImpact(stage);
+  spawnGoSparks(stage, 12);
+  juiceGoBtn(stage, true);
+  await wait(480);
+}
+
+async function animGoSlam(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  let cur = null;
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    const final = lv === toLevel;
+    if (cur) {
+      cur.classList.remove('slam-drop');
+      cur.classList.add('slam-crush');
+      const dying = cur;
+      setTimeout(() => dying.remove(), 220);
+      cur = null;
+    }
+    const num = document.createElement('div');
+    num.className = 'go-num slam-drop';
+    num.textContent = goBtnLabel(lv);
+    if (final) num.style.color = '#fef08a';
+    stage.appendChild(num);
+    cur = num;
+    await wait(90);
+    spawnGoImpact(stage);
+    spawnGoSparks(stage, final ? 10 : 4);
+    juiceGoBtn(stage, final);
+    sfxGoStep(i, final);
+    await wait(final ? 400 : Math.max(120, 200 - i * 12));
+  }
+}
+
+async function animGoShatter(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  let cur = null;
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    const final = lv === toLevel;
+    if (cur) {
+      spawnGoMiniShards(stage, goBtnLabel(lv - 1));
+      cur.remove();
+      cur = null;
+      await wait(40);
+    }
+    const num = document.createElement('div');
+    num.className = 'go-num assemble';
+    num.textContent = goBtnLabel(lv);
+    if (final) num.style.color = '#fef08a';
+    stage.appendChild(num);
+    cur = num;
+    juiceGoBtn(stage, final);
+    if (final) { spawnGoImpact(stage); spawnGoSparks(stage, 10); }
+    sfxGoStep(i, final);
+    await wait(final ? 420 : Math.max(140, 230 - i * 12));
+  }
+}
+
+async function animGoHeat(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  let cur = null;
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    const final = lv === toLevel;
+    if (cur) cur.remove();
+    const t = i / Math.max(1, toLevel - fromLevel - 1);
+    const num = document.createElement('div');
+    num.className = 'go-num heat';
+    num.textContent = goBtnLabel(lv);
+    num.style.textShadow =
+      `0 1px 0 rgba(127,29,29,.65), 0 0 ${10 + t * 22}px rgba(251,146,60,${0.4 + t * 0.55}), 0 0 ${18 + t * 30}px rgba(239,68,68,${0.2 + t * 0.5})`;
+    if (final) num.style.color = '#fef08a';
+    stage.appendChild(num);
+    cur = num;
+    for (let f = 0; f < 2 + Math.floor(t * 3); f++) {
+      const fl = document.createElement('div');
+      fl.className = 'go-heat-flame';
+      fl.textContent = '✦';
+      fl.style.color = '#fbbf24';
+      fl.style.fontSize = '11px';
+      fl.style.fontWeight = '900';
+      fl.style.setProperty('--fx', ((Math.random() - 0.5) * 40) + 'px');
+      fl.style.left = (42 + Math.random() * 16) + '%';
+      fl.style.animationDelay = (f * 40) + 'ms';
+      stage.appendChild(fl);
+      setTimeout(() => fl.remove(), 600);
+    }
+    juiceGoBtn(stage, final);
+    if (final) spawnGoImpact(stage);
+    sfxGoStep(i, final);
+    await wait(final ? 400 : Math.max(130, 210 - i * 10));
+  }
+}
+
+async function animGoGlitch(stage, fromLevel, toLevel, wait) {
+  clearGoBtnStage(stage);
+  const num = document.createElement('div');
+  num.className = 'go-num glitch';
+  stage.appendChild(num);
+  const scrambleMs = 520 + (toLevel - fromLevel) * 40;
+  const t0 = performance.now();
+  while (performance.now() - t0 < scrambleMs) {
+    const r = fromLevel + 1 + Math.floor(Math.random() * (toLevel - fromLevel));
+    num.textContent = goBtnLabel(r);
+    sfxGoStep(0, false);
+    juiceGoBtn(stage);
+    await wait(45 + Math.random() * 35);
+  }
+  // 빠르게 실제 시퀀스 스냅
+  for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
+    num.textContent = goBtnLabel(lv);
+    sfxGoStep(i, lv === toLevel);
+    await wait(55);
+  }
+  num.classList.remove('glitch');
+  num.classList.add('glitch-lock');
+  num.style.color = '#fef08a';
+  spawnGoImpact(stage);
+  spawnGoSparks(stage, 10);
+  juiceGoBtn(stage, true);
+  await wait(380);
+}
+
+async function animGoStack(stage, fromLevel, toLevel, wait) {
+  await runGoShatterCascade(fromLevel, toLevel, { stageEl: stage, fullscreen: false });
+}
+
+const GO_BTN_ANIMS = {
+  roulette: animGoRoulette,
+  punch: animGoPunch,
+  slide: animGoSlide,
+  hyper: animGoHyper,
+  slam: animGoSlam,
+  shatter: animGoShatter,
+  heat: animGoHeat,
+  glitch: animGoGlitch,
+  stack: animGoStack,
+};
+
+// ── 연출 프리뷰 (?goPreview=1) ─────────────────────────────
+const GO_PREVIEW_FROM = 0;
+const GO_PREVIEW_TO = 6;
+const GO_LIVE_MAX = 10;
+const GO_ANIM_CATALOG = [
+  { id: 'roulette', title: 'A · 룰렛+', desc: '「고」 고정, 숫자만 3바퀴 스핀 후 감속 정착 · 스파크' },
+  { id: 'punch', title: 'B · 펀치+', desc: '같은 자리 연타 임팩트링 · 마지막 초대형 펀치' },
+  { id: 'slide', title: 'C · 옆 밀치기+', desc: '같은 방향으로 직전까지 → 가짜 피날레·흔들림 → 같은 방향에서 최종이 더 세게' },
+  { id: 'hyper', title: 'D · 하이퍼번', desc: '초고속 플래시 연쇄 후 최종 슬램 (하이퍼버닝 맛)' },
+  { id: 'slam', title: 'E · 임팩트 슬램', desc: '위에서 찍어 누르고 납작하게 깨진 뒤 다음 숫자' },
+  { id: 'shatter', title: 'F · 파편 재조립', desc: '숫자 파편으로 터진 뒤 새 숫자가 뭉쳐 조립' },
+  { id: 'heat', title: 'G · 열기 상승', desc: '단계마다 글로우·불꽃 강해지며 뜨거워짐' },
+  { id: 'glitch', title: 'H · 글리치 락', desc: '숫자 스크램블 → 실제 단계로 스냅 → 락온' },
+];
+
+function goBtnPreviewStyle(toLevel) {
+  if (toLevel <= 1) return 'basic';
+  return toLevel <= 3 ? 'hyper' : 'slide';
+}
+
+function seedGoBtnStage(stage, labelLv = 0) {
+  if (!stage) return;
+  clearGoBtnStage(stage);
+  const num = document.createElement('div');
+  num.className = 'go-num';
+  num.textContent = goBtnLabel(labelLv);
+  stage.appendChild(num);
+}
+
+function openGoAnimPreview() {
+  const root = $('go-anim-preview');
+  const live = $('gap-live-grid');
+  const grid = $('gap-grid');
+  if (!root || !live || !grid) return;
+
+  live.innerHTML = Array.from({ length: GO_LIVE_MAX }, (_, i) => {
+    const n = i + 1;
+    const style = goBtnPreviewStyle(n);
+    const tag = style === 'basic' ? '기본' : style === 'hyper' ? 'D' : 'C';
+    const tagCls = style === 'basic' ? '' : style === 'hyper' ? 'd' : 'c';
+    return `
+      <div class="gap-live-card">
+        <h3>${n}고</h3>
+        <span class="gap-tag ${tagCls}">본게임 · ${tag}${style === 'basic' ? '' : ` (${style})`}</span>
+        <button type="button" class="choicebtn btn-go gs-simple" onclick="previewGoLevel(${n})">
+          <div class="t go-btn-stage" id="gap-live-${n}"></div>
+        </button>
+        <button type="button" class="gap-replay" onclick="previewGoLevel(${n})">다시 보기</button>
+      </div>`;
+  }).join('');
+
+  grid.innerHTML = GO_ANIM_CATALOG.map((c) => `
+    <div class="gap-card">
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <button type="button" class="choicebtn btn-go gs-simple" onclick="previewGoAnim('${c.id}')">
+        <div class="t go-btn-stage" id="gap-stage-${c.id}"></div>
+      </button>
+      <button type="button" class="gap-replay" onclick="previewGoAnim('${c.id}')">다시 보기 · ${c.id}</button>
+    </div>`).join('');
+
+  root.classList.add('on');
+  root.setAttribute('aria-hidden', 'false');
+
+  for (let n = 1; n <= GO_LIVE_MAX; n++) seedGoBtnStage($(`gap-live-${n}`), 0);
+  GO_ANIM_CATALOG.forEach((c) => seedGoBtnStage($(`gap-stage-${c.id}`), 0));
+}
+
+async function previewGoLevel(n) {
+  const stage = $(`gap-live-${n}`);
+  if (!stage) return;
+  const style = goBtnPreviewStyle(n);
+  if (style === 'basic') {
+    seedGoBtnStage(stage, n);
+    return;
+  }
+  await playGoBtnStyle(stage, 0, n, style);
+}
+
+async function previewGoLevelAll() {
+  for (let n = 1; n <= GO_LIVE_MAX; n++) {
+    await previewGoLevel(n);
+    await new Promise((r) => setTimeout(r, 220));
+  }
+}
+
+async function previewGoAnim(style) {
+  const stage = $(`gap-stage-${style}`);
+  if (!stage) return;
+  await playGoBtnStyle(stage, GO_PREVIEW_FROM, GO_PREVIEW_TO, style);
+}
+
+async function previewGoAnimAll() {
+  for (const c of GO_ANIM_CATALOG) {
+    await previewGoAnim(c.id);
+    await new Promise((r) => setTimeout(r, 280));
+  }
 }
 
 const SHAKE_SCORE = 100;       // 이 점수 이상일 때만 카메라 쉐이크
@@ -3056,9 +4225,9 @@ async function playJuiceSequence(snap, fromRects = null) {
     // 1) 족보 배너 슬램
     const tier = juiceTier(bd.handId);
     const handName = HAND_BY_ID[bd.handId].name;
-    const paRect = pa.getBoundingClientRect();
-    banner.style.left = (paRect.left + paRect.width / 2) + 'px';
-    banner.style.top = (paRect.top + 36) + 'px';
+    const anchor = handBannerAnchor();
+    banner.style.left = anchor.cx + 'px';
+    banner.style.top = anchor.cy + 'px';
     banner.className = '';
     void banner.offsetWidth;
     banner.textContent = bd.handId === 'none' ? handName : handName + '!';
