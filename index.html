@@ -2242,13 +2242,14 @@ function checkAfterPlay() {
 async function chooseGo() {
   if (state.screen !== 'gostop' || state.dealing) return;
   const fromLevel = state.goLevel;
-  // 밀치기 고: 이미 넘어 있는 문턱 전부 소급 인정, 선언 단계 = 아직 못 넘은 첫 문턱
+  // 밀치기 고: 이미 넘어 있는 문턱 전부를 소급 인정, 선언 단계 = 아직 못 넘은 첫 문턱
   state.goLevel = goLevelReached(state.baseTarget, state.roundScore, state.goLevel) + 1;
   state.target = goThreshold(state.baseTarget, state.goLevel);
   state.playsLeft++; // 고 보상: 내기 +1 (밀친 단계 수와 무관하게 선언 1회당 1개)
   state.pendingGoStop = false;
   state.screen = 'play';
   render(); // 모달 닫고 모자란 손패 노출
+  // 확정 풀스크린은 실제 점프 구간만 (버튼 연출은 1→N 유지)
   await playGoCascade(fromLevel, state.goLevel);
   await dealToHand();
   checkAfterPlay();
@@ -2922,10 +2923,9 @@ function renderModal() {
     m.innerHTML = gostopHTML();
     const stage = $('go-btn-stage');
     if (stage) {
-      const from = +stage.dataset.from || 0;
-      const to = +stage.dataset.to || 0;
-      // 첫 숫자 즉시 심어 빈 버튼 깜빡임 방지 후 쌓기 연출
-      playGoBtnCascade(from, to);
+      const to = +stage.dataset.to || n;
+      // 버튼 연출은 항상 1→N 전체
+      playGoBtnCascade(0, to);
     }
     return;
   }
@@ -3017,7 +3017,7 @@ function gostopHTML() {
     + `실패 시 <b>고박 = 런 종료</b>`;
   const goTitle = n <= 1
     ? `<div class="t">1고</div>`
-    : `<div class="t go-btn-stage" id="go-btn-stage" data-from="${state.goLevel}" data-to="${n}"></div>`;
+    : `<div class="t go-btn-stage" id="go-btn-stage" data-from="0" data-to="${n}"></div>`;
   return `
     <h2>🎉 목표 달성!</h2>
     <div class="sub">${fmt(state.roundScore)} / ${fmt(state.target)}점 · 내기 ${state.playsLeft} · 패 ${cardsRemaining()}</div>
@@ -3445,9 +3445,10 @@ async function playGoCascade(fromLevel, toLevel) {
 }
 
 // 선택 UI: 1고 = 기본 표기 / 2~3고 = D / 4고+ = C
+// 연출은 실제 goLevel과 무관하게 항상 0→N (1고부터 풀 시퀀스)으로 보여 줌
 async function playGoBtnCascade(fromLevel, toLevel) {
   const stage = $('go-btn-stage');
-  if (!stage || toLevel <= fromLevel) return;
+  if (!stage || toLevel <= 0) return;
   if (toLevel <= 1) {
     clearGoBtnStage(stage);
     const num = document.createElement('div');
@@ -3457,7 +3458,7 @@ async function playGoBtnCascade(fromLevel, toLevel) {
     return;
   }
   const style = toLevel <= 3 ? 'hyper' : 'slide';
-  await playGoBtnStyle(stage, fromLevel, toLevel, style);
+  await playGoBtnStyle(stage, 0, toLevel, style);
 }
 
 function goBtnLabel(lv) {
@@ -3478,7 +3479,7 @@ function juiceGoBtn(stage, heavy = false) {
   void btn.offsetWidth;
   btn.classList.add('go-btn-juice');
   setTimeout(() => btn.classList.remove('go-btn-juice'), 360);
-  if (heavy) screenShake(false);
+  // 고/스톱 버튼 안 연출에서는 카메라 쉐이크 없음 (본게임 주스·확정 연출은 유지)
 }
 
 function spawnGoImpact(stage) {
@@ -3679,7 +3680,7 @@ async function animGoSlide(stage, fromLevel, toLevel, wait) {
   }
   spawnGoImpact(stage);
   juiceGoBtn(stage, true);
-  await wait(760); // 흔들리기 전 — 가짜 피날레로 잠깐 더 머무름
+  await wait(920); // 흔들리기 전 — 가짜 피날레로 머무름
 
   if (cur) {
     cur.classList.remove('slide-fake');
