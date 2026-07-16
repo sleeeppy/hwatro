@@ -58,6 +58,36 @@
   @media (hover: hover) {
     .jokerslot.filled:hover .jtip { display: block; }
   }
+
+  /* ── 모바일 특수패 팝업 ─────────────── */
+  #joker-pop-overlay {
+    position: fixed; inset: 0; z-index: 55;
+    display: none; align-items: center; justify-content: center;
+    padding: 18px; background: rgba(0,0,0,.58);
+  }
+  #joker-pop-overlay.show { display: flex; }
+  .joker-pop-card {
+    width: min(320px, 92vw); border-radius: 16px; padding: 20px 18px 16px;
+    background: linear-gradient(170deg, #2a2410, #1a1508);
+    border: 1.5px solid rgba(212,175,55,.55);
+    box-shadow: 0 18px 48px rgba(0,0,0,.55);
+    text-align: center;
+  }
+  .joker-pop-card .jp-icon { font-size: 40px; line-height: 1; margin-bottom: 8px; }
+  .joker-pop-card .jp-name { font-size: 18px; font-weight: 900; color: #fde68a; margin-bottom: 8px; }
+  .joker-pop-card .jp-meta {
+    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .joker-pop-card .jp-desc {
+    font-size: 13.5px; color: #e2e8f0; line-height: 1.55; text-align: left;
+    padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.28);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+  .joker-pop-card .jp-close {
+    margin-top: 14px; width: 100%; padding: 11px;
+    background: rgba(255,255,255,.12); color: #f8fafc;
+    font-size: 14px; font-weight: 800; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
+  }
   #moneybox { font-size: 19px; font-weight: 800; color: #fbbf24; white-space: nowrap; }
   #moneybox .delta { font-size: 13px; color: #a3e635; }
   #top-help, #top-tutor {
@@ -488,16 +518,36 @@
   .offer .o-sold-tag {
     text-align: center; font-weight: 800; color: #94a3b8; font-size: 12px; padding: 8px 0 2px;
   }
-  .owned-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .owned {
-    border: 1px solid rgba(212,175,55,.45); background: rgba(212,175,55,.1);
-    border-radius: 10px; padding: 8px 10px; font-size: 11px; min-width: 120px; max-width: 200px;
+  .owned-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 10px;
   }
-  .owned b { color: #fde68a; font-size: 12px; }
-  .owned .od { color: #94a3b8; display: block; margin-top: 3px; line-height: 1.4; }
-  .owned .sellbtn {
-    margin-top: 6px; width: 100%; background: rgba(255,255,255,.1); color: #fca5a5;
-    font-size: 10.5px; padding: 5px; font-weight: 700; border-radius: 7px; border: 1px solid rgba(252,165,165,.25);
+  .owned-card {
+    position: relative;
+    border-radius: 14px; padding: 14px 12px 12px;
+    background: linear-gradient(180deg, rgba(212,175,55,.14), rgba(0,0,0,.3));
+    border: 1px solid rgba(212,175,55,.38);
+    display: flex; flex-direction: column; gap: 6px;
+    min-width: 0; min-height: 210px;
+  }
+  .owned-card .o-icon {
+    font-size: 28px; line-height: 1; text-align: center;
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,.35));
+  }
+  .owned-card .o-name { font-weight: 900; font-size: 14px; color: #fde68a; text-align: center; }
+  .owned-card .o-meta {
+    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+  }
+  .owned-card .o-desc {
+    font-size: 11.5px; color: #cbd5e1; line-height: 1.45; flex: 1;
+    text-align: center; min-height: 2.9em;
+  }
+  .owned-card .owned-sell {
+    margin-top: auto; width: 100%;
+    background: rgba(255,255,255,.1); color: #fca5a5;
+    font-size: 11px; padding: 8px; font-weight: 800; border-radius: 9px;
+    border: 1px solid rgba(252,165,165,.28);
   }
   .owned-empty {
     color: #64748b; font-size: 12px; padding: 10px 12px;
@@ -534,9 +584,14 @@
     padding-top: 12px; border-top: 1px solid rgba(255,255,255,.1);
   }
   .shop-footer .sf-next {
-    font-size: 12px; color: #cbd5e1; line-height: 1.45; font-weight: 600;
+    font-size: 13px; color: #cbd5e1; line-height: 1.4; font-weight: 600;
   }
-  .shop-footer .sf-next b { color: #fde68a; }
+  .shop-footer .sf-next b { color: #fde68a; font-size: 14px; }
+  .shop-footer .sf-target {
+    font-size: 26px; font-weight: 900; color: #fde68a;
+    margin-top: 4px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+  }
   #btn-nextround {
     background: linear-gradient(180deg, #22c55e, #15803d); color: #fff;
     padding: 12px 22px; font-size: 15px; font-weight: 900; border-radius: 11px; border: none;
@@ -1661,8 +1716,8 @@
   }
 
   @media (max-width: 720px) and (hover: none) {
-    .jokerslot.filled:active .jtip,
-    .jokerslot.filled:focus-within .jtip { display: block; }
+    .jokerslot.filled { cursor: pointer; }
+    .jokerslot.filled .jtip { display: none !important; }
   }
 
 </style>
@@ -1744,6 +1799,16 @@
 </div>
 
 <div id="modal-overlay"><div id="modal"></div></div>
+
+<div id="joker-pop-overlay" onclick="closeJokerPop()">
+  <div class="joker-pop-card" role="dialog" aria-labelledby="joker-pop-name" onclick="event.stopPropagation()">
+    <div class="jp-icon" id="joker-pop-icon"></div>
+    <div class="jp-name" id="joker-pop-name"></div>
+    <div class="jp-meta" id="joker-pop-meta"></div>
+    <div class="jp-desc" id="joker-pop-desc"></div>
+    <button type="button" class="jp-close" onclick="closeJokerPop()">닫기</button>
+  </div>
+</div>
 
 <div id="juice-root">
   <div id="hand-banner"></div>
@@ -2066,6 +2131,9 @@ function evaluateHand(hand, env) {
    ==== ENGINE END ====
    ================================================================ */
 
+// 일시 비활성 — true로 되돌리면 춘향 조력자·훈수 예약 복구
+const CHUNHYANG_ENABLED = false;
+
 // ── 게임 상태 ──────────────────────────────────────────────
 const seedParam = new URLSearchParams(location.search).get('seed');
 let runSeed = seedParam ? (Number(seedParam) >>> 0) : (Math.floor(Math.random() * 4294967296) >>> 0);
@@ -2149,7 +2217,7 @@ function startRound() {
   state.baseTarget = TARGETS[state.round - 1];
   state.target = state.baseTarget;
   state.kwangSoldThisRound = 0;
-  state.drunk = !!state.chunhyangNext; // 라운드 시작 전 예약한 훈수 활성화
+  state.drunk = CHUNHYANG_ENABLED && !!state.chunhyangNext;
   state.chunhyangNext = false;
   state.hoverReact = null;
   state.lastPlay = null;
@@ -3213,6 +3281,7 @@ function closeHelp() {
 // ── 조력자: 춘향 ───────────────────────────────────────────
 // 라운드 시작 전(준비/상점)에 예약 → 해당 월 내내 훈수. 판 중 막걸리 주기는 없음.
 function buyChunhyangNext() {
+  if (!CHUNHYANG_ENABLED) return;
   if (!(state.screen === 'shop' || state.screen === 'prep')) return;
   if (state.chunhyangNext || state.money < 3) return;
   state.money -= 3;
@@ -3433,6 +3502,12 @@ function render() {
 }
 
 function renderChunhyang() {
+  const root = $('chunhyang');
+  if (!CHUNHYANG_ENABLED) {
+    if (root) root.style.display = 'none';
+    return;
+  }
+  if (root) root.style.display = '';
   const hint = chunhyangHint();
   const face = $('ch-face');
   const bubble = $('ch-bubble');
@@ -3508,7 +3583,8 @@ function renderTopbar() {
     const j = state.jokers[i];
     if (j) {
       const def = JOKER_BY_ID[j.id];
-      slots += `<div class="jokerslot filled" tabindex="0">
+      const tap = isTouchUI() ? ` onclick="showJokerPop(${i})" role="button"` : '';
+      slots += `<div class="jokerslot filled" tabindex="0"${tap}>
         <div class="jname">${def.icon} ${def.name}</div>
         <div class="jtip">${esc(def.desc)}${def.id === 'mitjang' ? `<br>누적 +${state.mitjangChips}점` : ''}</div>
       </div>`;
@@ -3518,6 +3594,25 @@ function renderTopbar() {
   }
   $('jokerbar').innerHTML = slots;
   $('moneybox').textContent = `💰 ${state.money}냥`;
+}
+
+function showJokerPop(idx) {
+  if (!isTouchUI()) return;
+  const j = state.jokers[idx];
+  if (!j) return;
+  const def = JOKER_BY_ID[j.id];
+  const rarityKo = { common: '커먼', uncommon: '언커먼', rare: '레어' };
+  $('joker-pop-icon').textContent = def.icon;
+  $('joker-pop-name').textContent = def.name;
+  $('joker-pop-meta').innerHTML = `
+    <span class="o-rarity r-${def.rarity}">${rarityKo[def.rarity]}</span>
+    <span class="o-kind">${esc(def.kind || '')}</span>`;
+  $('joker-pop-desc').textContent = def.desc + (def.id === 'mitjang' ? ` (누적 +${state.mitjangChips}점)` : '');
+  $('joker-pop-overlay').classList.add('show');
+}
+
+function closeJokerPop() {
+  $('joker-pop-overlay').classList.remove('show');
 }
 
 function setNeedVal(score) {
@@ -3667,13 +3762,19 @@ function renderTable() {
   $('btn-play').disabled = !canAct || n < 1 || n > 5 || state.playsLeft <= 0;
   $('btn-discard').textContent = shortAct ? `버리기 (${state.discardsLeft})` : `버리기 (${state.discardsLeft}회 남음)`;
   $('btn-discard').disabled = !canAct || n < 1 || n > 5 || state.discardsLeft <= 0;
-  // 춘향 호버 예측 — 매 render마다 리스너 재바인딩
-  $('btn-play').onmouseenter = () => setChunhyangHover('play');
-  $('btn-play').onmouseleave = () => clearChunhyangHover();
-  $('btn-discard').onmouseenter = () => setChunhyangHover('discard');
-  $('btn-discard').onmouseleave = () => clearChunhyangHover();
-  bindActionLongPress($('btn-play'), 'play');
-  bindActionLongPress($('btn-discard'), 'discard');
+  if (CHUNHYANG_ENABLED) {
+    $('btn-play').onmouseenter = () => setChunhyangHover('play');
+    $('btn-play').onmouseleave = () => clearChunhyangHover();
+    $('btn-discard').onmouseenter = () => setChunhyangHover('discard');
+    $('btn-discard').onmouseleave = () => clearChunhyangHover();
+    bindActionLongPress($('btn-play'), 'play');
+    bindActionLongPress($('btn-discard'), 'discard');
+  } else {
+    $('btn-play').onmouseenter = null;
+    $('btn-play').onmouseleave = null;
+    $('btn-discard').onmouseenter = null;
+    $('btn-discard').onmouseleave = null;
+  }
 
   const g = state.hand.find((c) => c.tags.includes('dual') && !c.faceDown);
   const bg = $('btn-gukjin');
@@ -3749,7 +3850,9 @@ function renderCoach() {
     },
     shop: {
       sel: '#shop-offers', pad: 10, title: '🏪 상점',
-      body: `특수패를 사고, 마음에 안 들면 <b>리롤</b>하세요. 준비되면 <b>다음 판으로</b>!<br><span style="color:#94a3b8;font-size:12px">춘향 훈수도 여기서 예약할 수 있어요.</span>`,
+      body: CHUNHYANG_ENABLED
+        ? `특수패를 사고, 마음에 안 들면 <b>리롤</b>하세요. 준비되면 <b>다음 판으로</b>!<br><span style="color:#94a3b8;font-size:12px">춘향 훈수도 여기서 예약할 수 있어요.</span>`
+        : `특수패를 사고, 마음에 안 들면 <b>리롤</b>하세요. 준비되면 <b>다음 판으로</b>!`,
       next: '알겠어요',
     },
   };
@@ -3868,10 +3971,9 @@ function welcomeHTML() {
         </div>
       </div>
       <div class="help-card hc-helper">
-        <div class="hc-title"><span class="ico">🏪</span>상점 · 춘향</div>
+        <div class="hc-title"><span class="ico">🏪</span>상점</div>
         <div class="hc-body">
           판을 클리어하면 상점에서 <b>특수패</b>를 사고팝니다.
-          준비/상점에서 <b>3냥</b>에 춘향 훈수를 예약하면 그 달 내내 패를 봐줍니다.
         </div>
       </div>
     </div>
@@ -3887,18 +3989,24 @@ function welcomeHTML() {
 function prepHTML() {
   const M = MONTHS[0];
   const booked = state.chunhyangNext;
-  return `
-    <h2>${M.flower} 1월 · ${M.name} 준비</h2>
+  const chBlock = CHUNHYANG_ENABLED ? `
     <div class="sub">목표 <b style="color:var(--gold-soft)">${fmt(TARGETS[0])}점</b> · 보유 ${state.money}냥<br>
       라운드 시작 전에 춘향이 훈수를 예약하면 그 달 내내 패를 봐줍니다.</div>
     <div class="boss-preview" style="border-color:rgba(212,175,55,.45);background:rgba(120,85,20,.22);color:#fde68a;margin-top:12px">
       🍶 <b>춘향 훈수</b> — 3냥 · ${booked ? '예약 완료!' : '미예약'}
       <button class="smallbtn" style="margin-left:8px" onclick="buyChunhyangNext()" ${booked || state.money < 3 ? 'disabled' : ''}>${booked ? '✓ 예약됨' : '예약'}</button>
-    </div>
+    </div>` : `
+    <div class="sub">목표 <b style="color:var(--gold-soft)">${fmt(TARGETS[0])}점</b> · 보유 ${state.money}냥</div>`;
+  const startDesc = CHUNHYANG_ENABLED
+    ? (booked ? '춘향이 훈수와 함께' : '훈수 없이') + ' 판을 엽니다'
+    : '1월 판을 엽니다';
+  return `
+    <h2>${M.flower} 1월 · ${M.name} 준비</h2>
+    ${chBlock}
     <div class="modal-actions">
       <button class="choicebtn btn-stop" style="text-align:center" onclick="beginFromPrep()">
         <div class="t">▶ 1월 시작</div>
-        <div class="d">${booked ? '춘향이 훈수와 함께' : '훈수 없이'} 판을 엽니다</div>
+        <div class="d">${startDesc}</div>
       </button>
     </div>`;
 }
@@ -3973,9 +4081,17 @@ function shopHTML() {
   const owned = state.jokers.length
     ? state.jokers.map((j, i) => {
         const def = JOKER_BY_ID[j.id];
-        return `<div class="owned"><b>${def.icon} ${esc(def.name)}</b>
-          <span class="od">${esc(def.desc)}</span>
-          <button class="sellbtn" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button></div>`;
+        const extra = def.id === 'mitjang' ? ` (누적 +${state.mitjangChips}점)` : '';
+        return `<div class="owned-card">
+          <div class="o-icon">${def.icon}</div>
+          <div class="o-name">${esc(def.name)}</div>
+          <div class="o-meta">
+            <span class="o-rarity r-${def.rarity}">${rarityKo[def.rarity]}</span>
+            <span class="o-kind">${esc(def.kind || '')}</span>
+          </div>
+          <div class="o-desc">${esc(def.desc)}${esc(extra)}</div>
+          <button class="owned-sell" onclick="sellJoker(${i})">판매 +${Math.floor(j.paid / 2)}냥</button>
+        </div>`;
       }).join('')
     : '<div class="owned-empty">아직 보유한 특수패가 없습니다</div>';
 
@@ -3999,15 +4115,15 @@ function shopHTML() {
     }
   }
 
-  const makDisabled = state.chunhyangNext || state.money < 3;
   const nextMonth = state.round + 1;
-  const makBlock = `<div class="shop-util su-mak">
+  const makDisabled = state.chunhyangNext || state.money < 3;
+  const makBlock = CHUNHYANG_ENABLED ? `<div class="shop-util su-mak">
     <div class="su-title">🍶 춘향 훈수 · 3냥</div>
     ${nextMonth}월 동안 패를 봐주고, 내기/버리기에 올리면 다음 패를 예측해요.
     <div style="margin-top:8px">
       <button class="smallbtn" onclick="buyChunhyangNext()" ${makDisabled ? 'disabled' : ''}>${state.chunhyangNext ? '✓ 예약됨' : '다음 달 예약'}</button>
     </div>
-  </div>`;
+  </div>` : '';
 
   const needPick = isBossRound(next) && !state.nextBoss;
   const nm = MONTHS[next - 1];
@@ -4030,15 +4146,16 @@ function shopHTML() {
       </div>
       <div class="shop-offers">${offers}</div>
     </section>
-    <section class="shop-sec" id="shop-extras">
+    ${(makBlock || bossBlock) ? `<section class="shop-sec" id="shop-extras">
       <div class="shop-sec-h">다음 달 준비</div>
       <div class="shop-utils" style="${bossBlock ? '' : 'grid-template-columns:1fr'}">
         ${makBlock}
         ${bossBlock}
       </div>
-    </section>
+    </section>` : ''}
     <footer class="shop-footer" id="shop-footer">
-      <div class="sf-next">다음: <b>${nm.flower} ${next}월 · ${nm.name}</b><br>목표 ${fmt(TARGETS[next - 1])}점</div>
+      <div class="sf-next">다음 <b>${nm.flower} ${next}월 · ${nm.name}</b>
+        <div class="sf-target">목표 ${fmt(TARGETS[next - 1])}점</div></div>
       <button id="btn-nextround" onclick="nextRound()" ${needPick ? 'disabled title="디버프를 먼저 선택하세요"' : ''}>다음 판으로 →</button>
     </footer>`;
 }
@@ -4138,13 +4255,13 @@ function helpHTML() {
           <span>박 라운드 디버프</span>
         </div>
       </div>
-      <div class="help-card hc-helper">
+      ${CHUNHYANG_ENABLED ? `<div class="help-card hc-helper">
         <div class="hc-title"><span class="ico">🍶</span>춘향 훈수</div>
         <div class="hc-body">
           준비/상점에서 <b>3냥</b>에 다음 달 훈수를 예약하면 그 달 내내 패를 봐줍니다.
           패를 고른 뒤 내기·버리기에 마우스를 올리면 다음 패를 예측해 표정이 바뀝니다.
         </div>
-      </div>
+      </div>` : ''}
     </div>
     <div class="modal-actions"><button class="choicebtn btn-stop" style="text-align:center" onclick="closeHelp()"><div class="t">닫기</div></button></div>`;
 }
@@ -4619,7 +4736,7 @@ async function animGoSlide(stage, fromLevel, toLevel, wait) {
   }
   spawnGoImpact(stage);
   juiceGoBtn(stage, true);
-  await wait(920); // 흔들리기 전 — 가짜 피날레로 머무름
+  await wait(650); // 흔들리기 전 — 가짜 피날레로 머무름
 
   if (cur) {
     cur.classList.remove('slide-fake');
@@ -4936,6 +5053,7 @@ function screenShake(heavy = false) {
 }
 
 function chunhyangReact(score, handId) {
+  if (!CHUNHYANG_ENABLED) return;
   const tier = juiceTier(handId);
   let mood = '😊', text = '좋은 한 수예요!';
   if (score >= 500 || tier === 'S') {
