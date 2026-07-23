@@ -124,17 +124,18 @@ console.log('[3.5] 코어/플랫 분리');
 // ─── 4. 고 무제한 공식 ────────────────────────────────────
 console.log('[4] 고 무제한');
 {
-  assert(E.goMult(1) === 1.5 && E.goMult(2) === 2 && E.goMult(4) === 3 && E.goMult(6) === 4, 'goMult 1.5/2/3/4');
-  assert(E.goBonus(1) === 4 && E.goBonus(2) === 10 && E.goBonus(3) === 18 && E.goBonus(4) === 28 && E.goBonus(5) === 40,
-    'goBonus 4/10/18/28/40');
+  assert(E.goMult(1) === 1.6 && E.goMult(2) === 2.2 && E.goMult(5) === 4 && E.goMult(10) === 7, 'goMult 1.6/2.2/4/7');
+  assert(E.goBonus(3, 1) === 3 && E.goBonus(3, 2) === 6 && E.goBonus(2, 9) === 18 && E.goBonus(9, 2) === 18,
+    'goBonus n×m');
   // 밀치기 고: 이미 넘은 문턱은 전부 소급 인정, 선언 단계 = 아직 못 넘은 첫 문턱
-  assert(E.goThreshold(160, 1) === 240 && E.goThreshold(160, 3) === 400, 'goThreshold 240/400');
+  // 1고=ceil(160×1.6)=256, 3고=ceil(160×2.8)=448
+  assert(E.goThreshold(160, 1) === 256 && E.goThreshold(160, 3) === 448, 'goThreshold 256/448');
   assert(E.goLevelReached(160, 200, 0) === 0, '문턱 미달이면 소급 없음 (일반 1고)');
-  assert(E.goLevelReached(160, 245, 0) === 1, '245점 = 1고 문턱(240) 소급');
-  assert(E.goLevelReached(160, 450, 0) === 3, '450점 = 3고 문턱(400)까지 밀치기');
+  assert(E.goLevelReached(160, 260, 0) === 1, '260점 = 1고 문턱(256) 소급');
+  assert(E.goLevelReached(160, 450, 0) === 3, '450점 = 3고 문턱(448)까지 밀치기');
   assert(E.goLevelReached(160, 450, 5) === 5, '현재 goLevel 미만으로는 안 내려감');
   // 선언 목표는 항상 현재 점수보다 큼 → 고 선언 즉시 재충족(연쇄 고) 불가
-  for (const [base, score, cur] of [[160, 200, 0], [160, 245, 0], [160, 450, 0], [160, 3449, 2], [5500, 30000, 1]]) {
+  for (const [base, score, cur] of [[160, 200, 0], [160, 260, 0], [160, 450, 0], [160, 3449, 2], [5500, 30000, 1]]) {
     const declared = E.goLevelReached(base, score, cur) + 1;
     assert(E.goThreshold(base, declared) > score, `선언 목표(${base}, 점수 ${score}) > 현재 점수`);
   }

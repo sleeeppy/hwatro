@@ -1943,9 +1943,9 @@ const ROUNDS = 12;
 const TARGETS = [160, 240, 330, 450, 600, 820, 1150, 1600, 2200, 3000, 4100, 5500];
 const BOSS_ROUNDS = [3, 6, 9, 12];
 const MILD_BOSSES = ['pibak', 'gwangbak', 'meongbak'];
-// 고 무제한: n고 = 목표 ×(1+0.5n), 성공 보너스 n(n+3)냥 (4, 10, 18, 28, 40…)
-const goMult = (n) => 1 + 0.5 * n;
-const goBonus = (n) => n * (n + 3);
+// 고 무제한: n고 = 목표 ×(1+0.6n), 성공 보너스 n×m냥 (m=현재 월)
+const goMult = (n) => 1 + 0.6 * n;
+const goBonus = (n, m) => n * m;
 // n고 문턱 점수. 고 선언 시 이미 넘어 있는 문턱은 전부 소급 인정("밀치기 고") —
 // 선언 단계는 항상 "아직 못 넘은 첫 문턱"이라 목표 > 현재 점수가 보장되고, 즉시 재충족 연쇄는 불가.
 const goThreshold = (base, n) => Math.ceil(base * goMult(n));
@@ -2934,7 +2934,7 @@ function settle() {
   const interest = Math.min(Math.floor(state.money / 5), 5); // 정산 진입 시점 보유금 기준, 가장 먼저
   const base = isBossRound(state.round) ? 6 : 4;
   const playBonus = state.playsLeft;
-  const goB = state.goLevel > 0 ? goBonus(state.goLevel) : 0;
+  const goB = state.goLevel > 0 ? goBonus(state.goLevel, state.round) : 0;
   const insBonus = hasJoker('pibak_boheom') ? 1 : 0;
   const total = interest + base + playBonus + goB + insBonus;
   state.settleData = { interest, base, playBonus, goBonus: goB, insBonus, total, moneyBefore: state.money };
@@ -3745,7 +3745,7 @@ function renderSide() {
   const gl = $('golevel');
   if (state.goLevel > 0) {
     gl.style.display = 'block';
-    gl.textContent = `🔥 ${state.goLevel}고! (목표 ×${goMult(state.goLevel)} · 성공 시 +${goBonus(state.goLevel)}냥)`;
+    gl.textContent = `🔥 ${state.goLevel}고! (목표 ×${goMult(state.goLevel)} · 성공 시 +${goBonus(state.goLevel, state.round)}냥)`;
   } else gl.style.display = 'none';
 
   // 프리뷰 — 항상 같은 틀 유지 (모바일에서 깜빡임 방지)
@@ -4108,11 +4108,11 @@ function gostopHTML() {
   const jump = n - state.goLevel; // 1이면 일반 고, 2 이상이면 밀치기
   const newTarget = goThreshold(state.baseTarget, n);
   const stopTip = state.goLevel > 0
-    ? `지금 정산하고 다음 판으로<br>(${state.goLevel}고 보너스 <b>+${goBonus(state.goLevel)}냥</b> 확보)`
+    ? `지금 정산하고 다음 판으로<br>(${state.goLevel}고 보너스 <b>+${goBonus(state.goLevel, state.round)}냥</b> 확보)`
     : '지금 정산하고 안전하게 다음 판으로';
   const goTip = (jump > 1 ? `한 방으로 <b style="color:#fde68a">${jump}단계 밀치기</b><br>` : '')
     + `새 목표 <b>${fmt(newTarget)}점</b> (×${goMult(n)})<br>`
-    + `내기 <b>+1</b> · 손패 보충 · 성공 시 <b>+${goBonus(n)}냥</b><br>`
+    + `내기 <b>+1</b> · 손패 보충 · 성공 시 <b>+${goBonus(n, state.round)}냥</b><br>`
     + `실패 시 <b>고박 = 런 종료</b>`;
   const goTitle = n <= 1
     ? `<div class="t">1고</div>`
@@ -4330,7 +4330,7 @@ function helpHTML() {
         <div class="hc-title"><span class="ico">🎯</span>한 판 · 고/스톱</div>
         <div class="hc-body">
           내기 <b>4회</b> · 버리기 <b>4회</b> · 손패 <b>8장</b>. 목표를 넘기면 <b>고</b> 또는 <b>스톱</b>.
-          고는 무제한 — n고 문턱 = 목표 ×(1+0.5n), 내기 +1 · 손패 보충, 보너스 n(n+3)냥.
+          고는 무제한 — n고 문턱 = 목표 ×(1+0.6n), 내기 +1 · 손패 보충, 보너스 n×월 냥.
           점수가 이미 넘은 문턱은 고 선언 시 <b>전부 소급 인정(밀치기)</b> — 큰 한 방이면 여러 단계를 한 번에 점프.
           실패하면 <b>고박 = 런 종료</b>.
         </div>
