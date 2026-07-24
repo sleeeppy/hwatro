@@ -349,6 +349,34 @@
   }
   #btn-gukjin { background: linear-gradient(180deg, #7c3aed, #5b21b6); color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 800; display: none; }
   #btn-gukjin.on { display: inline-block; }
+  /* 추천 토글 — 개발자 모드처럼 구석에 숨김 */
+  #btn-hint {
+    display: none;
+    position: fixed;
+    left: max(8px, env(safe-area-inset-left));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 45;
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    color: rgba(148, 163, 184, .45);
+    background: transparent;
+    border: 1px solid transparent;
+    opacity: .35;
+    transition: opacity .15s ease, color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  #btn-hint.show { display: inline-block; }
+  #btn-hint:hover, #btn-hint:focus-visible {
+    opacity: 1;
+    color: #94a3b8;
+    background: rgba(0,0,0,.35);
+    border-color: rgba(255,255,255,.12);
+  }
+  #btn-hint.off { color: rgba(100, 116, 139, .4); }
+  #btn-hint.off:hover, #btn-hint.off:focus-visible { color: #64748b; }
+  #btn-hint.locked { cursor: default; }
   .smallbtn { background: rgba(255,255,255,.14); color: #e2e8f0; padding: 7px 12px; font-size: 12px; font-weight: 700; }
 
   /* ── 카드 ────────────────────────────── */
@@ -976,16 +1004,25 @@
     position: fixed; inset: 0; z-index: 72; display: none;
     align-items: center; justify-content: center;
     pointer-events: none;
+    overflow: hidden;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
+      env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
     background: radial-gradient(ellipse at 50% 45%, rgba(120,40,10,.45), transparent 62%);
   }
   #go-cascade.on { display: flex; }
   #go-cascade .go-stage {
-    position: relative; width: min(92vw, 420px); height: 160px;
+    position: relative;
+    width: min(92vw, 420px);
+    height: clamp(140px, 28vw, 200px);
+    max-width: 100%;
+    overflow: visible;
   }
   #go-cascade .go-num {
     position: absolute; left: 50%; top: 50%;
     transform: translate(-50%, -50%);
     font-weight: 900; font-variant-numeric: tabular-nums;
+    font-size: clamp(52px, 11vw, 120px);
+    line-height: 1;
     color: #fff7ed; letter-spacing: -0.04em; white-space: nowrap;
     text-shadow:
       0 0 24px rgba(251,191,36,.85),
@@ -1015,6 +1052,35 @@
   @keyframes goShardFly {
     0% { opacity: 1; transform: translate(-50%, -50%) rotate(0) scale(1); }
     100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) rotate(var(--rot)) scale(.25); }
+  }
+  @media (max-width: 720px) {
+    #go-cascade {
+      background: radial-gradient(ellipse at 50% 42%, rgba(120,40,10,.55), rgba(0,0,0,.35) 70%);
+    }
+    #go-cascade .go-stage {
+      width: min(88vw, 360px);
+      height: min(28vh, 180px);
+    }
+    #go-cascade .go-num {
+      font-size: clamp(44px, 14vw, 72px);
+      letter-spacing: -0.02em;
+      text-shadow:
+        0 0 16px rgba(251,191,36,.8),
+        0 0 32px rgba(239,68,68,.45),
+        0 4px 0 #7c2d12,
+        0 8px 18px rgba(0,0,0,.5);
+    }
+    #go-cascade .go-num.slam { animation-name: goSlamInMobile; }
+    #go-cascade .go-num.push-out { animation-name: goPushOutMobile; }
+    @keyframes goSlamInMobile {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(1.55) rotate(4deg); filter: blur(4px) brightness(1.6); }
+      60% { opacity: 1; transform: translate(-50%, -50%) scale(.94) rotate(-1deg); filter: blur(0) brightness(1.2); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); filter: brightness(1); }
+    }
+    @keyframes goPushOutMobile {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: brightness(1.3); }
+      100% { opacity: 0; transform: translate(-50%, -115%) scale(.55) rotate(-8deg); filter: brightness(1.8) blur(1px); }
+    }
   }
   /* 고 버튼 안 숫자 — 공통 + 프리뷰 연출들 (전체 ease-out) */
   .choicebtn.btn-go.gs-simple { overflow: visible; position: relative; }
@@ -1715,8 +1781,6 @@
       top: 26vh; font-size: clamp(28px, 8vw, 44px); max-width: 92vw;
       white-space: normal; text-align: center; line-height: 1.15;
     }
-    #go-cascade .go-stage { height: 140px; }
-    #go-cascade .go-num { font-size: clamp(56px, 16vw, 96px) !important; }
     .choicebtn.btn-go .go-btn-stage { height: 1.85em; }
     .choicebtn.btn-go .go-btn-stage .go-num,
     .choicebtn.btn-go .go-roulette { font-size: 1.85em; }
@@ -1782,6 +1846,8 @@
     </div>
   </main>
 </div>
+
+<button type="button" id="btn-hint" onclick="toggleHintEnabled()" title="패 추천 (구석 토글)">hint</button>
 
 <div id="chunhyang">
   <div id="ch-bubble"></div>
@@ -2191,8 +2257,9 @@ const state = {
   gameOverReason: '',
   stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
   helpReturn: null,
-  janAuraLeft: 0,       // 1월 조합 오라 남은 횟수
-  janAuraCharged: false, // 이번 추천 선택이 횟수를 이미 썼는지 (취소 시 환불)
+  janAuraLeft: 0,       // 1월 무료 추천 일괄선택 남은 횟수 (처음 3회 강제 ON)
+  janAuraCharged: false, // 이번 추천 선택이 횟수를 이미 썼는지 (전부 해제 시 환불)
+  hintEnabled: false,   // 무료 3회 소진 후 토글 (기본 OFF)
   coachStep: null,      // null | 'hand' | 'play' | 'scored' | 'junk' | 'gostop' | 'shop'
   coachPendingScored: false, // 내기 연출 후 점수 설명 일시정지
   coachAfterDeal: null, // 드로우 끝난 뒤 이어갈 코치 스텝
@@ -2603,38 +2670,43 @@ function selectedCards() {
   return state.selected.map((uid) => state.hand.find((c) => c.uid === uid)).filter(Boolean);
 }
 
+/** 추천 묶음 클릭: 미선택이면 전체 선택, 이미 선택된 장이면 그 장만 해제 */
+function toggleHintBundle(uid, uids, { charge = false } = {}) {
+  if (!uids.includes(uid)) return false;
+  if (state.selected.includes(uid)) {
+    state.selected = state.selected.filter((u) => u !== uid);
+    if (charge && state.janAuraCharged && !uids.some((u) => state.selected.includes(u))) {
+      state.janAuraLeft = Math.min(JAN_AURA_USES, state.janAuraLeft + 1);
+      state.janAuraCharged = false;
+    }
+  } else {
+    state.selected = uids.slice(0, 5);
+    if (charge && !state.janAuraCharged && state.janAuraLeft > 0) {
+      state.janAuraLeft = Math.max(0, state.janAuraLeft - 1);
+      state.janAuraCharged = true;
+    }
+  }
+  return true;
+}
+
 function toggleSelect(uid) {
   if (state.screen !== 'play' || state.juicing || state.dealing) return;
-  // 1월 버리기 튜토: 빨간 빛 약한 패 하나 누르면 추천분(최대 5장) 일괄 선택
+  // 1월 버리기 튜토: 빨간 빛 — 누르면 일괄, 선택된 장 다시 누르면 그 장만 해제
   if (state.coachStep === 'junk') {
     const junk = getJanJunkSuggest();
-    if (junk.includes(uid)) {
-      const allOn = junk.every((u) => state.selected.includes(u));
-      if (allOn) state.selected = state.selected.filter((u) => !junk.includes(u));
-      else state.selected = junk.slice(0, 5);
+    if (toggleHintBundle(uid, junk)) {
       state.hoverReact = null;
       render();
       return;
     }
   }
-  // 1월 조합 오라: 빛나는 패 하나 누르면 조합 전체 선택 (버리기 튜토 중엔 비활성)
-  const aura = state.coachStep === 'junk' ? null : getJanAuraBest();
-  if (aura && aura.uids.includes(uid)) {
-    const allOn = aura.uids.every((u) => state.selected.includes(u));
-    if (allOn) {
-      state.selected = state.selected.filter((u) => !aura.uids.includes(u));
-      if (state.janAuraCharged) {
-        state.janAuraLeft = Math.min(JAN_AURA_USES, state.janAuraLeft + 1);
-        state.janAuraCharged = false;
-      }
-    } else {
-      state.selected = aura.uids.slice(0, 5);
-      if (!state.janAuraCharged) {
-        state.janAuraLeft = Math.max(0, state.janAuraLeft - 1);
-        state.janAuraCharged = true;
-      }
-      if (state.coachStep === 'hand') state.coachStep = 'play';
-    }
+  // 추천 오라: 미선택 추천패 클릭 → 전체 선택 / 선택됨 → 그 장만 해제
+  const hint = state.coachStep === 'junk' ? null : getActiveCoachHint();
+  if (hint && hint.uids.includes(uid)) {
+    // 무료 3회: 내기·버리기 추천 일괄선택 모두 횟수 소모
+    const charge = state.janAuraLeft > 0;
+    toggleHintBundle(uid, hint.uids, { charge });
+    if (state.coachStep === 'hand' && state.selected.length) state.coachStep = 'play';
     state.hoverReact = null;
     render();
     return;
@@ -2646,6 +2718,14 @@ function toggleSelect(uid) {
     state.selected.push(uid);
   }
   state.hoverReact = null;
+  render();
+}
+
+function toggleHintEnabled() {
+  if (state.round !== 1 || state.screen !== 'play') return;
+  // 무료 3회 남았으면 강제 ON — 끌 수 없음
+  if (state.janAuraLeft > 0) return;
+  state.hintEnabled = !state.hintEnabled;
   render();
 }
 
@@ -3047,7 +3127,8 @@ function resetRun() {
     lastPlay: null, juicing: false, dealing: false, pendingGoStop: false, playLog: [],
     settleData: null, gameOverReason: '',
     stats: { bestSingle: 0, bestSingleHand: '', totalEarned: 0 },
-    janAuraLeft: 0, janAuraCharged: false, coachStep: null, coachPendingScored: false, coachAfterDeal: null, janTutorJunkPending: false,
+    janAuraLeft: 0, janAuraCharged: false, hintEnabled: false,
+    coachStep: null, coachPendingScored: false, coachAfterDeal: null, janTutorJunkPending: false,
   });
   state.baseTarget = TARGETS[0];
   state.target = TARGETS[0];
@@ -3160,14 +3241,19 @@ function replayTutorials() {
   render();
 }
 
-/** 1월 조합 오라 — 족보 등급 우선, 동급이면 점수. 코어만 하이라이트 */
-function getJanAuraBest() {
-  if (state.coachStep === 'junk') return null;
-  if (state.round !== 1 || state.janAuraLeft <= 0) return null;
-  if (state.screen !== 'play' || state.juicing || state.dealing) return null;
+/** 1월 추천 활성? — 무료 3회는 강제 ON, 이후는 토글 */
+function hintsActive() {
+  if (state.round !== 1) return false;
+  if (state.screen !== 'play' || state.juicing || state.dealing) return false;
+  if (state.coachStep === 'junk') return true;
+  if (state.janAuraLeft > 0) return true;
+  return !!state.hintEnabled;
+}
+
+/** 내기 추천 후보 — 족보 등급 우선, 동급이면 점수. 코어만 */
+function findBestPlayHint() {
   if (state.hand.length < 1) return null;
   const env = scoreEnv();
-  // evaluateHand는 flat 패딩으로 낮은 족보가 이길 수 있음 → 오라는 족보 등급 우선
   const avail = state.hand.filter((c) => !c.faceDown);
   const guk = avail.find((c) => c.tags.includes('dual'));
   const gukOrig = guk ? guk.asPi : null;
@@ -3197,9 +3283,11 @@ function getJanAuraBest() {
     const picks = (core && core.length) ? core : best.cards;
     if (!picks.length) return null;
     return {
+      kind: 'play',
       uids: picks.map((c) => c.uid),
       handId: best.handId,
       name: HAND_BY_ID[best.handId].name,
+      score: best.score,
     };
   }
 
@@ -3209,10 +3297,16 @@ function getJanAuraBest() {
     if (!top || cardChip(c, env) > cardChip(top, env)) top = c;
   }
   if (!top) return null;
-  return { uids: [top.uid], handId: 'none', name: '최고 칩 패' };
+  return {
+    kind: 'play',
+    uids: [top.uid],
+    handId: 'none',
+    name: '최고 칩 패',
+    score: computeScore([top], env).score,
+  };
 }
 
-/** 1월 버리기 추천 — 튜토에선 피·쌍피만, 없으면 저칩 */
+/** 버리기 추천 uid — 튜토: 피·쌍피 / 일반: 최적 내기 밖 저칩 */
 function getJanJunkSuggest() {
   const env = scoreEnv();
   const face = state.hand.filter((c) => !c.faceDown);
@@ -3226,14 +3320,61 @@ function getJanJunkSuggest() {
       .sort((a, b) => cardChip(a, env) - cardChip(b, env));
     if (pis.length) return pis.slice(0, 5).map((c) => c.uid);
   }
-  const rank = (c) => {
-    const t = effType(c);
-    const bias = t === 'pi' ? 0 : t === 'ssangpi' ? 1 : t === 'tti' ? 5 : 10;
-    return bias * 100 + cardChip(c, env);
-  };
-  return [...face].sort((a, b) => rank(a) - rank(b))
-    .slice(0, Math.min(3, face.length))
+  const play = findBestPlayHint();
+  const keep = new Set(play ? play.uids : []);
+  const junk = face
+    .filter((c) => !keep.has(c.uid))
+    .sort((a, b) => cardChip(a, env) - cardChip(b, env));
+  if (junk.length) return junk.slice(0, Math.min(3, junk.length)).map((c) => c.uid);
+  // 전부 전부 코어면 가장 싼 1~2장
+  return [...face].sort((a, b) => cardChip(a, env) - cardChip(b, env))
+    .slice(0, Math.min(2, face.length))
     .map((c) => c.uid);
+}
+
+/** 점수 비교로 내기 vs 버리기 중 이득인 쪽 추천 */
+function getActiveCoachHint() {
+  if (state.coachStep === 'junk') {
+    const uids = getJanJunkSuggest();
+    return uids.length ? { kind: 'junk', uids, name: '버리기' } : null;
+  }
+  if (!hintsActive()) return null;
+  const play = findBestPlayHint();
+  if (!play) return null;
+
+  // 튜토 조합·내기 단계는 내기 추천만
+  if (state.coachStep === 'hand' || state.coachStep === 'play' || state.coachStep === 'scored') {
+    return play;
+  }
+
+  const canDiscard = state.discardsLeft > 0 && state.boss !== 'bibaram' && state.deck.length > 0;
+  if (!canDiscard) return play;
+
+  const junkUids = getJanJunkSuggest();
+  if (!junkUids.length) return play;
+
+  const env = scoreEnv();
+  const junkSet = new Set(junkUids);
+  const n = junkUids.length;
+  const rest = state.hand.filter((c) => !junkSet.has(c.uid));
+  const incoming = state.deck.slice(-n);
+  const after = evaluateHand([...rest, ...incoming], env);
+  const afterScore = after ? after.score : 0;
+  const pace = Math.max(1, state.target - state.roundScore) / Math.max(1, state.playsLeft);
+  const playWeak = play.score < pace * 0.85;
+  const discardMuchBetter = afterScore > play.score * 1.2;
+  const discardClearlyBetter = afterScore > play.score * 1.35;
+
+  if (discardMuchBetter && (playWeak || discardClearlyBetter)) {
+    return { kind: 'junk', uids: junkUids, name: '버리기', score: afterScore };
+  }
+  return play;
+}
+
+/** 코치 텍스트용 — 내기 추천만 */
+function getJanAuraBest() {
+  const h = getActiveCoachHint();
+  return h && h.kind === 'play' ? h : null;
 }
 
 function maybeStartJanCoach(isRoundStart) {
@@ -3816,14 +3957,12 @@ function renderTable() {
     pa.innerHTML = `<div class="hint">카드를 고르고 <b>내기</b>를 누르세요</div>`;
   }
 
-  const isJunkAura = state.coachStep === 'junk';
-  const junkUids = isJunkAura ? new Set(getJanJunkSuggest()) : null;
-  const aura = isJunkAura ? null : getJanAuraBest();
-  const auraUids = junkUids || (aura ? new Set(aura.uids) : null);
-  const auraKind = isJunkAura ? 'junk' : 'play';
+  const hint = (state.screen === 'play') ? getActiveCoachHint() : null;
+  const auraUids = hint ? new Set(hint.uids) : null;
+  const auraKind = hint && hint.kind === 'junk' ? 'junk' : 'play';
   $('handarea').innerHTML = state.hand.map((c) => cardHTML(c, { selectable: true, auraUids, auraKind })).join('');
 
-  // 1월 오라 잔여 안내 (코치 중이 아닐 때 살짝)
+  // 1월 추천 안내
   let auraHint = $('jan-aura-hint');
   if (!auraHint) {
     auraHint = document.createElement('div');
@@ -3834,16 +3973,45 @@ function renderTable() {
     auraHint.hidden = false;
     auraHint.classList.add('junk');
     auraHint.textContent = '🗑️ 빨간 빛 — 버릴 약한 패 (눌러 고르고 버리기, 최대 5장)';
-  } else if (state.round === 1 && state.screen === 'play' && state.janAuraLeft > 0 && aura) {
+  } else if (hint && hint.kind === 'junk') {
+    auraHint.hidden = false;
+    auraHint.classList.add('junk');
+    auraHint.textContent = state.janAuraLeft > 0
+      ? `🗑️ 버리기 추천 · 무료 힌트 ${state.janAuraLeft}회 · 빨간 패를 누르면 한꺼번에 골라져요`
+      : '🗑️ 버리기 추천 · 빨간 패를 누르면 한꺼번에 골라져요 (한 장씩 해제 가능)';
+  } else if (hint && hint.kind === 'play') {
     auraHint.hidden = false;
     auraHint.classList.remove('junk');
-    auraHint.textContent = aura.handId === 'none'
-      ? `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 칩 최고 패가 골라져요`
-      : `✨ 조합 힌트 ${state.janAuraLeft}회 · 빛나는 패를 누르면 ${aura.name}이 한 번에 골라져요`;
+    const free = state.janAuraLeft > 0 ? `무료 ${state.janAuraLeft}회 · ` : '';
+    auraHint.textContent = hint.handId === 'none'
+      ? `✨ 내기 추천 · ${free}빛나는 패를 누르면 칩 최고 패가 골라져요`
+      : `✨ 내기 추천 · ${free}빛나는 패를 누르면 ${hint.name}이 한 번에 골라져요`;
   } else {
     auraHint.hidden = true;
     auraHint.classList.remove('junk');
     auraHint.textContent = '';
+  }
+
+  // 추천 토글 (1월 플레이만)
+  const hintBtn = $('btn-hint');
+  if (hintBtn) {
+    const showHintBtn = state.round === 1 && state.screen === 'play';
+    hintBtn.classList.toggle('show', showHintBtn);
+    if (showHintBtn) {
+      const locked = state.janAuraLeft > 0;
+      hintBtn.classList.toggle('locked', locked);
+      hintBtn.classList.toggle('off', !locked && !state.hintEnabled);
+      if (locked) {
+        hintBtn.textContent = `hint ${state.janAuraLeft}`;
+        hintBtn.title = '무료 추천 남음 (강제 ON)';
+      } else if (state.hintEnabled) {
+        hintBtn.textContent = 'hint:on';
+        hintBtn.title = '추천 끄기';
+      } else {
+        hintBtn.textContent = 'hint:off';
+        hintBtn.title = '추천 켜기';
+      }
+    }
   }
 
   const n = state.selected.length;
@@ -3898,8 +4066,8 @@ function renderCoach() {
   const aura = (!isShop && !isGoStop) ? getJanAuraBest() : null;
   const handText = aura
     ? (aura.handId === 'none'
-      ? `<b>연두 빛</b>이 도는 패를 눌러 보세요. 조합이 없으면 칩 최고 패가 골라집니다.<br><span style="color:#94a3b8;font-size:12px">1월 한정 · ${JAN_AURA_USES}회</span>`
-      : `<b>연두 빛</b>이 도는 패를 눌러 보세요. <b>${aura.name}</b>이 한 번에 골라집니다.<br><span style="color:#94a3b8;font-size:12px">1월 한정 · ${JAN_AURA_USES}회</span>`)
+      ? `<b>연두 빛</b>이 도는 패를 눌러 보세요. 조합이 없으면 칩 최고 패가 골라집니다.<br><span style="color:#94a3b8;font-size:12px">처음 ${JAN_AURA_USES}회 무료 · 이후 추천 ON/OFF</span>`
+      : `<b>연두 빛</b>이 도는 패를 눌러 보세요. <b>${aura.name}</b>이 한 번에 골라집니다.<br><span style="color:#94a3b8;font-size:12px">처음 ${JAN_AURA_USES}회 무료 · 이후 추천 ON/OFF · 한 장씩 해제 가능</span>`)
     : `연두 빛 패를 눌러 조합을 골라 보세요. <b>1월 한정</b>이에요.`;
 
   const playRes = state.lastPlay && state.lastPlay.result;
@@ -4525,18 +4693,22 @@ async function runGoShatterCascade(fromLevel, toLevel, opts = {}) {
   if (inBtn) stage.textContent = '';
 
   try {
+    const isMobile = window.matchMedia('(max-width: 720px)').matches;
     for (let lv = fromLevel + 1, i = 0; lv <= toLevel; lv++, i++) {
       const final = lv === toLevel;
       const label = inBtn
         ? `${lv}고`
-        : `${lv}고${'!'.repeat(Math.min(3, i + 1))}`;
-      const size = fullscreen
+        : (isMobile
+          ? `${lv}고${final ? '!' : ''}`
+          : `${lv}고${'!'.repeat(Math.min(3, i + 1))}`);
+      // 모바일은 CSS clamp에 맡기고 인라인 고정 px을 넣지 않음 (깨짐 방지)
+      const size = fullscreen && !isMobile
         ? Math.min(132, 64 + i * 14)
         : null;
 
       if (cur) {
         if (fullscreen) {
-          spawnGoShards(stage, cur.textContent.replace(/[!고]/g, ''), size || 28);
+          spawnGoShards(stage, cur.textContent.replace(/[!고]/g, ''), size || (isMobile ? 36 : 28));
           cur.classList.remove('slam');
           cur.classList.add('push-out');
         } else {
@@ -4555,17 +4727,20 @@ async function runGoShatterCascade(fromLevel, toLevel, opts = {}) {
       if (size) num.style.fontSize = size + 'px';
       if (final && fullscreen) {
         num.style.color = '#fef08a';
-        num.style.textShadow =
-          '0 0 28px rgba(250,204,21,.95), 0 0 56px rgba(239,68,68,.65), 0 8px 0 #9a3412, 0 12px 28px rgba(0,0,0,.55)';
+        num.style.textShadow = isMobile
+          ? '0 0 18px rgba(250,204,21,.9), 0 0 36px rgba(239,68,68,.5), 0 5px 0 #9a3412, 0 8px 20px rgba(0,0,0,.5)'
+          : '0 0 28px rgba(250,204,21,.95), 0 0 56px rgba(239,68,68,.65), 0 8px 0 #9a3412, 0 12px 28px rgba(0,0,0,.55)';
       }
       stage.appendChild(num);
       cur = num;
       sfxGoStep(i, final);
-      if (fullscreen && i >= 1) screenShake(final);
+      // 모바일: 바디 쉐이크가 고정 오버레이·뷰포트랑 싸우며 깨져 보임 → 최종만 약하게
+      if (fullscreen && !isMobile && i >= 1) screenShake(final);
+      else if (fullscreen && isMobile && final) screenShake(false);
       if (opts.onStep) opts.onStep(lv, final);
       await wait(final
-        ? (fullscreen ? 720 : 340)
-        : Math.max(120, Math.round((fullscreen ? 360 : 200) * Math.pow(0.88, i))));
+        ? (fullscreen ? (isMobile ? 640 : 720) : 340)
+        : Math.max(120, Math.round((fullscreen ? (isMobile ? 300 : 360) : 200) * Math.pow(0.88, i))));
     }
     if (opts.holdFinal) await wait(opts.holdFinal);
   } finally {
